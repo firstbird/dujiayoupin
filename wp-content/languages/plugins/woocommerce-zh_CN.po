@@ -30835,8 +30835,8 @@ msgstr "更新总数"
 
 #: templates/global/form-login.php:34
 #: templates/myaccount/form-lost-password.php:28
-msgid "Username or email"
-msgstr "用户名或电子邮件"
+msgid "Phone or email"
+msgstr "手机号码或电子邮件"
 
 #: templates/loop/sale-flash.php:27 templates/single-product/sale-flash.php:27
 msgid "Sale!"
