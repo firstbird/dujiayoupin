@@ -646,7 +646,7 @@ function wp_login_form( $args = array() ) {
  */
 function wp_lostpassword_url( $redirect = '' ) {
 	$args = array(
-		'action' => 'lostpassword',
+		'action' => 'reset_password',
 	);
 
 	if ( ! empty( $redirect ) ) {

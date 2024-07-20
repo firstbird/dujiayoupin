@@ -405,12 +405,14 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 					203
 				);
 			}
-			if ( $action === 'reset_password' && !email_exists( $email ) ) {
-				throw new MoException(
-					'registration-error-email-exists',
-					mo_( '重置密码失败: An account is already registered with your email address. Please login.' ),
-					203
-				);
+			if ( $action === 'reset_password') {
+				if (!email_exists( $email ) ) {
+					throw new MoException(
+						'registration-error-email-exists',
+						mo_( '重置密码失败: 邮箱地址不存在, 请确认后重新输入.' ),
+						203
+					);
+				}
 			}
 		}
 
@@ -468,10 +470,17 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 				} elseif ( $this->restrict_duplicates && $this->isPhoneNumberAlreadyInUse( $phone, 'billing_phone' ) ) {
 					return new WP_Error( 'billing_phone_error', MoMessages::showMessage( MoMessages::PHONE_EXISTS ) );
 				}
-				if ( username_exists( $phone ) ) {
+				if ( $_GET['action'] === 'reset_password' && ! email_username_match( $email, $username ) ) {
 					throw new MoException(
 						'registration-error-phone-exists',
-						mo_( '手机号已注册,请直接登陆.' ),
+						mo_( '邮箱和手机号码不匹配, 请检查.' ),
+						201
+					);
+				}
+				if ( $_GET['action'] === 'register' && username_exists( $phone ) ) {
+					throw new MoException(
+						'registration-error-phone-exists',
+						mo_( '手机号码已注册,请直接登陆.' ),
 						201
 					);
 				}

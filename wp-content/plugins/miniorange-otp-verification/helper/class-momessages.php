@@ -41,8 +41,8 @@ if ( ! class_exists( 'MoMessages' ) ) {
 					self::INVALID_SCRIPTS               => mo_( 'You cannot add script tags in the pop up template.' ),
 
 					self::OTP_SENT_PHONE                => mo_(
-						'A OTP (One Time Passcode) has been sent to ##phone##.
-														Please enter the OTP in the field below to verify your phone.'
+						'已发送短信验证码到您的手机: ##phone##. 请注意查看手机短信.
+														请在下面的输入框中输入手机上收到的验证码, 然后点击[校验验证码].'
 					),
 
 					self::OTP_SENT_EMAIL                => mo_(
@@ -63,8 +63,8 @@ if ( ! class_exists( 'MoMessages' ) ) {
 					),
 
 					self::ERROR_PHONE_FORMAT            => mo_(
-						'##phone## is not a valid phone number.
-														Please enter a valid Phone Number. E.g:+1XXXXXXXXXX'
+						'##phone## 不是一个有效的电话号码.
+														请重新输入.'
 					),
 
 					self::ERROR_EMAIL_FORMAT            => mo_(

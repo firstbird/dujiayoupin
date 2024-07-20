@@ -189,9 +189,7 @@ function wp_authenticate_username_password( $user, $username, $password ) {
 				/* translators: %s: User name. */
 				__( '<strong>Error:</strong> The password you entered for the username %s is incorrect.' ),
 				'<strong>' . $username . '</strong>'
-			) .
-			' <a href="' . wp_lostpassword_url() . '">' .
-			__( 'Lost your password?' ) .
+			) . ' 请检查密码或者点击下面的[忘记密码?]进行密码重置' .
 			'</a>'
 		);
 	}
@@ -261,9 +259,7 @@ function wp_authenticate_email_password( $user, $email, $password ) {
 				/* translators: %s: Email address. */
 				__( '<strong>Error:</strong> The password you entered for the email address %s is incorrect.' ),
 				'<strong>' . $email . '</strong>'
-			) .
-			' <a href="' . wp_lostpassword_url() . '">' .
-			__( 'Lost your password?' ) .
+			) .' 请检查密码或者点击下面的[忘记密码?]进行密码重置' .
 			'</a>'
 		);
 	}
@@ -1953,6 +1949,11 @@ function username_exists( $username ) {
 	 * @param string    $username The username to check for existence.
 	 */
 	return apply_filters( 'username_exists', $user_id, $username );
+}
+
+function email_username_match( $email, $username) {
+	$user = get_user_by( 'login', $username );
+	return $user && $user->user_login === $username;
 }
 
 /**
