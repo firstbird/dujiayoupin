@@ -1934,6 +1934,7 @@ function clean_user_cache( $user ) {
  * @param string $username The username to check for existence.
  * @return int|false The user ID on success, false on failure.
  */
+// login改成phone的数据
 function username_exists( $username ) {
 	$user = get_user_by( 'login', $username );
 	if ( $user ) {

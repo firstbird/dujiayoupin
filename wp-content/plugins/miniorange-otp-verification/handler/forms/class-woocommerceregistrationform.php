@@ -88,7 +88,6 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 			if ( $this->isPhoneVerificationEnabled() ) {
 
 				add_action( 'woocommerce_register_form', array( $this, 'mo_add_phone_field' ), 1 );
-				// mzl
 				add_action( 'woocommerce_resetpassword_form', array( $this, 'mo_rest_password_field' ), 1 );
 				add_action( 'wcmp_vendor_register_form', array( $this, 'mo_add_phone_field' ), 1 );
 			}
@@ -356,7 +355,7 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 				$this->assertPassword( $password );
 				$this->assertEmail( $email, $action );
 			} catch ( MoException $e ) {
-				return new WP_Error( $e->getmo_code(), $e->getMessage() );
+				return new WP_Error( $e->getmo_code(), $e->getMessage());
 			}
 			do_action( 'woocommerce_register_post', $username, $email, $errors );
 			$data = MoUtility::mo_sanitize_array( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- No need for nonce verification as the function is called on third party plugin hook
@@ -378,7 +377,7 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 				if ( MoUtility::is_blank( $password ) ) {
 					throw new MoException(
 						'registration-error-invalid-password',
-						mo_( 'Please enter a valid account password.' ),
+						mo_( '请输入有效的账号密码.' ),
 						204
 					);
 				}
@@ -402,7 +401,7 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 			if ( $action === 'register' && email_exists( $email ) ) {
 				throw new MoException(
 					'registration-error-email-exists',
-					mo_( '注册失败: An account is already registered with your email address. Please login.' ),
+					mo_( '注册失败: 邮箱地址已存在, 请确认后重新输入.' ),
 					203
 				);
 			}
@@ -422,12 +421,12 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 		 * @param string $username - username of the user.
 		 * @throws MoException Throws MoException if email is blank or invalid.
 		 */
-		private function assertUserName( $username ) {
+		public function assertUserName( $username ) {
 			if ( get_mo_option( 'woocommerce_registration_generate_username', '' ) === 'no' ) {
 				if ( MoUtility::is_blank( $username ) || ! validate_username( $username ) ) {
 					throw new MoException(
 						'registration-error-invalid-username',
-						mo_( 'Please enter a valid account username.' ),
+						mo_( '请输入有效的用户名.' ),
 						200
 					);
 				}
@@ -460,13 +459,21 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 			global $phone_logic;
 			$phone_number = isset( $data['billing_phone'] ) ? sanitize_text_field( wp_unslash( $data['billing_phone'] ) ) : '';
 			if ( strcasecmp( $this->otp_type, $this->type_phone_tag ) === 0 ) {
-				if ( ! isset( $phone ) || ! MoUtility::validate_phone_number( '+86' . $phone ) ) {
+				// mzl mod
+				if ( ! isset( $phone ) || ! MoUtility::validate_phone_number( '+86' . $phone )) {
 					return new WP_Error(
 						'billing_phone_error',
 						str_replace( '##phone##', $phone, $phone_logic->get_otp_invalid_format_message() )
 					);
 				} elseif ( $this->restrict_duplicates && $this->isPhoneNumberAlreadyInUse( $phone, 'billing_phone' ) ) {
 					return new WP_Error( 'billing_phone_error', MoMessages::showMessage( MoMessages::PHONE_EXISTS ) );
+				}
+				if ( username_exists( $phone ) ) {
+					throw new MoException(
+						'registration-error-phone-exists',
+						mo_( '手机号已注册,请直接登陆.' ),
+						201
+					);
 				}
 				$this->send_challenge( $username, $email, $errors, $phone, VerificationType::PHONE, $password );
 			} elseif ( strcasecmp( $this->otp_type, $this->type_email_tag ) === 0 ) {
