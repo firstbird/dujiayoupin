@@ -96,13 +96,13 @@ function wc_get_account_menu_items() {
 	);
 
 	$items = array(
-		'dashboard'       => __( 'Dashboard', 'woocommerce' ),
+		'dashboard'       => __( '指引 ➡️ ', 'woocommerce' ),
 		'orders'          => __( 'Orders', 'woocommerce' ),
 		'downloads'       => __( 'Downloads', 'woocommerce' ),
 		'edit-address'    => _n( 'Address', 'Addresses', ( 1 + (int) wc_shipping_enabled() ), 'woocommerce' ),
 		'payment-methods' => __( 'Payment methods', 'woocommerce' ),
 		'edit-account'    => __( 'Account details', 'woocommerce' ),
-		'customer-logout' => __( 'Log out', 'woocommerce' ),
+		'customer-logout' => __( '退出账号', 'woocommerce' ),
 	);
 
 	// Remove missing endpoints.

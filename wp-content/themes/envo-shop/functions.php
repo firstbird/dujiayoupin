@@ -461,12 +461,7 @@ if (!function_exists('envo_shop_generate_construct_footer')) :
         <div class="footer-credits-text text-center">
             <?php
             /* translators: %s: WordPress name with wordpress.org URL */
-            printf(esc_html__('Proudly powered by %s', 'envo-shop'), '<a href="' . esc_url(__('https://wordpress.org/', 'envo-shop')) . '">' . esc_html__('WordPress', 'envo-shop') . '</a>');
-            ?>
-            <span class="sep"> | </span>
-            <?php
-            /* translators: %1$s: Envo Shop theme name (do not translate) with envothemes.com URL */
-            printf(esc_html__('Theme: %1$s', 'envo-shop'), '<a href="' . esc_url('https://envothemes.com/free-envo-shop/') . '">' . esc_html_x('Envo Shop', 'Theme name, do not translate', 'envo-shop') . '</a>');
+            printf(esc_html__('Copyright © 2024-2024 · 赤梦科技 · 独家优品', 'envo-shop'),  '<a>' . '</a>');
             ?>
         </div> 
         <?php
