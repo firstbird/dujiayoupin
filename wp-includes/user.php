@@ -2538,7 +2538,7 @@ function wp_update_user( $userdata ) {
 
 	$user_id = isset( $userdata['ID'] ) ? (int) $userdata['ID'] : 0;
 	if ( ! $user_id ) {
-		return new WP_Error( 'invalid_user_id', __( 'Invalid user ID.' ) );
+		return new WP_Error( 'invalid_user_id', __( 'Invalidxx user ID.' ) );
 	}
 
 	// First, get all of the original fields.

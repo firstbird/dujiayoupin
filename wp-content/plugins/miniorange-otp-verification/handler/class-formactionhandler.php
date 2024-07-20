@@ -169,10 +169,10 @@ if ( ! class_exists( 'FormActionHandler' ) ) {
 			$token = ! $token ? $otp : $token;
 			if ( ! is_null( $tx_id ) ) {
 
-				//$gateway           = GatewayFunctions::instance();
-				//$content           = $gateway->mo_validate_otp_token( $tx_id, $token );
-				// mzl added
-				$content = ['status' => 'SUCCESS'];
+				$gateway           = GatewayFunctions::instance();
+				$content           = $gateway->mo_validate_otp_token( $tx_id, $token );
+				// mzl todo validate added
+				//$content = ['status' => 'SUCCESS'];
 				$validation_status = 'SUCCESS' === $content['status'] ? 'OTP_VERIFIED' : 'VERIFICATION_FAILED';
 				apply_filters( 'mo_update_reporting', $tx_id, $validation_status );
 				switch ( $content['status'] ) {

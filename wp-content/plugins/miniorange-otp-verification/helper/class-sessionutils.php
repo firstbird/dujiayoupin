@@ -198,6 +198,29 @@ if ( ! class_exists( 'SessionUtils' ) ) {
 			MoPHPSessions::add_session_var( FormSessionVars::TX_SESSION_ID, $transaction_data );
 		}
 
+		/**Function to set phone vcode
+		 *
+		 * @param string $vcode phone vcode.
+		 */
+		public static function set_phone_vcode( $vcode ) {
+			$transaction_data = MoPHPSessions::get_session_var( FormSessionVars::TX_SESSION_ID );
+			if ( ! $transaction_data instanceof TransactionSessionData ) {
+				$transaction_data = new TransactionSessionData();
+			}
+			$transaction_data->set_phone_vcode( $vcode );
+			MoPHPSessions::add_session_var( FormSessionVars::TX_SESSION_ID, $transaction_data );
+		}
+
+		/**Function to get phone vcode
+		 */
+		public static function get_phone_vcode() {
+			$transaction_data = MoPHPSessions::get_session_var( FormSessionVars::TX_SESSION_ID );
+			if ( $transaction_data instanceof TransactionSessionData ) {
+				return $transaction_data->get_phone_vcode();
+			}
+			return '';
+		}
+
 		/**Function to get transaction id of otp type
 		 *
 		 * @param string $otp_type   OTP Type to pick up the transaction ID for.

@@ -1101,10 +1101,11 @@ class WC_Form_Handler {
 			$username = 'no' === get_option( 'woocommerce_registration_generate_username' ) && isset( $_POST['username'] ) ? wp_unslash( $_POST['username'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$password = 'no' === get_option( 'woocommerce_registration_generate_password' ) && isset( $_POST['password'] ) ? $_POST['password'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$email    = wp_unslash( $_POST['email'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$action    = wp_unslash( $_POST['action'] );
 
 			try {
 				$validation_error  = new WP_Error();
-				$validation_error  = apply_filters( 'woocommerce_process_registration_errors', $validation_error, $username, $password, $email );
+				$validation_error  = apply_filters( 'woocommerce_process_registration_errors', $validation_error, $username, $password, $email, $action);
 				$validation_errors = $validation_error->get_error_messages();
 
 				if ( 1 === count( $validation_errors ) ) {
@@ -1116,16 +1117,33 @@ class WC_Form_Handler {
 					throw new Exception();
 				}
 
-				$new_customer = wc_create_new_customer( sanitize_email( $email ), wc_clean( $username ), $password );
-
-				if ( is_wp_error( $new_customer ) ) {
-					throw new Exception( $new_customer->get_error_message() );
+				// mzl modify: adapt reset_password
+				$new_customer = null;
+				if ($action === 'register') {
+					$new_customer = wc_create_new_customer( sanitize_email( $email ), wc_clean( $username ), $password );
+					if ( is_wp_error( $new_customer ) ) {
+						throw new Exception( $new_customer->get_error_message() );
+					}
+				} elseif ($action === 'reset_password') {
+					$new_customer = wc_update_customer( sanitize_email( $email ), $password );
+					if ( is_wp_error( $new_customer ) ) {
+						throw new Exception( $new_customer->get_error_message() );
+					}
 				}
 
+
 				if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) ) {
-					wc_add_notice( __( 'Your account was created successfully and a password has been sent to your email address.', 'woocommerce' ) );
+					if ($action === 'register') {
+						wc_add_notice( __( 'Your account was created successfully and a password has been sent to your email address.', 'woocommerce' ) );
+					} else {
+						wc_add_notice( __( 'Reset password was done successfully with generate password. ', 'woocommerce' ) );
+					}
 				} else {
-					wc_add_notice( __( 'Your account was created successfully. Your login details have been sent to your email address.', 'woocommerce' ) );
+					if ($action === 'register') {
+						wc_add_notice( __( 'Your account was created successfully. Your login details have been sent to your email address.', 'woocommerce' ) );
+					} elseif ($action === 'reset_password') {
+						wc_add_notice( __( 'Reset password was done successfully. ', 'woocommerce' ) );
+					}
 				}
 
 				// Only redirect after a forced login - otherwise output a success notice.

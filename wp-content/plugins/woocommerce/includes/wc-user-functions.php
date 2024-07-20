@@ -116,6 +116,60 @@ if ( ! function_exists( 'wc_create_new_customer' ) ) {
 
 		return $customer_id;
 	}
+
+	/**
+	 * Create a new customer.
+	 *
+	 * @param  string $email    Customer email.
+	 * @param  string $username Customer username.
+	 * @param  string $password Customer password.
+	 * @param  array  $args     List of arguments to pass to `wp_insert_user()`.
+	 * @return int|WP_Error Returns WP_Error on failure, Int (user ID) on success.
+	 */
+	function wc_update_customer( $email, $password = '', $args = array() ) {
+		if ( empty( $email ) || ! is_email( $email ) ) {
+			return new WP_Error( 'registration-error-invalid-email', __( 'Please provide a valid email address.', 'woocommerce' ) );
+		}
+
+		if ( !email_exists( $email ) ) {
+			return new WP_Error( 'registration-error-email-exists', apply_filters( 'woocommerce_reset_password_error_email_exists', __( 'An account is not registered with email address. <a href="#" class="showlogin">Please confirm email address.</a>', 'woocommerce' ), $email ) );
+		}
+
+		// Handle password creation.
+		$password_generated = false;
+		if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) && empty( $password ) ) {
+			$password           = wp_generate_password();
+			$password_generated = true;
+		}
+
+		if ( empty( $password ) ) {
+			return new WP_Error( 'registration-error-missing-password', __( 'Please enter an account password.', 'woocommerce' ) );
+		}
+
+		// Use WP_Error to handle registration errors.
+		$errors = new WP_Error();
+		$user_details = get_user_by( 'email', $email );
+		$update_customer_data = apply_filters(
+			'woocommerce_update_customer_data',
+			array_merge(
+				$args,
+				array(
+					'ID' => $user_details->ID,
+					'user_pass'  => $password,
+					'user_email' => $email,
+					'role'       => 'customer',
+				)
+			)
+		);
+
+		$customer_id = wp_update_user( $update_customer_data );
+
+		if ( is_wp_error( $customer_id ) ) {
+			return $customer_id;
+		}
+
+		return $customer_id;
+	}
 }
 
 /**

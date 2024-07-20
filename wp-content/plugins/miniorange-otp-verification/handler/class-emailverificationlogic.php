@@ -44,7 +44,7 @@ if ( ! class_exists( 'EmailVerificationLogic' ) ) {
 		 * @param string $from_both     has user enabled from both.
 		 */
 		public function handle_logic( $user_login, $user_email, $phone_number, $otp_type, $from_both ) {
-			$this->checkIfUserRegistered( $otp_type, $from_both );
+			// $this->checkIfUserRegistered( $otp_type, $from_both );
 			$mle                     = MoUtility::mllc();
 			$license_expired_message = MoMessages::showMessage( MoMessages::ERROR_OTP_EMAIL );
 			if ( $mle['STATUS'] ) {

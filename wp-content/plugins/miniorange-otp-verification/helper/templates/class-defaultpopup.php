@@ -41,8 +41,8 @@ if ( ! class_exists( 'DefaultPopup' ) ) {
 		 * @return string
 		 */
 		private function get_default_pop_up_html() {
-			$pop_up_template =
-			'<html><head><title></title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" type="text/css" href="{{MO_CSS_URL}}">{{JQUERY}}</head><body><div class="mo-modal-backdrop"><div class="mo_customer_validation-modal mo-new-ui-modal" tabindex="-1" role="dialog" id="mo_site_otp_form"><div class="mo_customer_validation-modal-backdrop"></div><div class="mo_customer_validation-modal-dialog mo_customer_validation-modal-md"><div class="login mo_customer_validation-modal-content mo-new-ui-content"><div class="mo_customer_validation-modal-header mo-new-ui-header"><div class="mo-popup-header">{{HEADER}}</div><a onclick={{GO_BACK_ACTION_CALL}}><span class="mo-icon-button close mo-close-button-x">{{GO_BACK}}</span></a></div><div class="mo_customer_validation-modal-body center"><div>{{MESSAGE}}</div><br><div class="mo_customer_validation-login-container"><form id="{{FORM_ID}}" name="f" method="post" action="">{{OTP_STYLE}} {{REQUIRED_FIELDS}}<div class="mo-flex-space-between"><a class="mo-resend" onclick="mo_otp_verification_resend()">{{RESEND_OTP}}</a> {{VALIDATE_BUTTON_OTP}} </div></form><div id="{{OTP_MESSAGE_BOX}}" hidden style="background-color:#f7f6f7;padding:1em 2em 1em 1.5em;color:#000">{{LOADER_IMG}}</div></div></div></div></div></div></div>{{REQUIRED_FORMS_SCRIPTS}}</body></html>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet --already enqued file.
+			$pop_up_template = '';
+			'<html><head><title></title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" type="text/css" href="{{MO_CSS_URL}}">{{JQUERY}}</head><body><div class="mo-modal-backdrop"><div class="mo_customer_validation-modal mo-new-ui-modal" tabindex="-1" role="dialog" id="mo_site_otp_form"><div class="mo_customer_validation-modal-backdrop"></div><div class="mo_customer_validation-modal-dialog mo_customer_validation-modal-md"><div class="login mo_customer_validation-modal-content mo-new-ui-content"><div class="mo_customer_validation-modal-header mo-new-ui-header"><div class="mo-popup-header">{{HEADER}}</div><a onclick={{GO_BACK_ACTION_CALL}}><span class="mo-icon-button close mo-close-button-x">{{GO_BACK}}</span></a></div><div class="mo_customer_validation-modal-body center"><div>{{MESSAGE}}</div><br><div class="mo_customer_validation-login-container"><form id="{{FORM_ID}}" name="f" method="post" action="">{{OTP_STYLE}} {{REQUIRED_FIELDS}}<div class="mo-flex-space-between" ><a class="mo-notice-error" onclick="mo_otp_verification_resend()">{{RESEND_OTP}}</a> {{VALIDATE_BUTTON_OTP}} </div></form><div id="{{OTP_MESSAGE_BOX}}" hidden style="background-color:#f7f6f7;padding:1em 2em 1em 1.5em;color:#000">{{LOADER_IMG}}</div></div></div></div></div></div></div>{{REQUIRED_FORMS_SCRIPTS}}</body></html>'; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet --already enqued file.
 			return $pop_up_template;
 		}
 
@@ -99,18 +99,18 @@ if ( ! class_exists( 'DefaultPopup' ) ) {
 			$template = str_replace( '{{OTP_MESSAGE_BOX}}', 'mo_message', $template );
 			$template = str_replace( '{{MO_CSS_URL}}', MOV_CSS_URL, $template );
 			$template = str_replace( '{{REQUIRED_FORMS_SCRIPTS}}', $required_scripts, $template );
-			$template = str_replace( '{{HEADER}}', mo_( 'Validate OTP (One Time Passcode)' ), $template );
+			$template = str_replace( '{{HEADER}}', mo_( '请输入验证码' ), $template );
 			$template = str_replace( '{{GO_BACK}}', mo_( 'X' ), $template );
 			$template = str_replace( '{{MESSAGE}}', mo_( $message ), $template );
 			$template = str_replace( '{{OTP_STYLE}}', $append_input_field, $template );
 			$template = str_replace( '{{OTP_FIELD_NAME}}', 'mo_otp_token', $template );
 			$template = str_replace( '{{OTP_FIELD_TITLE}}', mo_( 'Enter Code' ), $template );
 			$template = str_replace( '{{VALIDATE_BUTTON_OTP}}', $button_html, $template );
-			$template = str_replace( '{{BUTTON_TEXT}}', mo_( 'Validate OTP' ), $template );
+			$template = str_replace( '{{BUTTON_TEXT}}', mo_( '校验验证码' ), $template );
 			$template = str_replace( '{{REQUIRED_FIELDS}}', $extra_form_fields, $template );
 			$template = str_replace( '{{LOADER_IMG}}', $this->img, $template );
 			$template = str_replace( '{{EXTRA_POST_DATA}}', $extra_post_data, $template );
-			$template = str_replace( '{{RESEND_OTP}}', mo_( 'Resend OTP' ), $template );
+			$template = str_replace( '{{RESEND_OTP}}', mo_( '重新发送' ), $template );
 
 			$template = apply_filters( 'mo_add_script', $template );
 			return $template;
@@ -217,14 +217,27 @@ if ( ! class_exists( 'DefaultPopup' ) ) {
 			$scripts = '<style>.mo_customer_validation-modal{display:block!important}</style>';
 			if ( ! $this->preview ) {
 				$scripts .= '<script>function mo_validation_goback(){
-				document.getElementById("validation_goBack_form").submit()}function mo_otp_verification_resend(){
-					document.getElementById("verification_resend_otp_form").submit()}function mo_select_goback(){
-						document.getElementById("goBack_choice_otp_form").submit()}document.addEventListener("DOMContentLoaded", function() {
-						var form = document.querySelector("#mo_validate_form");
-						form.addEventListener("submit", function() {
-						this.style.display = "none";
-						document.querySelector("#mo_message").style.display = "block";
-						});
+				document.getElementById("validation_goBack_form").submit()}
+				function mo_otp_verification_resend(){
+					var lastSendTime = document.getElementById("g_sms_send_time").value;
+					var curTime = Date.parse(new Date()) / 1000;
+					var delta = curTime - lastSendTime;
+					if (delta < 30) {
+						alert("验证码发送频繁，请" + (30 - delta) + "秒后重试~");
+						e.preventDefault();
+					} else {
+						document.getElementById("g_sms_send_time").value = lastSendTime;
+						document.getElementById("verification_resend_otp_form").submit()};
+						alert("发送成功");
+					}
+						function mo_select_goback(){
+							document.getElementById("goBack_choice_otp_form").submit()}
+						document.addEventListener("DOMContentLoaded", function() {
+							var form = document.querySelector("#mo_validate_form");
+							form.addEventListener("submit", function() {
+								this.style.display = "none";
+								document.querySelector("#mo_message").style.display = "block";
+							});
 							});</script>';
 			} else {
 				$scripts .= '<script>document.querySelector("#mo_validate_form").addEventListener("submit", function(e) {
@@ -279,6 +292,7 @@ if ( ! class_exists( 'DefaultPopup' ) ) {
 		private function getExtraFormFields( $otp_type, $from_both ) {
 			return ' <input type="hidden" name="otp_type" value="' . $otp_type . '">
                  <input type="hidden" id="from_both" name="from_both" value="' . $from_both . '">
+				 <input type="hidden" id="g_sms_send_time" name="g_sms_send_time" value="' . time() . '">
                  {{EXTRA_POST_DATA}}';
 		}
 	}

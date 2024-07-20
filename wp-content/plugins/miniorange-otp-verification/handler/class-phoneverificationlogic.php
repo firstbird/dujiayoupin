@@ -69,20 +69,26 @@ if ( ! class_exists( 'PhoneVerificationLogic' ) ) {
      * @param string[] $args
      * @return void
      */
-    public static function sendSms(){
+    public static function sendSms($phone_number){
         $client = self::createClient();
+		$code = ''.mt_rand(1000,9999).'';
         $sendSmsRequest = new SendSmsRequest([
             "signName" => "VirtualSpace",
             "templateCode" => "SMS_460725266",
-            "phoneNumbers" => "8618817846273",
-            "templateParam" => "{\"code\":\"1234\"}",
+            "phoneNumbers" => '86' . $phone_number,
+            "templateParam" => "{\"code\":\"$code\"}",
             "smsUpExtendCode" => ""
         ]);
         $runtime = new RuntimeOptions([]);
         try {
             $resp = $client->sendSmsWithOptions($sendSmsRequest, $runtime);
-            //Console::log(Utils::toJSONString($resp));
-	    return $resp->toMap();
+	        $respMap = $resp->toMap();
+			$content = array(
+				"statusCode" => $respMap['statusCode'] === 200 && $respMap['body']['Code'] === 'OK' ? "OK" : "ERR",
+				"smsCode" => $code,
+				"requestId" => $respMap['body']['RequestId'],
+			);
+			return $content;
         }
         catch (Exception $error) {
             if (!($error instanceof TeaError)) {
@@ -109,9 +115,10 @@ if ( ! class_exists( 'PhoneVerificationLogic' ) ) {
 		 * @param string $from_both has user enabled from both.
 		 */
 		public function handle_logic( $user_login, $user_email, $phone_number, $otp_type, $from_both ) {
-			$this->checkIfUserRegistered( $otp_type, $from_both );
-			$match                   = MoUtility::validate_phone_number( $phone_number );
-			$is_country_block        = MoUtility::check_for_selected_country_addon( $phone_number );
+			// $this->checkIfUserRegistered( $otp_type, $from_both );
+			$match                   = MoUtility::validate_phone_number( '+86' . $phone_number );
+			// $is_country_block        = MoUtility::check_for_selected_country_addon( $phone_number );
+			$is_country_block = false;
 			$message                 = MoMessages::showMessage( MoMessages::BLOCKED_COUNTRY );
 			$mle                     = MoUtility::mllc();
 			$license_expired_message = MoMessages::showMessage( MoMessages::ERROR_OTP_PHONE );
@@ -199,9 +206,10 @@ if ( ! class_exists( 'PhoneVerificationLogic' ) ) {
 			$gateway           = GatewayFunctions::instance();
 			$verification_type = 'SMS';
 			//$content           = $gateway->mo_send_otp_token( $verification_type, '', $phone_number );
-			$content = self::sendSms();
+			$content = self::sendSms($phone_number);
 			switch ( $content['statusCode'] ) {
-				case 200:
+				case "OK":
+					SessionUtils::set_phone_vcode( $content['smsCode'] );
 					$this->handle_otp_sent( $user_login, $user_email, $phone_number, $otp_type, $from_both, $content );
 					break;
 				default:
@@ -267,9 +275,9 @@ if ( ! class_exists( 'PhoneVerificationLogic' ) ) {
 		 */
 		public function handle_otp_sent( $user_login, $user_email, $phone_number, $otp_type, $from_both, $content ) {
 			// txId => RequestId
-			SessionUtils::set_phone_transaction_id( $content['body']['RequestId'] );
+			SessionUtils::set_phone_transaction_id( $content['requestId'] );
 			$message = str_replace( '##phone##', $phone_number, $this->get_otp_sent_message() );
-			apply_filters( 'mo_start_reporting', $content['body']['RequestId'], $phone_number, $phone_number, $otp_type, $message, 'OTP_SENT' );
+			apply_filters( 'mo_start_reporting', $content['requestId'], $phone_number, $phone_number, $otp_type, $message, 'OTP_SENT' );
 			if ( $this->is_ajax_form() ) {
 				wp_send_json( MoUtility::create_json( $message, MoConstants::SUCCESS_JSON_TYPE ) );
 			} else {

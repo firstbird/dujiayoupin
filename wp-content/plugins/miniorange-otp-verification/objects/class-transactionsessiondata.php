@@ -27,6 +27,12 @@ if ( ! class_exists( 'TransactionSessionData' ) ) {
 		 */
 		private $phone_transaction_id;
 
+		/**Variable declaration
+		 *
+		 * @var string
+		 */
+		private $phone_vcode;
+
 		/**MoInternal Function
 		 *
 		 * @return mixed
@@ -57,6 +63,14 @@ if ( ! class_exists( 'TransactionSessionData' ) ) {
 		 */
 		public function set_phone_transaction_id( $phone_transaction_id ) {
 			$this->phone_transaction_id = $phone_transaction_id;
+		}
+
+		public function set_phone_vcode( $phone_vcode ) {
+			$this->phone_vcode = $phone_vcode;
+		}
+
+		public function get_phone_vcode() {
+			return $this->phone_vcode;
 		}
 	}
 }

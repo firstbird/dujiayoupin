@@ -221,7 +221,7 @@ if ( ! class_exists( 'WooCommerceProductVendors' ) ) {
 
 			global $phone_logic;
 			if ( strcasecmp( $this->otp_type, $this->type_phone_tag ) === 0 ) {
-				if ( ! isset( $phone ) || ! MoUtility::validate_phone_number( $phone ) ) {
+				if ( ! isset( $phone ) || ! MoUtility::validate_phone_number( '+86' . $phone ) ) {
 					return new WP_Error(
 						'billing_phone_error',
 						str_replace( '##phone##', $phone, $phone_logic->get_otp_invalid_format_message() )

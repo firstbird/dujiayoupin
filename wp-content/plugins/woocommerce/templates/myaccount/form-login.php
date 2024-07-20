@@ -82,12 +82,10 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 
 			<?php endif; ?>
 
-			<?php if ( $_GET["action"] !== 'reset_password' ) : ?>
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<label for="reg_email"><?php esc_html_e( 'Email address', 'woocommerce' ); ?>&nbsp;<span class="required">*</span></label>
 				<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="<?php echo ( ! empty( $_POST['email'] ) ) ? esc_attr( wp_unslash( $_POST['email'] ) ) : ''; ?>" /><?php // @codingStandardsIgnoreLine ?>
 			</p>
-			<?php endif; ?>
 
 			<?php if ( 'no' === get_option( 'woocommerce_registration_generate_password' ) ) : ?>
 
@@ -113,10 +111,11 @@ do_action( 'woocommerce_before_customer_login_form' ); ?>
 
 			<?php if ( $_GET["action"] === 'reset_password' ) : ?>
 			<p class="woocommerce-form-row form-row">
-				<?php wp_nonce_field( 'woocommerce-reset_password', 'woocommerce-reset_password-nonce' ); ?>
-				<button type="submit" class="woocommerce-Button woocommerce-button button<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?> " name="reset_password" value="<?php esc_attr_e( 'Reset password', 'woocommerce' ); ?>"><?php esc_html_e( 'Reset password', 'woocommerce' ); ?></button>
+				<?php wp_nonce_field( 'woocommerce-register', 'woocommerce-register-nonce' ); ?>
+				<button type="submit" class="woocommerce-Button woocommerce-button button<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?> " name="register" value="<?php esc_attr_e( 'Reset password', 'woocommerce' ); ?>"><?php esc_html_e( 'Reset password', 'woocommerce' ); ?></button>
 			</p>
 			<?php endif; ?>
+			<input id ="account_action" type="hidden" name="action" value='<?php echo $_GET["action"]; ?>'> </input>
 
 			<?php do_action( 'woocommerce_register_form_end' ); ?>
 

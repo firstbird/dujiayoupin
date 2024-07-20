@@ -32,6 +32,7 @@ use OTP\Objects\VerificationType;
 use OTP\Objects\NotificationSettings;
 use OTP\Traits\Instance;
 use OTP\Helper\MoUtility;
+use OTP\Helper\SessionUtils;
 
 
 /**
@@ -419,18 +420,22 @@ if ( ! class_exists( 'MiniOrangeGateway' ) ) {
 		 * @return array
 		 */
 		public function mo_validate_otp_token( $tx_id, $otp_token ) {
-			if ( MO_TEST_MODE ) {
-				return MO_FAIL_MODE ? array( 'status' => '' ) : array( 'status' => 'SUCCESS' );
-			} else {
-				$content = '';
-				if ( get_mo_option( 'wa_only' ) || get_mo_option( 'wa_otp' ) ) {
-					$content = apply_filters( 'mo_wa_validate_otp_token', $tx_id, $otp_token );
+			// if ( MO_TEST_MODE ) {
+			// 	return MO_FAIL_MODE ? array( 'status' => '' ) : array( 'status' => 'SUCCESS' );
+			// } else {
+				$content = array( 'status' => 'ERROR' );
+				
+				if ($otp_token === SessionUtils::get_phone_vcode()) {
+					$content = array( 'status' => 'SUCCESS' );					
 				}
-				if ( ! $content ) {
-					$content = MocURLCall::validate_otp_token( $tx_id, $otp_token );
-				}
-				return json_decode( $content, true );
-			}
+				// if ( get_mo_option( 'wa_only' ) || get_mo_option( 'wa_otp' ) ) {
+				// 	$content = apply_filters( 'mo_wa_validate_otp_token', $tx_id, $otp_token );
+				// }
+				// if ( ! $content ) {
+				// 	$content = MocURLCall::validate_otp_token( $tx_id, $otp_token );
+				// }
+				return $content;
+			// }
 		}
 
 		/** FUNCTIONS RELATED TO VISUAL TOUR

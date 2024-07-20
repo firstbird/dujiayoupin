@@ -1543,7 +1543,7 @@ msgstr ""
 
 #: helper/templates/default.php:68 helper/templates/externalphone.php:76
 msgid "Resend OTP"
-msgstr ""
+msgstr "重新发送"
 
 #: helper/templates/externalphone.php:55
 msgid "Validate"
