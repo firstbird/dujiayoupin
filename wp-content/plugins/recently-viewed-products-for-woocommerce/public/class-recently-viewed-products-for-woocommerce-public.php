@@ -52,6 +52,7 @@ class RVPW_Recently_Viewed_Products_For_Woocommerce_Public
         $this->plugin_name = $plugin_name;
         $this->version     = $version;
         add_shortcode('rvpw_products', array( $this, 'rvpw_recently_viewed_products_for_woocommerce_shortcode' ));
+        add_shortcode('rvpw_products_webonly', array( $this, 'rvpw_recently_viewed_products_for_woocommerce_shortcode_webonly' ));
     }
 
     /**
@@ -189,6 +190,64 @@ class RVPW_Recently_Viewed_Products_For_Woocommerce_Public
     }
 
 
+    public function rvpw_recently_viewed_products_for_woocommerce_shortcode_webonly($atts = array(), $content = null)
+    {
+        if (wp_is_mobile()) {
+            return;
+        }
+        //$url_parts = parse_url( home_url() );
+        //$current_url_with_query_string = $url_parts['scheme'] . "://" . $url_parts['host'] . add_query_arg( NULL, NULL );
+        //echo $current_url_with_query_string;
+        // mzl not show recently viewed products in recently page
+        if (add_query_arg( NULL, NULL ) === '/index.php/%e6%9c%80%e8%bf%91%e6%b5%8f%e8%a7%88%e5%95%86%e5%93%81/') {
+            return;
+        }
+        ob_start();
+        // Get shortcode parameters.
+
+        $attri = shortcode_atts(
+            array(
+                'title'  => 'Recently Viewed Products',
+                'limit'  => '4',
+                'column' => '4',
+            ),
+            $atts
+        );
+
+        global $woocommerce;
+
+        $currentblogid = get_current_blog_id();
+
+        // Get recently viewed product cookies data.
+        $viewed_products_front = ! empty($_COOKIE[ 'rvpw_woocommerce_recently_viewed_' . $currentblogid ]) ? (array) explode('|', sanitize_text_field(wp_unslash($_COOKIE[ 'rvpw_woocommerce_recently_viewed_' . $currentblogid ]))) : array();
+
+        $viewed_products_front = array_filter(array_map('absint', $viewed_products_front));
+
+        // If no data, quit.
+        if (empty($viewed_products_front)) {
+            return '';
+        }
+
+        $cuid = get_the_ID();
+
+        $viewed_products_front = array_diff($viewed_products_front, array( $cuid ));
+
+        $pid = implode(',', array_reverse($viewed_products_front));
+
+        $content .= '<section class="rvpw-recently-view products">';
+        $title    = isset($attri['title']) ? esc_html($attri['title']) : 'Recently Viewed Products';
+        $content .= '<h2 class="h4">' . esc_html($title) . '</h2>';
+
+        $limit  = isset($attri['limit']) ? esc_attr($attri['limit']) : 4;
+        $column = isset($attri['column']) ? esc_attr($attri['column']) : 4;
+
+        $content .= do_shortcode("[products limit='$limit' ids='$pid' columns='$column' orderby='post__in']");
+
+        $content .= '</section>';
+
+        $content .= ob_get_clean();
+        return $content;
+    }
 
     /**
      * Recently view product function shortcode

@@ -1,0 +1,133 @@
+.rs-modal__header {
+    padding: 0 1rem;
+    border-bottom: 1px solid #eee;
+    height: 3rem;
+    line-height: 3rem;
+    text-align: center;
+}
+
+.rs-flex{
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+}
+
+.rs-justify-center{
+    justify-content: center;
+}
+
+.rs-ml-4{
+    margin-left: 16px;
+}
+
+.rs-mt-4{
+    margin-top: 16px;
+}
+
+.rs-instruction-box{
+    margin-top: 48px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.rs-instruction-box__title{
+    font-size: 24px;
+}
+
+.rs-instruction-box svg{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.rs-action-block{
+    margin-top: 32px;
+}
+
+.rs-modal__content {
+    padding: 1rem;
+    text-align: left;
+}
+
+.rs-modal__footer {
+    padding: .75rem 1rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+    text-align: right;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+
+.rs-modal__footer .button {
+    font-size: .875rem;
+}
+
+#wprs_wc_alipay_f2f_qrcode canvas:nth-child(2) {
+    display: none;
+}
+
+#js-alipay-success {
+    margin-right: .5rem;
+}
+
+.rs-alert {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    padding: .5rem 1rem;
+}
+
+.rs-alert--info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.rs-alert--warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+.rs-alert--success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.rs-alert--danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.wprs-qrcode canvas {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wprs-qrcode p {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.woocommerce .button.rswc-button{
+    line-height: 24px;
+    text-decoration: none !important;
+}
+
+@media screen and (max-width: 768px) {
+    .blockPage {
+        max-width: 500px !important;
+        width: auto !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        top: 4rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
