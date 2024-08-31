@@ -18,6 +18,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_address();
+$user = get_userdata( $order->get_user_id() );
 ?>
 <section class="woocommerce-customer-details">
 
@@ -41,8 +42,10 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
 			<p class="woocommerce-customer-details--email"><?php echo esc_html( $order->get_billing_email() ); ?></p>
 		<?php endif; ?>
 
+		<p class="woocommerce-customer-details--user"><?php echo esc_html( WC()->customer->get_billing_first_name() ); ?></p>
+
 		<?php
-			/**
+			/** mzl add details--user
 			 * Action hook fired after an address in the order customer details.
 			 *
 			 * @since 8.7.0
@@ -65,6 +68,8 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
 				<?php if ( $order->get_shipping_phone() ) : ?>
 					<p class="woocommerce-customer-details--phone"><?php echo esc_html( $order->get_shipping_phone() ); ?></p>
 				<?php endif; ?>
+
+				<p class="woocommerce-customer-details--user"><?php echo esc_html( WC()->customer->get_billing_first_name() ); ?></p>
 
 				<?php
 					/**

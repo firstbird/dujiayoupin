@@ -1,0 +1,393 @@
+/*
+Theme Name: Retailer Ecommerce
+Theme URI: https://www.titanthemes.net/themes/free-ecommerce-wordpress-theme/
+Author: Titan Themes
+Author URI: https://www.titanthemes.net/
+Description: Retailer Ecommerce is a comprehensive WordPress theme tailored for businesses specializing in tools, hardware, and safety equipment. Designed to showcase a wide array of products such as hand tools, power tools, drill bits, saws, hammers, screwdrivers, wrenches, pliers, clamps, and tool sets, it caters to both retail and wholesale markets. Visually, the theme boasts a modern and intuitive layout that enhances the shopping experience. Clean lines and organized grids ensure easy navigation through categories like measuring tools, levels, tape measures, allen wrenches, socket sets, and ratchets. It emphasizes usability with detailed product pages that feature high-resolution images, comprehensive descriptions, and customer reviews, facilitating informed purchasing decisions. The design elements prioritize functionality, ensuring compatibility with various devices for seamless browsing on desktops, tablets, and smartphones. Moreover, the Retailer Ecommerce WordPress Theme supports e-commerce essentials like secure payment gateways and shipping integrations, optimizing the buying process. Whether selling tools or hardware accessories such as nails, screws, bolts, nuts, washers, anchors, brackets, hinges, door and cabinet hardware, it provides robust functionality to meet business needs efficiently. Ideal for businesses seeking a professional and user-friendly online storefront, the Retailer Ecommerce WordPress Theme combines aesthetic appeal with practical features tailored for the tools and hardware industry.
+Requires at least: 6.1
+Tested up to: 6.6
+Requires PHP: 7.2
+Version: 1.2
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+Text Domain: retailer-ecommerce
+Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, block-patterns, rtl-language-support, sticky-post, threaded-comments, wide-blocks, block-styles, blog, photography, e-commerce
+*/
+
+.searchbox .wp-block-categories-dropdown select {
+  padding: 12px 12px;
+  width: 165px;
+  border-radius: 8px 0px 0px 8px;
+  border: 1px solid #E7E7E6;
+  background: transparent;
+  position: relative;
+  border-right: 0px !important;
+}
+.wp-block-image img{
+  vertical-align: unset;
+}
+.search-box button.wp-block-search__button.has-icon.wp-element-button {
+  background: transparent;
+  padding: 5px 0px;
+}
+.wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container li a {
+  color: #000;
+}
+.header-menu .wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container li a span.wp-block-navigation-item__label:hover{
+  padding: 0px;
+  background: transparent;
+}
+.currency-box form.woocommerce-currency-switcher-form.woocs_show_flags br {
+  display: none;
+}
+.currency-box p{
+  display: none;
+}
+select.gt_selector.notranslate {
+  background: transparent;
+  border: 0px;
+}
+.chosen-container-single .chosen-single span{
+  color: #000;
+}
+.woocommerce-currency-switcher-form .chosen-container-single .chosen-single div {
+  background: transparent !important;
+  border: 0px !important;
+}
+.woocommerce-currency-switcher-form .chosen-container-single .chosen-single {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #000;
+}
+.search-box .wp-block-search__inside-wrapper {
+  padding: 3.5px 10px 3.5px 30px;
+  border-radius: 0px 8px 8px 0px;
+  border: 1px solid #E7E7E6;
+  border-left: 0px;
+}
+.header-search{
+  position: relative;
+}
+.searchbox ::placeholder {
+  opacity: 1;
+  color: #6D758D;
+  font-family: Figtree;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 12px;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.product-content h5,.product-content h6,.product-content{
+  margin-top: 10px !important;
+}
+.price-box p span{
+  color: #a7a7a7;
+}
+.price-box{
+  margin-top: 10px !important;
+  justify-content: space-between;
+}
+.price-box p {
+  padding: 4px 0px;
+}
+.product-img{
+  width: 100%;
+}
+.header-menu span.wp-block-navigation-item__label:hover {
+  padding: 19px 15px;
+  background: #FFDA00;
+  color: #000;
+}
+.header-menu .menu-box {
+  gap: 50px;
+  padding: 0px;
+}
+.searchbox ::-ms-input-placeholder {
+  color: red;
+  }
+.header-search:after {
+  content: "";
+  width: 2px;
+  background: #E7E7E6;
+  height: 25px;
+  position: absolute;
+  top: 9px;
+  right: -15px;
+}
+.searchbox .wp-block-columns.is-layout-flex.wp-container-core-columns-is-layout-2.wp-block-columns-is-layout-flex {
+  gap: 0px !important;
+}
+.homepage-header {
+  padding: 0 !important;
+}
+.homepage-header {
+  position: relative;
+  width: 100%;
+}
+.home .homepage-header {
+  padding: 0 !important;
+  position: absolute;
+  width: 70%;
+  left: 0px;
+  right: 0px;
+  z-index: 999;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 0;
+}
+.color-word{
+  color: #2453D4;
+}
+.product-box:hover .price-box .wp-block-buttons{
+  display: block;
+}
+.price-box .wp-block-buttons{
+  display: none;
+}
+.menu-box{
+  margin-top: 0 !important;
+  padding: 12px 0;
+}
+.slider-area{
+	margin: 0;
+}
+.wp-site-blocks{
+	padding: 0 !important;
+}
+.product-main img {
+  width: 100%;
+}
+.toggle-icon img {
+  top: -7px;
+  position: relative;
+}
+.banner-main{
+  position: relative;
+}
+.slider-banner {
+  gap: 40px;
+}
+.home .main-header {
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+  background: transparent !important;
+}
+.slide-img {
+  position: absolute;
+  right: 0px;
+  bottom: 6%;
+}
+.slider-img img{
+  width: 100%;
+}
+.counter-box {
+  border-radius: 10px;
+}
+.is-head-menu li a:hover {
+  text-decoration: none;
+}
+.is-head-menu li a:hover {
+  text-decoration: none;
+  border-top: 2px solid #ffd900;
+}
+
+.is-head-menu li a:hover span {
+  color: #ffd900;
+}
+.counter-box:hover {
+  background-color: #ffd900 !important;
+}
+.counter-box:hover h3{
+  color: #fff !important;
+}
+.slider-content {
+  padding-left: 45px;
+}
+.slide-img img.wp-image-66 {
+  z-index: 1;
+  position: relative;
+}
+.slide-img {
+  position: absolute;
+  right: -45px;
+  bottom: 6%;
+}
+.short-heading {
+  display: inline-block;
+}
+footer.wp-block-template-part {
+  margin-top: 0;
+}
+@media screen and (max-width: 375px) {
+  .main-header .wp-block-columns.is-layout-flex.wp-container-core-columns-is-layout-1.wp-block-columns-is-layout-flex{
+    max-width: 100%;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 599px) {
+  span.wp-block-navigation-item__label {
+    color: #000;
+  }
+  .menu-box a.wp-block-navigation-item__content {
+    color: #000 !important;
+  }
+  .menu-box .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content .wp-block-navigation__submenu-container{
+    padding-top: 0px;
+  }
+}
+@media screen and (min-width: 801px) {
+  .menu-box {
+    padding-left: 45px;
+  }
+}
+@media screen and (min-width: 320px) and (max-width: 800px) {
+	.header-area .wp-container-core-buttons-layout-1.wp-container-core-buttons-layout-1 {
+		justify-content: center;
+	}
+  .topheader-area .wp-block-columns.is-layout-flex.wp-container-core-columns-is-layout-1.wp-block-columns-is-layout-flex {
+    text-align: center;
+  }
+  .header-cat {
+    width: 100%;
+    border: 1px solid #E7E7E6;
+    border-radius: 10px;
+    margin-bottom: 10px !important;
+  }
+  .search-box .wp-block-search__inside-wrapper{
+    border-radius: 8px !important;
+    border: 1px solid #E7E7E6 !important;
+  }
+  .searchbox .wp-block-categories-dropdown select{
+    border: 0px;
+  }
+  .header-search:after{
+    display: none;
+  }
+  .topheader-area .social-box{
+    justify-content: center !important;
+  }
+  .wp-block-cover, .wp-block-cover-image{
+    min-height: 430px;
+  }
+  .header-area h5{
+    text-align: center;
+  }
+  .meta-box,.top-text{
+    justify-content: center !important;
+  }
+  .header-area{
+    text-align: center;
+  }
+  
+  .slider-banner .wp-block-buttons {
+    justify-content: center;
+  }
+  .slider-banner p,.product-heading{
+    text-align: center;
+  }
+  .header-menu .menu-box {
+    gap: 10px !important;
+  }
+  .main-header{
+    text-align: center;
+  }
+  .slide-btn{
+    justify-content: center !important;
+  }
+  .about-text-box,.about-image-box {
+    text-align: center;
+  }
+  .product-main {
+    max-width: 90% !important;
+  }
+  .slider-banner{
+    text-align: center;
+  }
+  .main-header nav{
+    justify-content: center !important;
+  }
+  .slide-img {
+    left: 0px;
+    right: 0px;
+  }
+  .about-right {
+    text-align: center;
+    padding: 0px 10px
+  }
+  .logo-box {
+    justify-content: center;
+    display: flex;
+  }
+  .menu-box {
+    justify-content: center;
+    display: flex;
+  }
+  .slider-content {
+    padding: 20px 14px;
+  }
+  .admin-bar .wp-block-navigation__responsive-container-close {
+    color: #000;
+    top:15px;
+  }
+  .slider-banner {
+    gap: 20px;
+  }
+  .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content .wp-block-navigation__container{
+    justify-content: center !important;
+  }
+  .slider-content{
+    text-align: center;
+  }
+	.homepage-header{
+	    position: static;
+	    width: 100%;
+	    text-align: center;
+  	}
+	.homepage-header .wp-header-search-social{
+		justify-content: center;
+	}
+}
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .product-main{
+    max-width: 100% !important;
+  }
+  .searchbox .wp-block-columns.is-layout-flex.wp-container-core-columns-is-layout-3.wp-block-columns-is-layout-flex,.meta-box{
+    gap:10px !important;
+  }
+  .top-bar,.header-area-box{
+    max-width: 100% !important;
+    gap: 10px;
+  }
+  .price-box ,.social-box,.has-small-icon-size{
+    gap: 10px !important;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 999px) {
+  .product-main,.main-search-box{
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+  }
+  .meta-box{
+    display: grid !important;
+    grid-template-columns: auto auto auto !important;
+  }
+}
+@media screen and (min-width: 782px) and (max-width: 1420px) {
+  .counter-box {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+  .counter-box h6 {
+    font-size: 11px !important;
+    line-height: 22px;
+  }
+  .counter-box h3 {
+    font-size: 30px !important;
+    line-height: 40px;
+  }
+  .about-right h3{
+
+  }
+}

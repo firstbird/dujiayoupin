@@ -572,7 +572,7 @@ class WC_Countries {
 					'CA'      => "{company}\n{name}\n{address_1}\n{address_2}\n{city} {state_code} {postcode}\n{country}",
 					'CH'      => "{company}\n{name}\n{address_1}\n{address_2}\n{postcode} {city}\n{country}",
 					'CL'      => "{company}\n{name}\n{address_1}\n{address_2}\n{state}\n{postcode} {city}\n{country}",
-					'CN'      => "{country} {postcode}\n{state}, {city}, {address_2}, {address_1}\n{company}\n{name}",
+					'CN'      => "{country} {postcode}\n{state}, {city}, {address_2}, {address_1}\n{company}\n",
 					'CZ'      => "{company}\n{name}\n{address_1}\n{address_2}\n{postcode} {city}\n{country}",
 					'DE'      => "{company}\n{name}\n{address_1}\n{address_2}\n{postcode} {city}\n{country}",
 					'DK'      => "{company}\n{name}\n{address_1}\n{address_2}\n{postcode} {city}\n{country}",
@@ -738,19 +738,19 @@ class WC_Countries {
 
 		$fields = array(
 			'first_name' => array(
-				'label'        => __( 'First name', 'woocommerce' ),
+				'label'        => __( 'Receiver name', 'woocommerce' ),
 				'required'     => true,
 				'class'        => array( 'form-row-first' ),
 				'autocomplete' => 'given-name',
 				'priority'     => 10,
 			),
-			'last_name'  => array(
-				'label'        => __( 'Last name', 'woocommerce' ),
-				'required'     => true,
-				'class'        => array( 'form-row-last' ),
-				'autocomplete' => 'family-name',
-				'priority'     => 20,
-			),
+			// 'last_name'  => array(
+			// 	'label'        => __( 'Last name', 'woocommerce' ),
+			// 	'required'     => true,
+			// 	'class'        => array( 'form-row-last' ),
+			// 	'autocomplete' => 'family-name',
+			// 	'priority'     => 20,
+			// ),
 			'company'    => array(
 				'label'        => __( 'Company name', 'woocommerce' ),
 				'class'        => array( 'form-row-wide' ),
@@ -782,7 +782,8 @@ class WC_Countries {
 				'class'        => array( 'form-row-wide', 'address-field' ),
 				'autocomplete' => 'address-line2',
 				'priority'     => 60,
-				'required'     => 'required' === get_option( 'woocommerce_checkout_address_2_field', 'optional' ),
+				'required'	   => true,	
+				//'required'     => 'required' === get_option( 'woocommerce_checkout_address_2_field', 'optional' ),
 			),
 			'city'       => array(
 				'label'        => __( 'Town / City', 'woocommerce' ),

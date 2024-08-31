@@ -29,8 +29,9 @@ function wc_template_redirect() {
 
 	// When on the checkout with an empty cart, redirect to cart page.
 	if ( is_page( wc_get_page_id( 'checkout' ) ) && wc_get_page_id( 'checkout' ) !== wc_get_page_id( 'cart' ) && WC()->cart->is_empty() && empty( $wp->query_vars['order-pay'] ) && ! isset( $wp->query_vars['order-received'] ) && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
-		wp_safe_redirect( wc_get_cart_url() );
-		exit;
+		//mzl echo esc_html( '当前没有商品');
+		//wp_safe_redirect( wc_get_cart_url() );
+		//exit;
 
 	}
 
@@ -2759,6 +2760,7 @@ if ( ! function_exists( 'woocommerce_order_details_table' ) ) {
 				 * @param WC_Order $order          The related order.
 				 */
 				'show_downloads' => apply_filters( 'woocommerce_order_downloads_table_show_downloads', ( $order->has_downloadable_item() && $order->is_download_permitted() ), $order ),
+				'show_message' => true
 			)
 		);
 	}
@@ -3263,7 +3265,7 @@ if ( ! function_exists( 'woocommerce_account_content' ) ) {
 				if ( 'pagename' === $key ) {
 					continue;
 				}
-
+				// mzl echo esc_html($key);
 				if ( has_action( 'woocommerce_account_' . $key . '_endpoint' ) ) {
 					do_action( 'woocommerce_account_' . $key . '_endpoint', $value );
 					return;

@@ -46,7 +46,17 @@ class CartItemSchema extends ItemSchema {
 		 * @param string $cart_item_key     Cart item key.
 		 */
 		$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $product->get_permalink(), $cart_item, $cart_item['key'] );
-
+		$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $product->get_image(), $cart_item, $cart_item['key'] );
+		$attachment_ids = array_merge( [ $product->get_image_id() ], $product->get_gallery_image_ids() );
+		$images = array_values( array_filter( array_map( [ $this->image_attachment_schema, 'get_item_response' ], $attachment_ids ) ) );
+		//echo implode( ' ', $attachment_ids );
+		foreach ($images as $value) {
+			//echo json_encode($value);
+			if ( $thumbnail != null ) {
+				$value->thumbnail = $thumbnail;
+			}
+			// $value->thumbnail
+		}
 		return [
 			'key'                  => $cart_item['key'],
 			'id'                   => $product->get_id(),
@@ -62,7 +72,7 @@ class CartItemSchema extends ItemSchema {
 			'show_backorder_badge' => (bool) $product->backorders_require_notification() && $product->is_on_backorder( $cart_item['quantity'] ),
 			'sold_individually'    => $product->is_sold_individually(),
 			'permalink'            => $product_permalink,
-			'images'               => $this->get_images( $product ),
+			'images'               => $images,
 			'variation'            => $this->format_variation_data( $cart_item['variation'], $product ),
 			'item_data'            => $this->get_item_data( $cart_item ),
 			'prices'               => (object) $this->prepare_product_price_response( $product, get_option( 'woocommerce_tax_display_cart' ) ),

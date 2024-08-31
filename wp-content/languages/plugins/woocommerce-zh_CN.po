@@ -12562,7 +12562,7 @@ msgstr "公司（可选）"
 
 #: src/Blocks/Domain/Services/CheckoutFields.php:168
 msgid "Apartment, suite, etc. (optional)"
-msgstr "公寓、套房等（可选）"
+msgstr "公寓、套房等"
 
 #: src/Blocks/Domain/Services/CheckoutFields.php:120
 msgid "First name (optional)"
@@ -23852,7 +23852,7 @@ msgstr "%1$s 库存较低，还有%2$d。"
 
 #: includes/class-wc-countries.php:734
 msgid "Apartment, suite, unit, etc. (optional)"
-msgstr "公寓、套房、单元房等（可选）"
+msgstr "公寓、套房、单元房等"
 
 #. translators: %s: product name
 #: includes/class-wc-cart.php:1161

@@ -82,7 +82,6 @@ class ImageAttachmentSchema extends AbstractSchema {
 		if ( ! is_array( $attachment ) ) {
 			return null;
 		}
-
 		$thumbnail = wp_get_attachment_image_src( $attachment_id, 'woocommerce_thumbnail' );
 
 		return (object) [

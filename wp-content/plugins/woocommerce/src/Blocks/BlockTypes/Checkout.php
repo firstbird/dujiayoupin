@@ -149,7 +149,6 @@ class Checkout extends AbstractBlock {
 			// legacy shortcode instead and do not render block.
 			return wc_current_theme_is_fse_theme() ? do_shortcode( '[woocommerce_checkout]' ) : '[woocommerce_checkout]';
 		}
-
 		// Dequeue the core scripts when rendering this block.
 		add_action( 'wp_enqueue_scripts', array( $this, 'dequeue_woocommerce_core_scripts' ), 20 );
 
@@ -443,7 +442,7 @@ class Checkout extends AbstractBlock {
 		}
 
 		if ( ! is_admin() && ! WC()->is_rest_api_request() ) {
-			echo esc_html( 'checkout processing ......' );
+			// echo esc_html( 'mzl checkout processing ......' );
 			$this->asset_data_registry->hydrate_api_request( '/wc/store/v1/cart' );
 			$this->asset_data_registry->hydrate_data_from_api_request( 'checkoutData', '/wc/store/v1/checkout' );
 			$this->hydrate_customer_payment_methods();

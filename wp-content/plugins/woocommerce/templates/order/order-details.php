@@ -60,7 +60,8 @@ if ( $show_downloads ) {
 
 		<tbody>
 			<?php
-			do_action( 'woocommerce_order_details_before_order_table_items', $order );
+			// mzl delete temporaryly
+			// do_action( 'woocommerce_order_details_before_order_table_items', $order );
 
 			foreach ( $order_items as $item_id => $item ) {
 				$product = $item->get_product();
@@ -102,7 +103,9 @@ if ( $show_downloads ) {
 		</tfoot>
 	</table>
 
-	<?php do_action( 'woocommerce_order_details_after_order_table', $order ); ?>
+	<?php if ( $show_message === true ) : ?>
+		<?php do_action( 'woocommerce_order_details_after_order_table', $order ); ?>
+	<?php endif; ?>
 </section>
 
 <?php

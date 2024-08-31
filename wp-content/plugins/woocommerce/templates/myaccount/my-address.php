@@ -65,7 +65,12 @@ $col    = 1;
 		<address>
 			<?php
 				echo $address ? wp_kses_post( $address ) : esc_html_e( 'You have not set up this type of address yet.', 'woocommerce' );
-
+				echo '<br/>';
+				if ( $name === 'billing') {
+					echo esc_html( WC()->customer->get_billing_email() );
+					echo '<br/>';
+				}
+				echo esc_html_e(WC()->customer->get_billing_first_name());
 				/**
 				 * Used to output content after core address fields.
 				 *

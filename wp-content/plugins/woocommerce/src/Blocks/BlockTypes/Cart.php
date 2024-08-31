@@ -118,6 +118,8 @@ class Cart extends AbstractBlock {
 			'path'         => $this->asset_api->get_block_asset_build_path( $this->block_name . '-frontend' ),
 			'dependencies' => [],
 		];
+		//echo $script[ 'path' ];
+		//echo '<br/>';
 		return $key ? $script[ $key ] : $script;
 	}
 

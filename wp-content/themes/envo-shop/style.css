@@ -1320,11 +1320,7 @@ button#place_order {
 }
 .woocommerce-cart-form .coupon #coupon_code {
     width: 50%;
-    max-width: 50%;
-}
-.inner-wrapper {
-    display: block;
-    margin-bottom: 15px;
+    max-width: 100%;
 }
 .content-date-comments {
     display: inline-block;

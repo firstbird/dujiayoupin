@@ -78,7 +78,7 @@ class WC_Shortcode_Checkout {
 	 * @param int $order_id Order ID.
 	 */
 	private static function order_pay( $order_id ) {
-
+		// echo esc_html( 'mzl order_pay processing ......' );
 		do_action( 'before_woocommerce_pay' );
 
 		$order_id = absint( $order_id );
@@ -239,7 +239,9 @@ class WC_Shortcode_Checkout {
 			$order     = wc_get_order( $order_id );
 
 			if ( $order && $order->get_id() === $order_id && hash_equals( $order->get_order_key(), $order_key ) ) {
-
+				$order_items        = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) );
+				$show_purchase_note = $order->has_status( apply_filters( 'woocommerce_purchase_note_order_statuses', array( 'completed', 'processing' ) ) );
+				wc_get_template( 'order/order-details.php', array( 'order_id' => $order_id, 'show_downloads' => false, 'show_message' => false  ) );
 				if ( $order->needs_payment() ) {
 
 					wc_get_template( 'checkout/order-receipt.php', array( 'order' => $order ) );

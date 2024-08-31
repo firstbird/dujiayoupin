@@ -461,7 +461,18 @@ if (!function_exists('envo_shop_generate_construct_footer')) :
         <div class="footer-credits-text text-center">
             <?php
             /* translators: %s: WordPress name with wordpress.org URL */
-            printf(esc_html__('Copyright © 2024-2024 · 赤梦科技 · 独家优品', 'envo-shop'),  '<a>' . '</a>');
+            //$registration_url = sprintf( '<a href="%s">%s</a>', esc_url( "http://beian.miit.gov.cn/" ), __( '沪ICP备2024085214号-1' ) );
+
+            $admin_email_help_url = __( 'http://beian.miit.gov.cn/' );
+
+            printf(
+                '<a href="%s" rel="noopener" target="_blank">%s</a>',
+                esc_url( $admin_email_help_url ),
+                __( '沪ICP备2024085214号-1' )
+            );
+
+            //echo esc_html( $registration_url );
+            printf(esc_html__(' Copyright © 2024 · 赤梦科技 · 独家优品', 'envo-shop'),  '<a>' . '</a>');
             ?>
         </div> 
         <?php
