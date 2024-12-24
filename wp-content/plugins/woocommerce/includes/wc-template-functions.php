@@ -1631,8 +1631,20 @@ function wc_get_gallery_image_html( $attachment_id, $main_image = false ) {
 			$main_image
 		)
 	);
-
-	return '<div data-thumb="' . esc_url( $thumbnail_src[0] ) . '" data-thumb-alt="' . esc_attr( $alt_text ) . '" class="woocommerce-product-gallery__image"><a href="' . esc_url( $full_src[0] ) . '">' . $image . '</a></div>';
+	// $image_test = wp_get_attachment_image_src( $attachment_id, $image_size, false );
+	// list( $src, $width, $height ) = $image_test;
+	// echo $src;
+	// foreach ($full_src as $value) {
+	// 	//echo json_encode($value);
+	// 	echo 'mzl shop image: ' . $value;
+	// 	echo '  ';
+	// }
+	// mzl 这里$thumbnail_src[0]和esc_url( $full_src[0] )没用
+	// echo esc_url( $thumbnail_src[0] );
+	// echo 'mzl wc_get_gallery_image_html end';
+	//echo json_encode($image);
+	// return $image;
+	return '<div data-thumb="' . esc_url( $thumbnail_src[0] ) . '" data-thumb-alt="' . '" class="woocommerce-product-gallery__image"><a href="' . esc_url( $full_src[0] ) . '">' . $image . '</a></div>';
 }
 
 if ( ! function_exists( 'woocommerce_output_product_data_tabs' ) ) {

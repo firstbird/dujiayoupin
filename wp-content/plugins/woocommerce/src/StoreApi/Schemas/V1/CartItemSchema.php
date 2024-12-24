@@ -32,7 +32,7 @@ class CartItemSchema extends ItemSchema {
 	 */
 	public function get_item_response( $cart_item ) {
 		$product = $cart_item['data'];
-
+		// do_action( 'woocommerce_before_single_product_summary' );
 		/**
 		 * Filter the product permalink.
 		 *
@@ -46,17 +46,62 @@ class CartItemSchema extends ItemSchema {
 		 * @param string $cart_item_key     Cart item key.
 		 */
 		$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $product->get_permalink(), $cart_item, $cart_item['key'] );
+		
 		$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $product->get_image(), $cart_item, $cart_item['key'] );
+		// $fpd_data = $cart_item['fpd_data'];
+		//$fpd_data['fpd_product']
 		$attachment_ids = array_merge( [ $product->get_image_id() ], $product->get_gallery_image_ids() );
 		$images = array_values( array_filter( array_map( [ $this->image_attachment_schema, 'get_item_response' ], $attachment_ids ) ) );
-		//echo implode( ' ', $attachment_ids );
+		// echo implode( ' ', $attachment_ids );
+		// echo implode( ' ', $cart_item['fpd_data'] );
+		// mzl mod thumb
+		// echo $attachment_ids[0];
+		//$thumbnail = null;
+		// $fpd_data = null;
+		// if ( !is_null($cart_item) && isset($cart_item['data']) != null ) {
+			// $fpd_data = $cart_item['fpd_data'];
+			// echo $fpd_data['fpd_product_thumbnail'];
+		// }
+		// echo '------------------------------------';
+		$width = 900;
+		$height = 600;
+		// echo '<div>aa </div>';
+		// do_action( 'woocommerce_before_single_product' );
+
+		// echo $thumbnail;
+		// do_action( 'woocommerce_before_single_product_summary' );
+		// echo '</div>';
+		// $imageSrc = $thumbnail;
+		// $product_meta = get_post_meta($post_id);
+		// echo wp_get_attachment_image( $product_meta['_thumbnail_id'][0], 'full' );
+		//$image = wp_get_attachment_image_src( get_post_thumbnail_id( $cart_item['product_id'] ), 'full' );//$cart_item['product_id'] single-post-thumbnail
+		
+		//$htmlImage = "<img src=\"$image[0]\" width=\"$width\" height=\"$height\" alt=\"Image\">";
+		//echo $htmlImage;
+		// echo json_encode(wp_get_attachment_url( $cart_item['product_id'] ));
+		
+		// foreach ($attachment_ids as $attachment_id) {
+		// 	echo $attachment_id;
+		// 	$html = wc_get_gallery_image_html(530, true);
+		// 	echo '
+		// 	<div class="woocommerce-product-gallery woocommerce-product-gallery--with-images woocommerce-product-gallery--columns-4 images" data-columns="4" style="opacity: 1; transition: opacity 0.25s ease-in-out;"><a href="#" class="woocommerce-product-gallery__trigger">' . '
+		// 	<div class="woocommerce-product-gallery__wrapper">' . 
+		// 	apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $attachment_id )
+		// 	. '
+		// 	</div>
+		// 	</div>
+		// 	';
+		// }
 		foreach ($images as $value) {
-			//echo json_encode($value);
-			if ( $thumbnail != null ) {
-				$value->thumbnail = $thumbnail;
+			// echo json_encode($value);
+			if ( $thumbnail ) {
+				$value->thumbnail = $thumbnail;//$cart_item['data'];//$cart_item['key'];
+				$value->width = 600;
+				$value->height = 450;
 			}
-			// $value->thumbnail
 		}
+		//echo wc_get_template( 'single-product/product-image.php' );
+
 		return [
 			'key'                  => $cart_item['key'],
 			'id'                   => $product->get_id(),

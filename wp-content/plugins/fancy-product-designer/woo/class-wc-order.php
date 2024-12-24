@@ -1,4 +1,6 @@
 <?php
+if( !extension_loaded('imagick') )
+	die( json_encode(array('error' => 'on order Imagick extension is required in order to upload PDF files. Please enable Imagick on your server!')) );
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -85,6 +87,7 @@ if(!class_exists('FPD_WC_Order')) {
 
 		public function add_order_item_thumbnail_email( $item_id, $item, $order, $plain_text=false ) {
             // echo esc_html( 'mzl add_order_item_thumbnail_email ......' );
+			$order_id = method_exists($order,'get_id') ? $order->get_id() : $order->id;
 
 			if( fpd_get_option('fpd_order_product_thumbnail') && !$plain_text ) {
 
@@ -101,25 +104,52 @@ if(!class_exists('FPD_WC_Order')) {
 
 					$temp_img_path = FPD_TEMP_DIR . uniqid(time()) . '.png';
 					//get the base-64 from data
-					$data_url = $item['_fpd_product_thumbnail'];
+					// $data_url = $item['_fpd_product_thumbnail'];
+					$data_url = content_url('/uploads/test_email_image_' . $product->get_id() . '_' . $order_id . '.png');
 					$base64_str = substr($data_url, strpos($data_url, ",")+1);
 
-					if( !is_page(get_the_ID()) && !is_view_order_page() && file_put_contents($temp_img_path, base64_decode($base64_str)) ) {
-						$this->embedded_mail_images[] = $temp_img_path;
-						$item_thumb_src = 'cid:'.basename($temp_img_path, '.d');
+					if( !is_page(get_the_ID()) && !is_view_order_page() && file_put_contents($temp_img_path, base64_decode($data_url))) { // 
+						echo 'mzl fpd email side'; //  提交和查询不会进入，只有发email时候进入
+						
+						//$this->embedded_mail_images[] = $temp_img_path;
+						//$item_thumb_src = 'cid:'.basename($temp_img_path, '.d');
+						// $item_thumb_src = isset($item['_fpd_product_thumbnail']) ? $item['_fpd_product_thumbnail'] : get_the_post_thumbnail_url($product->get_id());
+						
+						echo '<div style="float: left; margin-right: auto; margin-bottom: 5px; width: 100%; min-height: 100px; background: url('.$data_url.'); background-repeat: no-repeat; background-position: top left; background-size: contain;"></div>';
+						return;
 					}
 					else {
+						echo 'mzl fpd 查询/提交订单';
 						$item_thumb_src = isset($item['_fpd_product_thumbnail']) ? $item['_fpd_product_thumbnail'] : get_the_post_thumbnail_url($product->get_id());
 					}
 
 				}
 				else {
-					$item_thumb_src = get_the_post_thumbnail_url($product->get_id());
+					echo 'mzl no fpd 提交订单';
+					$item_thumb_src = null;//get_the_post_thumbnail_url($product->get_id());
 				}
 
-				if( !empty( $item_thumb_src ) )
-					echo '<div style="float: left; margin-right: 5px; margin-bottom: 5px; width: 30%; min-height: 100px; background: url('.$item_thumb_src.'); background-repeat: no-repeat; background-position: top center; background-size: contain;"></div>';
+				if( !empty( $item_thumb_src ) ) {
+					echo 'mzl wc order, thumb src ' . $order_id;
+					$handle = fopen($item_thumb_src, 'rb');
+					echo 'mzl wc order, handle: ' . $handle . '---';
+					$imagick = new Imagick();
+				    $imagick->readImageFile($handle);
+					$imagick->setImageFormat('png');
+					// $imagick->readImageBlob(base64_decode($item_thumb_src));
+					$image_path = FPD_WP_CONTENT_DIR . '/uploads/test_email_image_' . $product->get_id() . '_' . $order_id . '.png';
+					$imagick->writeImage($image_path);
+					$image_url = content_url('/uploads/test_email_image_' . $product->get_id() . '_' . $order_id . '.png');
+					echo '<div style="float: left; margin-right: auto; margin-bottom: 5px; width: 100%; min-height: 100px; background: url('.$image_url.'); background-repeat: no-repeat; background-position: top left; background-size: contain;"></div>';//$item_thumb_src
+				} else {
+					// mzl add product src
+					$image_id  = $product->get_image_id();
 
+					// Get the image URL using the image ID and specify the image size ('full' in this case)
+					$image_url = wp_get_attachment_image_url( $image_id, 'full' );
+					// echo 'mzl wc order, image_url: ' . $image_url;
+					echo '<div style="float: left; margin-right: auto; margin-bottom: 5px; width: 100%; min-height: 100px; background: url('.$image_url.'); background-repeat: no-repeat; background-position: top left; background-size: contain;"></div>';
+				}
 			}
 
 		}
@@ -152,20 +182,21 @@ if(!class_exists('FPD_WC_Order')) {
 					'order' => method_exists($order,'get_id') ? $order->get_id() : $order->id,
 					'item_id' => $item_id),
 				$product->get_permalink($item) );
-
-				echo sprintf( '<a href="%s" style="display: block; font-size: 0.9em; color: rgba(0,0,0,0.8);">%s</a>', $url, FPD_Settings_Labels::get_translation('woocommerce', 'order:_view_customized_product') );
+				
+				// mzl remove link
+				//echo sprintf( '<a href="%s" style="display: block; font-size: 0.9em; color: rgba(0,0,0,0.8);">%s</a>', $url, FPD_Settings_Labels::get_translation('woocommerce', 'order:_view_customized_product') );
 
 			}
 
 			//download button
 			if( $item_has_fpd && $product->is_downloadable() && $order->is_download_permitted() ) {
+				// mzl remove download button
+				//$url = add_query_arg( array(
+				//	'order' => method_exists($order,'get_id') ? $order->get_id() : $order->id,
+				//	'item_id' => $item_id),
+				//$product->get_permalink($item) );
 
-				$url = add_query_arg( array(
-					'order' => method_exists($order,'get_id') ? $order->get_id() : $order->id,
-					'item_id' => $item_id),
-				$product->get_permalink($item) );
-
-				echo sprintf( ' | <a href="%s" class="fpd-order-item-download" style="font-size: 0.85em; color: rgba(0,0,0,0.8);">%s</a>', esc_url( $url ), __('Download', 'radykal') );
+				//echo sprintf( ' | <a href="%s" class="fpd-order-item-download" style="font-size: 0.85em; color: rgba(0,0,0,0.8);">%s</a>', esc_url( $url ), __('Download', 'radykal') );
 			}
 
 			//show element props

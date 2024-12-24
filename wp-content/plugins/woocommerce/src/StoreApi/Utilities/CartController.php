@@ -1157,6 +1157,7 @@ class CartController {
 		 * @return array
 		 */
 		$request['cart_item_data'] = (array) apply_filters(
+			//mzl 'woocommerce_before_single_product',
 			'woocommerce_add_cart_item_data',
 			$request['cart_item_data'],
 			$product_id,

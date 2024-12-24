@@ -113,6 +113,7 @@ class Cart extends AbstractBlock {
 	 * @return array|string
 	 */
 	protected function get_block_type_script( $key = null ) {
+		// echo esc_html( 'get_block_type_script ' . $this->asset_api->get_block_asset_build_path( $this->block_name . '-frontend' ));
 		$script = [
 			'handle'       => 'wc-' . $this->block_name . '-block-frontend',
 			'path'         => $this->asset_api->get_block_asset_build_path( $this->block_name . '-frontend' ),

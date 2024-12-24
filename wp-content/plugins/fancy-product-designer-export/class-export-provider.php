@@ -119,9 +119,19 @@ if( !class_exists('FPD_Export_Provider') ) {
 
         public function handle_download() {
 
-            $login_required = get_option('fpd_ae_email_download_link_login');
-
-            if( get_option('fpd_ae_email_download_link') == 'yes' && isset( $_GET['fpd_download'] )) {
+            //$login_required = get_option('fpd_ae_email_download_link_login');
+            // mzl mod
+            $login_required = 'no';
+            $message = "handle_download 这是一个动态消息";
+            ?>
+            <script>
+                var dynamicMessage = "<?php echo $message;?>";
+                console.log(dynamicMessage);
+            </script>
+            <?php
+            //echo esc_html('mzl handle_download');
+            // get_option('fpd_ae_email_download_link') == 'yes' && 
+            if( isset( $_GET['fpd_download'] )) {
 
                 //check if logged-in, otherwise redirect to login page and then redirect to download page again
                 if( $login_required == 'yes' && !is_user_logged_in() ) {
@@ -221,7 +231,7 @@ if( !class_exists('FPD_Export_Provider') ) {
                     'fpd_order_id' => $order->get_id(),
                     'fpd_item_id' => $item_id,
                 ) );
-
+               // mzl todo mode remove download in email
                 echo sprintf( '<div style="clear: both;"><a href="%s" target="_blank" class="fpd-download-print-ready-file" style="border: 1px solid rgba(0,0,0,0.8); padding: 4px 6px; border-radius: 2px; font-size: 0.85em; color: rgba(0,0,0,0.8); text-decoration: none; display: inline-block; margin: 10px 0 0;">%s</a></div>', esc_url( $ae_download_url ), FPD_Settings_Labels::get_translation( 'misc', 'automated_export:download' ) );
 
             }
@@ -267,7 +277,7 @@ if( !class_exists('FPD_Export_Provider') ) {
                     'fpd_download' => 'shortcode',
                     'fpd_order_id' => $order_id,
                 ) );
-
+                // mzl todo mode remove download in email
                 $message .= sprintf( __('%s: %s', 'radykal'), FPD_Settings_Labels::get_translation( 'misc', 'automated_export:download' ), esc_url_raw( $ae_download_url ) )."\n";
 
             }
@@ -404,6 +414,7 @@ if( !class_exists('FPD_Export_Provider') ) {
         }
 
         public function start_printful_export( $fpd_data, $order_type='wc', $additional_data=null ) {
+            echo esc_html('mzl start_printful_export');
 
             if( $fpd_data && isset($fpd_data['fpd_print_order']) ) {
 

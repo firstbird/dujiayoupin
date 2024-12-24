@@ -258,15 +258,16 @@ function fpd_get_domain_from_url( $url)  {
 }
 
 function fpd_genius_request( $endpoint='client', $license_key=null, $method= 'GET', $body=null ) {
+	// mzl stub license
+	// if ( empty($license_key) )
+	// 	$license_key = get_option('fpd_genius_license_key', '');
 
-	if ( empty($license_key) )
-		$license_key = get_option('fpd_genius_license_key', '');
+	// if( empty($license_key) )
+	// 	return null;
 
-	if( empty($license_key) )
-		return null;
-
-	$genius_url = $GLOBALS['FPD_GENIUS_URL'];
-	if(Fancy_Product_Designer::LOCAL)
+	//$genius_url = $GLOBALS['FPD_GENIUS_URL'];
+	//if(Fancy_Product_Designer::LOCAL)
+	echo 'mzl endpoint: ' . $endpoint . '---';
 		$genius_url = 'http://localhost:3000/api/';
 		
 	$curl_options = array(
@@ -279,7 +280,7 @@ function fpd_genius_request( $endpoint='client', $license_key=null, $method= 'GE
 		CURLOPT_CUSTOMREQUEST => $method,
 		CURLOPT_HTTPHEADER => array(
 			"Content-Type: application/json",
-			"X_API_TOKEN: ". $license_key,
+			"X_API_TOKEN: ". '1231j4j12l1231213',//$license_key,
 			"X_API_DOMAIN: ". ( fpd_get_domain_from_url( get_site_url() ) )
 		)
 	);

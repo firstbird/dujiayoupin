@@ -358,6 +358,9 @@ if( !class_exists('FPD_Export_Printful') ) {
                         if(tempProduct) {
                             fancyProductDesigner.loadProduct(tempProduct, true);
                             tempProduct = null;
+							const dataURL = fancyProductDesigner.currentViewInstance.fabricCanvas.toDataURL();
+
+							console.info('mzl class printful dataURL: ' + dataURL);
                         }
                             
                         

@@ -530,7 +530,7 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 			if ( ! did_action( 'woocommerce_register_form' ) || ! did_action( 'wcmp_vendor_register_form' ) ) {
 				echo '<p class="form-row form-row-wide">
                 <label for="reg_billing_phone">
-                    ' . esc_html( mo_( '手机号码mzl' ) ) . '
+                    ' . esc_html( mo_( '手机号码' ) ) . '
                     <span class="required">*</span>
                 </label>
                 <input type="text" class="input-text" 
@@ -542,7 +542,7 @@ if ( ! class_exists( 'WooCommerceRegistrationForm' ) ) {
 		public function mo_rest_password_field () {
 			echo '<p class="form-row form-row-wide">
 			<label for="reg_verification_phone">
-				' . esc_html( mo_( 'mzl password reset' ) ) . '
+				' . esc_html( mo_( 'password reset' ) ) . '
 				<span class="required">*</span>
 			</label>
 			<input type="text" class="input-text" name="moverify" 

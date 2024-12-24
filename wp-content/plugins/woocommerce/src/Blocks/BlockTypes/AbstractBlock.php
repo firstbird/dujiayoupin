@@ -506,6 +506,7 @@ abstract class AbstractBlock {
 	 */
 	protected function enqueue_scripts( array $attributes = [] ) {
 		if ( null !== $this->get_block_type_script() ) {
+			// echo esc_html( 'mzl enqueue_scripts ' . $this->get_block_type_script( 'handle' ) );
 			wp_enqueue_script( $this->get_block_type_script( 'handle' ) );
 		}
 	}

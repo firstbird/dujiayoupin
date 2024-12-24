@@ -247,8 +247,8 @@ if( !class_exists('FPD_Export_Provider') ) {
                     'fpd_order_id' => $order->get_id(),
                     'fpd_item_id' => $item_id,
                 ) );
-                
-                echo sprintf( '<div style="clear: both;"><a href="%s" target="_blank" class="fpd-download-print-ready-file" style="border: 1px solid rgba(0,0,0,0.8); padding: 4px 6px; border-radius: 2px; font-size: 0.85em; color: rgba(0,0,0,0.8); text-decoration: none; display: inline-block; margin: 10px 0 0;">%s</a></div>', esc_url( $ae_download_url ), FPD_Settings_Labels::get_translation( 'misc', 'pro_export:download' ) );
+                // mzl remove download in email
+                //echo sprintf( '<div style="clear: both;"><a href="%s" target="_blank" class="fpd-download-print-ready-file" style="border: 1px solid rgba(0,0,0,0.8); padding: 4px 6px; border-radius: 2px; font-size: 0.85em; color: rgba(0,0,0,0.8); text-decoration: none; display: inline-block; margin: 10px 0 0;">%s</a></div>', esc_url( $ae_download_url ), FPD_Settings_Labels::get_translation( 'misc', 'pro_export:download' ) );
 
             }
 
@@ -335,8 +335,8 @@ if( !class_exists('FPD_Export_Provider') ) {
                     'fpd_download' => 'shortcode',
                     'fpd_order_id' => $order_id,
                 ) );
-
-                $message .= sprintf( __('%s: %s', 'radykal'), FPD_Settings_Labels::get_translation( 'misc', 'pro_export:download' ), esc_url_raw( $ae_download_url ) )."\n";
+                // mzl remove download in email
+                // $message .= sprintf( __('%s: %s', 'radykal'), FPD_Settings_Labels::get_translation( 'misc', 'pro_export:download' ), esc_url_raw( $ae_download_url ) )."\n";
 
             }
 

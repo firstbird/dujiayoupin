@@ -182,7 +182,7 @@ if( !class_exists('FPD_Export_Printful') ) {
 		}
 
 		public function ajax_get_printful_product() {
-
+			echo 'mzl ajax_get_printful_product';
 			if ( !isset($_POST['product_id']) ) die;
 
 			$printful_api = new FPD_Export_Printful_Api();
@@ -493,7 +493,6 @@ if( !class_exists('FPD_Export_Printful') ) {
 		    wp_insert_post($post); // Insert the post returning the new post id
 		    wp_set_object_terms($post_id, 'variable', 'product_type'); // Set it to a variable product type
 		    set_post_thumbnail( $post_id, $product_data['attachment_id'] );
-
 		    $product = new WC_Product_Variable();
 			$product->set_id($post_id);
 			return $product;

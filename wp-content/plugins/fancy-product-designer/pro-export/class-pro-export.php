@@ -19,7 +19,7 @@ if( !class_exists('FPD_Pro_Export') ) {
         }
 
         public static function create_print_ready_file( $print_data, $job_async=true ) {
-
+            echo 'mzl pro export create_print_ready_file start';
             $export_method = get_option( 'fpd_pro_export_method', 'svg2pdf' );
             
             $print_data = array_merge( array(
@@ -46,7 +46,6 @@ if( !class_exists('FPD_Pro_Export') ) {
             ), $print_data );
 
             $print_data['name'] = sanitize_key( $print_data['name'] );
-            
             if( !Fancy_Product_Designer::LOCAL && self::ENABLE_PRINT_JOB && $print_data['create_print_job'] ) { 
                 
                 $print_job_data = array(
@@ -68,7 +67,7 @@ if( !class_exists('FPD_Pro_Export') ) {
 
                 $print_data['print_job_id'] = $print_job_id;
                 $print_data['file_ready_webhook'] = get_rest_url( null, self::ROUTE_NAMESPACE  . '/print_job/') . $print_data['print_job_id'];
-
+                // echo 'mzl create_print_ready_file start local';
             }
 
             if( !file_exists(FPD_ORDER_DIR) )
@@ -77,12 +76,13 @@ if( !class_exists('FPD_Pro_Export') ) {
             if( !file_exists(FPD_ORDER_DIR . 'print_ready_files') )
                 wp_mkdir_p(FPD_ORDER_DIR . 'print_ready_files');
 
-            $google_webfonts = self::get_google_webfonts();
+            // $google_webfonts = self::get_google_webfonts(); //mzl todo 会超时
+            $google_webfonts = null;
             $custom_fonts_dir = FPD_WP_CONTENT_DIR.'/uploads/fpd_fonts/';
-
             $used_fonts = is_array( $print_data['used_fonts'] ) ? $print_data['used_fonts'] : array();
             $fonts_to_embed = array();
-
+            echo 'mzl pro export mid----';
+            // return 'mzl stub return----';
             foreach($used_fonts as $used_font) {
 
                 if( !isset($used_font['url']) )

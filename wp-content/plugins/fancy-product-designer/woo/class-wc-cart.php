@@ -10,7 +10,13 @@ if(!class_exists('FPD_WC_Cart')) {
 		public function __construct() {
 
 			$cross_sell_display = get_option('fpd_cross_sells_display', 'none');
-
+			// mzl add
+			// add_action( 'woocommerce_before_single_product', array( &$this, 'before_product_container'), 1 );
+			// add_filter( 'fpd_frontend_setup_configs', array( &$this, 'add_app_options') );
+			// add_action( 'fpd_before_product_designer', array( &$this, 'before_product_designer'), 1 );
+			// mzl 在after designer中附加了定制图片
+			// add_action( 'fpd_after_product_designer', array( &$this, 'after_product_designer'), 1 );
+		
 			//ADD_TO_CART process
 			//add additional [fpd_data]([fpd_product],[fpd_price]) to cart item
 			// mzl add custom product info
@@ -45,11 +51,194 @@ if(!class_exists('FPD_WC_Cart')) {
 			//names & numbers
 			add_action( 'woocommerce_after_cart_item_name', array(&$this, 'after_cart_item_name'), 10, 2 );
 
+		}
+
+		public function before_product_container() {
+			// echo esc_html( 'mzl cart before_product_container in ......' );
+	
+			global $post;
+	
+			if( is_fancy_product( $post->ID ) ) {
+	
+				//add product designer
+				$product_settings = new FPD_Product_Settings( $post->ID );
+				$position = $product_settings->get_option('placement');
+				// echo 'mzl $position ' . $position;
+	
+				if( $position  == 'fpd-replace-image') {
+					add_action( 'woocommerce_before_single_product_summary', 'FPD_Frontend_Product::add_product_designer', 15 );
+				}
+				else if( $position  == 'fpd-under-title') {
+					add_action( 'woocommerce_single_product_summary', 'FPD_Frontend_Product::add_product_designer', 6 );
+				}
+				else if( $position  == 'fpd-after-summary') {
+					add_action( 'woocommerce_after_single_product_summary', 'FPD_Frontend_Product::add_product_designer', 1 );
+				}
+				else {
+					add_action( 'fpd_product_designer', 'FPD_Frontend_Product::add_product_designer' );
+				}
+	
+				//remove product image, there you gonna see the product designer
+				// mzl 条件不能去掉，不然product界面看不到预览
+				if( $product_settings->get_option('hide_product_image') || ($position == 'fpd-replace-image' && (!$product_settings->customize_button_enabled)) ) {
+					remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
+				}
+	
+			}
+		}
+	
+		public function before_product_designer( $post ) {
+
+			if( get_post_type( $post ) !== 'product' )
+				return;
+
+			global $product, $woocommerce;
+
+			//added to cart, recall added product
+			if( isset($_POST['fpd_product']) ) {
+
+				if( fpd_get_option('fpd_wc_add_to_cart_product_load') == 'customized-product' ) {
+
+					$views = strip_tags( $_POST['fpd_product'] );
+					FPD_Frontend_Product::$initial_product = stripslashes($views);
+
+				}
+				
+
+			}
+			else if( isset($_GET['cart_item_key']) ) {
+
+				//load from cart item
+				$cart = $woocommerce->cart->get_cart();				
+
+				$cart_item = $woocommerce->cart->get_cart_item( sanitize_key( $_GET['cart_item_key'] ) );
+				if( !empty($cart_item) ) {
+
+					if( isset($cart_item['fpd_data']) ) {
+
+						if( isset( $cart_item['quantity'] ) )
+							$_POST['quantity'] = $cart_item['quantity'];
+
+						$views = $cart_item['fpd_data']['fpd_product'];
+						FPD_Frontend_Product::$initial_product = stripslashes($views);
+						// echo 'mzl before_product_designer, views: ' . json_encode(stripslashes($views));//htmlspecialchars($cart_item);
+
+						// echo $cart[$_GET['cart_item_key']]['fpd_data']['fpd_product_thumbnail'];
+						// add_filter( 'woocommerce_product_single_add_to_cart_text', array( &$this, 'change_add_to_cart_btn_text') );
+					}
+
+				}
+				else {
+
+					//cart item could not be found
+					echo '<p><strong>';
+					echo FPD_Settings_Labels::get_translation( 'woocommerce', 'cart_item_not_found' );
+					echo '</strong></p>';
+					return;
+
+				}
+
+			}
+			else if( isset($_GET['order']) && isset($_GET['item_id']) ) {
+
+				$order = wc_get_order( intval( $_GET['order'] ) );
+
+				//check if order belongs to customer
+				if(!fpd_get_option('fpd_order_login_required')
+					|| current_user_can(Fancy_Product_Designer::CAPABILITY)
+					|| $order->get_user_id() === get_current_user_id()
+				) {
+
+					$item_meta = fpd_wc_get_order_item_meta( intval( $_GET['item_id'] ) );
+
+					//V3.4.9: only order is stored in fpd_data
+					FPD_Frontend_Product::$initial_product = is_array($item_meta) ? $item_meta['fpd_product'] : $item_meta;
+
+					if( $order && $order->is_paid() ) {
+						FPD_Frontend_Product::$remove_watermark = true;
+
+						if( $product->is_downloadable() ) :
+						?>
+						<a href="#" id="fpd-extern-download-pdf" class="<?php echo trim(fpd_get_option('fpd_start_customizing_css_class')); ?>" style="display: inline-block; margin: 10px 10px 10px 0;">
+							<?php echo FPD_Settings_Labels::get_translation( 'actions', 'download' ); ?>
+						</a>
+						<?php
+						endif;
+
+					}
+					else {
+						FPD_Frontend_Product::$remove_watermark = false;
+					}
+
+					$allowed_edit_status = array(
+						'pending',
+						'processing',
+						'on-hold'
+					);
+
+					if( fpd_get_option('fpd_order_save_order') && in_array($order->get_status(), $allowed_edit_status) ) : ?>
+						<a href="#" id="fpd-save-order" class="<?php echo trim(fpd_get_option('fpd_start_customizing_css_class')); ?>"  style="display: inline-block; margin: 10px 10px 10px 0;">
+							<?php echo FPD_Settings_Labels::get_translation( 'woocommerce', 'save_order' ); ?>
+						</a>
+					<?php endif;
+
+				}
+
+			}
+			else if( isset($_GET['start_customizing']) && isset($_GET['fpd_product']) ) {
+
+				$get_fpd_product_id = intval($_GET['fpd_product']);
+				
+				if( FPD_Product::exists($get_fpd_product_id) ) {
+					$fancy_product = new FPD_Product( $get_fpd_product_id );
+					FPD_Frontend_Product::$initial_product = $fancy_product->to_JSON();
+					
+				}
+
+			}
+
+		}
+
+		public function after_product_designer( $post ) {
+			// echo 'mzl after_product_designer post: ' . get_post_type( $post );
+
+			if( is_admin() || get_post_type( $post ) !== 'page' )
+				return;
+
+			global $product;
+            
+            if( !method_exists($product, 'get_id') ) return;
+			echo 'mzl after_product_designer method_exists id: ' . $product->get_id();
+
+			$product_settings = new FPD_Product_Settings( $product->get_id() );
+
+			$product_price = wc_get_price_to_display( $product );
+			$product_price = $product_price && is_numeric($product_price) ? $product_price : 0;
+
+			wp_enqueue_script( 
+				'fpd-frontend-woo', 
+				plugins_url('/assets/js/frontend-woo.js', FPD_PLUGIN_ROOT_PHP), 
+				array('fpd-js-utils'), 
+				Fancy_Product_Designer::VERSION 
+			);
+			// echo 'mzl fpd_lightbox_update_product_image: ' . fpd_get_option('fpd_lightbox_update_product_image');
+			$woo_configs = array(
+				'options' => array(
+					'lightbox_update_product_image' => fpd_get_option('fpd_lightbox_update_product_image'),
+					'replace_initial_elements' 		=> 1,//$product_settings->get_option('replace_initial_elements'),
+					'product_image_css_selector' 	=> fpd_get_option('fpd_wc_product_image_css_selector'),
+				),
+				'labels' => array(
+					'loading_product' 		=> FPD_Settings_Labels::get_translation( 'woocommerce', 'loading_product' ),
+					'product_loading_fail'	=> FPD_Settings_Labels::get_translation( 'woocommerce', 'product_loading_fail' )
+				)
+			);
+			wp_localize_script( 'fpd-frontend-woo', 'fpd_woo_configs', $woo_configs);
 
 		}
 
 		public function cross_sells_display() {
-
+			echo 'mzl cross_sells_display'
 			?>
 			<style type="text/css">
 
@@ -98,9 +287,10 @@ if(!class_exists('FPD_WC_Cart')) {
 				if( isset($_POST['fpd_quantity']) && !empty($_POST['fpd_quantity']) )
 					$cart_item_meta['fpd_data']['fpd_quantity'] = strip_tags( $_POST['fpd_quantity'] );
 
-				if( isset($_POST['fpd_product_thumbnail']) )
+				if( isset($_POST['fpd_product_thumbnail']) ) {
+					// echo 'mzl post fpd_product_thumbnail: ' . strip_tags( $_POST['fpd_product_thumbnail'] );
 					$cart_item_meta['fpd_data']['fpd_product_thumbnail'] = strip_tags( $_POST['fpd_product_thumbnail'] );
-
+				}
 				if( isset($_POST['fpd_print_order']) )
 					$cart_item_meta['fpd_data']['fpd_print_order'] = $_POST['fpd_print_order'];
 
@@ -262,6 +452,7 @@ if(!class_exists('FPD_WC_Cart')) {
 				 $permalink = add_query_arg( array('cart_item_key' => $cart_item_key), $permalink );
 
 			}
+			// echo 'mzl set_cart_item_permalink permalink: ' . $permalink;
 
 			return $permalink;
 
@@ -280,7 +471,8 @@ if(!class_exists('FPD_WC_Cart')) {
 				libxml_clear_errors();
 				$doc = $dom->getElementsByTagName("a")->item(0);
 				$href = $xpath->query(".//@href");
-				
+				//echo 'mzl reset_cart_item_link href: ' . $href;
+
 				foreach ( $href as $s ) {
 					$url = $s->nodeValue;
 
@@ -290,6 +482,7 @@ if(!class_exists('FPD_WC_Cart')) {
 
 					//set again for WPML
 					$url = add_query_arg( array('cart_item_key' => $cart_item_key), $url );
+					echo 'mzl reset_cart_item_link url: ' . $url;
 
 					$link = sprintf( '<a href="%s">%s<br /><i style="opacity: 1; font-size: 0.9em;">%s</i></a>', $url, $cart_item['data']->get_name(), FPD_Settings_Labels::get_translation( 'woocommerce', 'cart:_re-edit product' ) );
 
@@ -318,6 +511,8 @@ if(!class_exists('FPD_WC_Cart')) {
 
 		public function change_cart_item_thumbnail( $thumbnail, $cart_item = null ) {
 			//echo '<div class="error"><p>'. 'change_cart_item_thumbnail' .'</p></div>';
+			global $product;
+			$product = $cart_item['data'];
 
 			if( fpd_get_option('fpd_cart_custom_product_thumbnail') && !empty($thumbnail) && !is_null($cart_item) && isset($cart_item['fpd_data']) ) {
 			//	echo esc_html( 'change_cart_item_thumbnail switch on ......' );
@@ -334,22 +529,31 @@ if(!class_exists('FPD_WC_Cart')) {
 					libxml_clear_errors();
 					$doc = $dom->getElementsByTagName("img")->item(0);
 					$src = $xpath->query(".//@src");
-					// $srcset = $xpath->query(".//@srcset");
-					// echo '<div class="error"><p>'. 'src: ' . $fpd_data['fpd_product_thumbnail'] . '</p></div>';
-					//echo '<div class="error"><p>'. 'srcset: ' . $thumbnail . '</p></div>';
-
+					$srcset = $xpath->query(".//@srcset");
 
 					foreach ( $src as $s ) {
 						$s->nodeValue = $fpd_data['fpd_product_thumbnail'];
 					}
 					
-					// foreach ( $srcset as $s ) {						
-					// 	$s->nodeValue = '';
-					// }
-					// $dom->saveXML( $doc );
-					// return $dom->saveXML( $doc );
+					foreach ( $srcset as $s ) {						
+						$s->nodeValue = $fpd_data['fpd_product_thumbnail'];
+					}
+					$dom->saveXML( $doc );
+					//return $dom->saveXML( $doc );
 					return $s->nodeValue;
-
+					
+					
+					// $classstr = 'class="' . esc_attr( implode( ' ', wc_get_product_class( '', $product ) ) ) . '"';
+					// $_div = '<div id="product-' . $cart_item['product_id'] . '" ' .
+					// $classstr;
+					// $_div .= '>';
+					
+					// do_action( 'woocommerce_before_single_product_summary' );
+			
+				
+					// do_action( 'woocommerce_after_single_product' );
+					// $_div .= '</div>';
+					// return $_div;
 		        }
 
 			}

@@ -69,6 +69,7 @@ if( !class_exists('Fancy_Product_Designer_Export') ) {
         }
 
         public static function create_print_ready_file( $print_data, $job_async=true ) {
+            echo 'mzl designer export create_print_ready_file start';
 
             $print_data = array_merge( array(
                 'print_ready' 			=> true,
@@ -99,6 +100,7 @@ if( !class_exists('Fancy_Product_Designer_Export') ) {
                 $print_data['print_job_id'] = $print_job_id;
 
             }
+            // return 'mzl designer create_print_ready_file start';
 
             if( isset($print_data['print_job_id']) )
                 $print_data['file_ready_webhook'] .= $print_data['print_job_id'];

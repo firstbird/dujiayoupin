@@ -455,7 +455,7 @@ class PaymentGateway extends \WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ): array {
 		// todo mzl
-		wc_add_notice( __( 'process_payment begin', 'wprs-wc-wechatpay' ), 'error' );
+		// wc_add_notice( __( 'process_payment begin', 'wprs-wc-wechatpay' ), 'error' );
 
 		$order = wc_get_order( $order_id );
 

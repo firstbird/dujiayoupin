@@ -326,7 +326,7 @@ jQuery(document).ready(() => {
                 if(tempShow) {
                     $modalDesigner.removeClass('fpd-show');
                 }
-
+                console.info('mzl dataURL1: ' + dataURL)
                 _updateProductImage(dataURL);
                 fpdImage = dataURL;
 
@@ -338,6 +338,8 @@ jQuery(document).ready(() => {
         $productWrapper.find('.images').on('woocommerce_gallery_init_zoom', () => {
 
             if(fpdImage) {
+                console.info('mzl dataURL2: ' + fpdImage)
+
                 _updateProductImage(fpdImage);
             }
 
@@ -345,6 +347,8 @@ jQuery(document).ready(() => {
             setTimeout(() => {
 
                 if(fpdImage) {
+                    console.info('mzl dataURL3: ' + fpdImage)
+
                     _updateProductImage(fpdImage);
                 }
 

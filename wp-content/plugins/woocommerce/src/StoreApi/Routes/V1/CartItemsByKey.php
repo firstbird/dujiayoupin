@@ -89,7 +89,7 @@ class CartItemsByKey extends AbstractCartRoute {
 		if ( empty( $cart_item ) ) {
 			throw new RouteException( 'woocommerce_rest_cart_invalid_key', __( 'Cart item does not exist.', 'woocommerce' ), 409 );
 		}
-
+		// echo 'mzl get_route_response key: ' . $request['key'];
 		$data     = $this->prepare_item_for_response( $cart_item, $request );
 		$response = rest_ensure_response( $data );
 

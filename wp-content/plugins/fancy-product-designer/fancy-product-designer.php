@@ -40,6 +40,7 @@ if( !class_exists('Fancy_Product_Designer') ) {
 			require_once( FPD_PLUGIN_DIR.'/inc/api/class-ui-layouts.php' );
 			require_once( FPD_PLUGIN_DIR.'/inc/api/class-print-job.php' );
 			require_once( FPD_PLUGIN_ADMIN_DIR.'/class-admin.php' );
+			require_once( FPD_PLUGIN_DIR.'/pro-export/class-pro-export.php' );
 			require_once( FPD_PLUGIN_DIR.'/inc/class-install.php' );
 			require_once( FPD_PLUGIN_DIR.'/inc/class-scripts-styles.php' );
 			require_once( FPD_PLUGIN_DIR.'/inc/api/class-shortcode-order.php' );
@@ -85,12 +86,11 @@ if( !class_exists('Fancy_Product_Designer') ) {
 		}
 
 		public static function create_print_ready_file( $payload, $job_async=true ) {
-
-			if( !empty( get_option('fpd_genius_license_key', '') ) ) {
+			//if( !empty( get_option('fpd_genius_license_key', '') ) ) {
 
 				return FPD_Pro_Export::create_print_ready_file( $payload, $job_async );
 
-			}
+			//}
 
 		}
 

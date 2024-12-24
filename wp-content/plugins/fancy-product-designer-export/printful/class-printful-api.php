@@ -134,7 +134,7 @@ if( !class_exists('FPD_Export_Printful_Api') ) {
         }
         
         private function jwt_request( $endpoint, $post_data=null) {
-            
+            echo 'mzl jwt_request ----- ';
             $token = get_option( 'fpd_printful_api_key', '' );
             $url = $this->api_url . $endpoint;
             

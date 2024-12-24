@@ -59,7 +59,9 @@ if(!class_exists('FPD_Frontend_Product')) {
 			if( !is_admin() ) {
 
 				global $post;
+				// echo 'mzl head_frontend -- ';
 				if( isset($post->ID) && is_fancy_product( $post->ID ) ) {
+					// echo 'mzl head_frontend is_fancy_product -- ';
 
 					$product_settings = new FPD_Product_Settings( $post->ID );
 					$main_bar_pos = $product_settings->get_option('main_bar_position');
@@ -106,6 +108,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 
 					//view thumbnails
 					$view_thumbnails_placement = $product_settings->get_option('view_thumbnails_placement');										
+					// echo 'mzl head_frontend view_thumbnails_placement: -- ' . $view_thumbnails_placement;
 					if( $view_thumbnails_placement === 'before_fpd' ||  $view_thumbnails_placement == 'after_fpd' ) {
 
 						if($view_thumbnails_placement === 'before_fpd')
@@ -247,12 +250,12 @@ if(!class_exists('FPD_Frontend_Product')) {
 
 		//the actual product designer will be added
 		public static function add_product_designer() {
-
+			// echo 'mzl add_product_designer -----';
 			global $post;
 
 			$product_settings = new FPD_Product_Settings( $post->ID );
-
 			if( $product_settings->show_designer() ) {
+				// echo 'mzl add_product_designer show_designer -----';
 
 				do_action( 'fpd_before_product_designer' );
 
@@ -517,7 +520,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 					<div id="<?php echo $selector; ?>" class="<?php echo $selector_classes; ?>"></div>
 				</div>
 				<?php
-								
+				// echo 'mzl custom_image_props: ';// . json_encode($custom_image_props);
 				$configs = array(
 					'selector'			=> $selector,
 					'post_id'			=> $post->ID,
@@ -679,6 +682,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 
 				//app options from layout
 				$layout_options = is_array($ui_layout['plugin_options']) ? $ui_layout['plugin_options'] : array();
+				// mzl 下面两个没用
 				$configs['app_options'] = array_merge($configs['app_options'], $layout_options);
 
 				$configs = apply_filters( 'fpd_frontend_setup_configs', $configs );				
@@ -698,6 +702,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 					Fancy_Product_Designer::VERSION 
 				);
 				
+				// mzl important
 				wp_localize_script( 'fpd-frontend', 'fpd_setup_configs', $configs);
 
 				if( fpd_get_option('fpd_sharing') ) {
@@ -710,7 +715,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 					);
 
 				}
-
+				// echo 'mzl fpd_after_product_designer do action -----';
 				do_action('fpd_after_product_designer', $post);
 
 			}
@@ -746,7 +751,8 @@ if(!class_exists('FPD_Frontend_Product')) {
 				<?php
 
 			}
-
+    		// $product_meta = get_post_meta($post->ID);
+    		// echo 'mzl wp_get_attachment_image: ' . wp_get_attachment_image( $product_meta['_thumbnail_id'][0], 'full' );
 		}
 
 		public function shortcode_action_handler( $atts ) {
@@ -786,7 +792,7 @@ if(!class_exists('FPD_Frontend_Product')) {
 		}
 
 		public function ajax_create_print_ready_file() {
-
+			echo 'mzl ajax_create_print_ready_file start';
 			if( isset($_POST['print_data']) &&  Fancy_Product_Designer::pro_export_enabled() ) {
 
 				$print_data = json_decode(stripslashes($_POST['print_data']), true);

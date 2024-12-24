@@ -83,7 +83,6 @@ class ImageAttachmentSchema extends AbstractSchema {
 			return null;
 		}
 		$thumbnail = wp_get_attachment_image_src( $attachment_id, 'woocommerce_thumbnail' );
-
 		return (object) [
 			'id'        => (int) $attachment_id,
 			'src'       => current( $attachment ),

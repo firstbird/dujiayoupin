@@ -83,14 +83,16 @@ define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-
-
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
+/* SSL Settings */
+define('FORCE_SSL_ADMIN', true);
+define('FORCE_SSL_LOGIN', true);
+/* Turn HTTPS 'on' if HTTP_X_FORWARDED_PROTO matches 'https' */
 
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';

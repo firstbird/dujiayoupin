@@ -807,6 +807,7 @@ if(!class_exists('FPD_Admin_Ajax')) {
 		}
 
 		public function create_file_export() {
+			//echo '<script>console.error("mzl create_file_export")</script>';
 
 			check_ajax_referer( 'fpd_ajax_nonce' );
 
@@ -820,16 +821,19 @@ if(!class_exists('FPD_Admin_Ajax')) {
 			//print-ready export
 			if( isset($payload['print_ready']) && $payload['print_ready'] ) {
 
-				
-				if( Fancy_Product_Designer::pro_export_enabled() ) {
+				// Fancy_Product_Designer::pro_export_enabled()
+				// mzl mod
+				if( 1 === 1 ) {
 
 					try {
 						
 						$res = Fancy_Product_Designer::create_print_ready_file( $payload );						
 
+						echo 'mzl create_print_ready_file: ' . $res; //. ' payload: ' . json_encode($payload);
 						if( is_string($res) ) { //a string is returned as response which holds the file url to download
 							$file_url = content_url( '/fancy_products_orders/print_ready_files/' . $res );
 						}
+						echo 'mzl file_url: ' . $file_url;
 
 					}
 					catch(Exception $e) {

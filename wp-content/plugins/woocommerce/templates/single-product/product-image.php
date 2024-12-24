@@ -39,17 +39,34 @@ $wrapper_classes   = apply_filters(
 <div class="<?php echo esc_attr( implode( ' ', array_map( 'sanitize_html_class', $wrapper_classes ) ) ); ?>" data-columns="<?php echo esc_attr( $columns ); ?>" style="opacity: 0; transition: opacity .25s ease-in-out;">
 	<div class="woocommerce-product-gallery__wrapper">
 		<?php
+		// echo 'mzl gallery__wrapper post_thumbnail_id: ' . $post_thumbnail_id;
 		if ( $post_thumbnail_id ) {
 			$html = wc_get_gallery_image_html( $post_thumbnail_id, true );
+			// $html = '<div>mzl sb .... </div>';
+			//echo 'mzl wc_placeholder_img_src post_thumbnail_id: ' . $post_thumbnail_id;
 		} else {
 			$html  = '<div class="woocommerce-product-gallery__image--placeholder">';
 			$html .= sprintf( '<img src="%s" alt="%s" class="wp-post-image" />', esc_url( wc_placeholder_img_src( 'woocommerce_single' ) ), esc_html__( 'Awaiting product image', 'woocommerce' ) );
 			$html .= '</div>';
 		}
-
-		echo apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id ); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
-
+		//echo 'mzl wc_placeholder_img_src post_thumbnail_id: ' . $post_thumbnail_id;
+		
+		// 下面连个动作不是原因
+		apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id ); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
 		do_action( 'woocommerce_product_thumbnails' );
+		// echo 'yyyy';
+		// 只要echo html就行 html是模版的，没有定制的
+		// echo htmlspecialchars($html);
+		echo $html;
+		// $dom = new DOMDocument();
+		// @$dom->loadHTML($new_html);
+		// $images = $dom->getElementsByTagName('a');
+		// foreach ($images as $image) {
+		// 	$src = $image->getAttribute('data-thumb');
+		// 	echo $src;
+		// }
+		// echo htmlspecialchars($new_html);
+
 		?>
 	</div>
 </div>

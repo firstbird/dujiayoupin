@@ -1156,6 +1156,7 @@ function wp_get_attachment_image( $attachment_id, $size = 'thumbnail', $icon = f
 		}
 
 		$html .= ' />';
+		// echo 'mzl wp_get_attachment_image html: ' . $html;
 	}
 
 	/**

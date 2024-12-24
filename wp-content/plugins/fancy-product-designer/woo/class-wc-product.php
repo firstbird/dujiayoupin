@@ -23,6 +23,7 @@ if( !class_exists('FPD_WC_Product') ) {
 
 			add_filter( 'fpd_frontend_setup_configs', array( &$this, 'add_app_options') );
 			add_action( 'fpd_before_product_designer', array( &$this, 'before_product_designer'), 1 );
+			// mzl 在after designer中附加了定制图片
 			add_action( 'fpd_after_product_designer', array( &$this, 'after_product_designer'), 1 );
 
 			//add customize button
@@ -135,7 +136,7 @@ if( !class_exists('FPD_WC_Product') ) {
 		}
 
 		public function before_product_container() {
-            //echo esc_html( 'mzl before_product_container in ......' );
+            // echo esc_html( 'mzl before_product_container in ......' );
 
 			global $post;
 
@@ -144,6 +145,7 @@ if( !class_exists('FPD_WC_Product') ) {
 				//add product designer
 				$product_settings = new FPD_Product_Settings( $post->ID );
 				$position = $product_settings->get_option('placement');
+				// echo 'mzl $position ' . $position;
 
 				if( $position  == 'fpd-replace-image') {
 					add_action( 'woocommerce_before_single_product_summary', 'FPD_Frontend_Product::add_product_designer', 15 );
@@ -160,6 +162,7 @@ if( !class_exists('FPD_WC_Product') ) {
 
 				//remove product image, there you gonna see the product designer
 				if( $product_settings->get_option('hide_product_image') || ($position == 'fpd-replace-image' && (!$product_settings->customize_button_enabled)) ) {
+					echo 'mzl product remove product image';
 					remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
 				}
 
@@ -200,7 +203,9 @@ if( !class_exists('FPD_WC_Product') ) {
 
 						$views = $cart_item['fpd_data']['fpd_product'];
 						FPD_Frontend_Product::$initial_product = stripslashes($views);
+						// echo 'mzl before_product_designer, views: ' . json_encode(stripslashes($views));//htmlspecialchars($cart_item);
 
+						// echo $cart[$_GET['cart_item_key']]['fpd_data']['fpd_product_thumbnail'];
 						add_filter( 'woocommerce_product_single_add_to_cart_text', array( &$this, 'change_add_to_cart_btn_text') );
 					}
 
@@ -338,7 +343,7 @@ if( !class_exists('FPD_WC_Product') ) {
 				array('fpd-js-utils'), 
 				Fancy_Product_Designer::VERSION 
 			);
-
+			// echo 'mzl fpd_lightbox_update_product_image: ' . fpd_get_option('fpd_lightbox_update_product_image');
 			$woo_configs = array(
 				'options' => array(
 					'number_of_decimals' 			=> !apply_filters( 'woocommerce_price_trim_zeros', false ) ? intval(get_option('woocommerce_price_num_decimals')) : 0,

@@ -49,7 +49,10 @@ if( !class_exists('FPD_File_Export') ) {
 			// set document information
 			$pdf->SetCreator( get_site_url() );
 			$pdf->SetTitle( $args['name'] );
-			$pdf->SetFont('dejavusans');
+			// mzl set font
+			//$fontname = $pdf->addTTFfont(FPD_PLUGIN_ADMIN_DIR.'vendors/mdi/fonts/chsong.ttf');
+			$pdf->SetFont('droidsansfallback');//dejavusans
+			//$pdf->SetFont('chsong');
 
 			// remove default header/footer
 			$pdf->setPrintHeader(false);
@@ -119,7 +122,8 @@ if( !class_exists('FPD_File_Export') ) {
 					foreach($viewElements as $viewElement) {
 
 						$elementParams = $viewElement['parameters'];
-						$element_html = '<div>Content: '.(isset($elementParams['text']) ? $elementParams['text'] : $viewElement['source']).'</div>';
+						// mzl mod export
+						$element_html = '<div>Content: '.(isset($elementParams['text']) ? $elementParams['text'] : '<p>Visit <a href="'.$viewElement['source'].'">图片链接</a>.</p>').'</div>';
 
 						foreach($includedParameters as $param) {
 
@@ -144,7 +148,7 @@ if( !class_exists('FPD_File_Export') ) {
 
 				}
 
-				$pdf->writeHTML($html, true, false, true, false, '');
+				$pdf->writeHTML($html, false, false, false, false, '');
 				$pdf->lastPage();
 
 			}

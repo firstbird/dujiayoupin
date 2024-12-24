@@ -68,7 +68,6 @@ if(!class_exists('FPD_Share')) {
 				return $transient_val === false ? $url : $transient_val['image_url'];
 
 			}
-
 			return $url;
 		}
 
