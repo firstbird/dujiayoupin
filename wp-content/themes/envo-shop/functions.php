@@ -71,6 +71,8 @@ if (!function_exists('envo_shop_setup')) :
         add_theme_support('wc-product-gallery-lightbox');
         add_theme_support('wc-product-gallery-slider');
         add_theme_support('html5', array('search-form'));
+        add_theme_support('customize-selective-refresh-widgets');
+
         /*
          * This theme styles the visual editor to resemble the theme style,
          * specifically font, colors, icons, and column width.

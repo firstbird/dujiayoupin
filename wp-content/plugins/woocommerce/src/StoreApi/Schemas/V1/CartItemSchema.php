@@ -32,6 +32,29 @@ class CartItemSchema extends ItemSchema {
 	 */
 	public function get_item_response( $cart_item ) {
 		$product = $cart_item['data'];
+		// mzl mod nbd preview
+		if( isset( $cart_item['nbd_item_meta_ds'] ) ){
+			if( isset( $cart_item['nbd_item_meta_ds']['nbd'] ) ){
+				$path = NBDESIGNER_CUSTOMER_DIR;
+				$path = str_replace('/www/wwwroot/', 'https://', $path);
+				$parsedUrl = parse_url($path);
+				$path = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . '.com' . (isset($parsedUrl['path']) ?
+					$parsedUrl['path'] : '');
+				$path .= '/' . $cart_item['nbd_item_meta_ds']['nbd'] .
+						'/' . 'preview' . '/'. 'frame_0.png';
+						// echo '<div> get_item_response nbd_item_meta_ds path: ' . $path . '</div>';
+				$cart_item['fpd_data']['fpd_product_thumbnail'] = $path;
+			}
+			
+		}
+		// if( isset( $cart_item['nbo_meta'] ) ){
+        //     $builder_folder = $cart_item['nbo_meta']['nbdpb'];
+		// 	echo 'get_item_response builder_folder ' . $builder_folder;
+        //     $path           = NBDESIGNER_CUSTOMER_DIR . '/' . $builder_folder;
+		// 	echo 'get_item_response path ' . $path;
+		// }
+		 
+// 'https://www.dujiayoupin.com/wp-content/uploads/2024/09/braceletA.png';//todo mzl 4.13
 		// do_action( 'woocommerce_before_single_product_summary' );
 		/**
 		 * Filter the product permalink.
@@ -52,6 +75,7 @@ class CartItemSchema extends ItemSchema {
 		//$fpd_data['fpd_product']
 		$attachment_ids = array_merge( [ $product->get_image_id() ], $product->get_gallery_image_ids() );
 		$images = array_values( array_filter( array_map( [ $this->image_attachment_schema, 'get_item_response' ], $attachment_ids ) ) );
+		// echo 'CartItemSchema get_item_response';
 		// echo implode( ' ', $attachment_ids );
 		// echo implode( ' ', $cart_item['fpd_data'] );
 		// mzl mod thumb

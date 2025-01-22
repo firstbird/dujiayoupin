@@ -322,7 +322,6 @@ jQuery(document).ready(() => {
                 fancyProductDesigner.currentViewInstance.fabricCanvas.resetSize();
                 
                 const dataURL = fancyProductDesigner.currentViewInstance.fabricCanvas.toDataURL();
-
                 if(tempShow) {
                     $modalDesigner.removeClass('fpd-show');
                 }

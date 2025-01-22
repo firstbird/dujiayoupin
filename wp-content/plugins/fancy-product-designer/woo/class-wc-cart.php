@@ -290,6 +290,7 @@ if(!class_exists('FPD_WC_Cart')) {
 				if( isset($_POST['fpd_product_thumbnail']) ) {
 					// echo 'mzl post fpd_product_thumbnail: ' . strip_tags( $_POST['fpd_product_thumbnail'] );
 					$cart_item_meta['fpd_data']['fpd_product_thumbnail'] = strip_tags( $_POST['fpd_product_thumbnail'] );
+					// $cart_item_meta['fpd_data']['fpd_product_thumbnail'] = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.bbc.co.uk%2Fnews%2Farticles%2Fcy4g193qezno&psig=AOvVaw10h4_g8Oy_XEFOiwQIn7Pn&ust=1735751780891000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKDe-ITC0ooDFQAAAAAdAAAAABAJ';
 				}
 				if( isset($_POST['fpd_print_order']) )
 					$cart_item_meta['fpd_data']['fpd_print_order'] = $_POST['fpd_print_order'];
@@ -531,6 +532,7 @@ if(!class_exists('FPD_WC_Cart')) {
 					$src = $xpath->query(".//@src");
 					$srcset = $xpath->query(".//@srcset");
 
+					// todo mzl mod cart image
 					foreach ( $src as $s ) {
 						$s->nodeValue = $fpd_data['fpd_product_thumbnail'];
 					}

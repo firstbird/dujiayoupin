@@ -495,22 +495,22 @@ if( !class_exists('FPD_Admin_Scripts_Styles') ) {
 		}
 
 		public function global_admin_footer () {
-			
-			if( !fpd_get_option('fpd_disable_usetiful') ):
-				?>
-				<script>
-					(function (w, d, s) {
-						var a = d.getElementsByTagName('head')[0];
-						var r = d.createElement('script');
-						r.async = 1;
-						r.src = s;
-						r.setAttribute('id', 'usetifulScript');
-						r.dataset.token = "7147bc26ddfd1eb2397b9e43031503f5";
-											a.appendChild(r);
-					})(window, document, "https://www.usetiful.com/dist/usetiful.js");</script>
-				</script>
-				<?php
-			endif;
+			// mzl fpd fpd_disable_usetiful
+			// if( !fpd_get_option('fpd_disable_usetiful') ):
+			// 	?>
+			// 	<script>
+			// 		(function (w, d, s) {
+			// 			var a = d.getElementsByTagName('head')[0];
+			// 			var r = d.createElement('script');
+			// 			r.async = 1;
+			// 			r.src = s;
+			// 			r.setAttribute('id', 'usetifulScript');
+			// 			r.dataset.token = "7147bc26ddfd1eb2397b9e43031503f5";
+			// 								a.appendChild(r);
+			// 		})(window, document, "https://www.usetiful.com/dist/usetiful.js");</script>
+			// 	</script>
+			// 	<?php
+			// endif;
 
 		}
 	}
