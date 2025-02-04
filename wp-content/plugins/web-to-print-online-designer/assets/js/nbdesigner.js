@@ -41,6 +41,7 @@ jQuery(document).ready(function () {
                 }
                 jQuery('#nbd-custom-design-wrap').prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');
                 nbd_append_iframe = true;
+                alert('show Design done1');
             }
         }else{
             if(is_nbd_upload_without_design){
@@ -48,6 +49,7 @@ jQuery(document).ready(function () {
                 if( nbu_advanced_upload == '1' ){
                     enableAdvancedUpload = true;
                 }
+                alert('show Design done2');
             }else if( is_nbd_upload == 0 && use_our_template == 0 && hire_us_design_for_you == 0 ){
                 if( !nbd_append_iframe ){
                     var iframe_src = jQuery('#container-online-designer').attr('data-iframe');
@@ -56,6 +58,7 @@ jQuery(document).ready(function () {
                     }
                     jQuery('#nbd-m-custom-design-wrap').prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');        
                     nbd_append_iframe = true;
+                    alert('show Design done33');
                 }
                 jQuery('#nbd-m-custom-design-wrap').addClass('is-visible');
             }
@@ -66,10 +69,12 @@ jQuery(document).ready(function () {
         if(jQuery(this).hasClass('nbdesigner_disable')){
             alert(nbds_frontend.check_invalid_fields);
         }else{
+            alert('triggerDesign11');
             showDesignFrame();
             var frame = document.getElementById('onlinedesigner-designer');
             if( frame ){
                 frame.contentWindow.postMessage('change_nbo_options', window.location.origin);
+                // jQuery("#nbd_processing").hide();
             }
         }
     });

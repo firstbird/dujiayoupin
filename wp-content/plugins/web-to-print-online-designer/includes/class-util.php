@@ -337,20 +337,72 @@ class Nbdesigner_IO {
 }
 class NBD_Image {
     public static function nbdesigner_resize_imagepng( $file, $w, $h, $path = '' ){
-        list($width, $height)   = getimagesize( $file );
-        if( $path != '' ) $h    = round( $w / $width * $height );
-        $src = imagecreatefrompng( $file );
-        $dst = imagecreatetruecolor( $w, $h );
-        imagesavealpha( $dst, true );
-        $color = imagecolorallocatealpha( $dst, 255, 255, 255, 127 );
-        imagefill( $dst, 0, 0, $color );
-        imagecopyresampled( $dst, $src, 0, 0, 0, 0, $w, $h, $width, $height );
-        imagedestroy( $src );
-        if( $path == '' ){
-            return $dst;
-        } else{
-            imagepng( $dst, $path );
-            imagedestroy( $dst );
+        try {
+            // 检查文件是否存在且可读
+            if(!file_exists($file) || !is_readable($file)) {
+                echo 'Source file is not readable: ' . $file;
+                return '';
+            }
+            
+            // 检查GD库是否已安装
+            if(!extension_loaded('gd')) {
+                echo 'GD Library is not installed';
+                return '';
+            }
+            
+            // 增加内存限制
+            ini_set('memory_limit', '256M');
+            
+            list($width, $height) = getimagesize($file);
+            if($path != '') $h = round($w / $width * $height);
+            
+            // 创建源图像
+            $src = @imagecreatefrompng($file);
+            if(!$src) {
+                echo 'Failed to create image from PNG: ' . $file;
+                return '';
+            }
+            
+            // 创建目标图像
+            $dst = imagecreatetruecolor($w, $h);
+            if(!$dst) {
+                echo 'Failed to create destination image';
+                return '';
+            }
+            
+            // 保持PNG透明度
+            imagesavealpha($dst, true);
+            $color = imagecolorallocatealpha($dst, 255, 255, 255, 127);
+            imagefill($dst, 0, 0, $color);
+            
+            // 调整图像大小
+            if(!imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height)) {
+                echo 'Failed to resize image';
+                return '';
+            }
+            
+            imagedestroy($src);
+            
+            if($path == '') {
+                return $dst;
+            } else {
+                // 确保目标目录存在
+                $dir = dirname($path);
+                if(!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+                
+                // 保存图像
+                if(!imagepng($dst, $path)) {
+                    echo 'Failed to save image to: ' . $path;
+                }
+                imagedestroy($dst);
+                return '';
+            }
+            
+        } catch(Exception $e) {
+            echo 'NBD Image resize error: ' . $e->getMessage();
+            return '';
         }
     }
     public static function nbdesigner_resize_imagejpg( $file, $w, $h, $path = '' ) {
