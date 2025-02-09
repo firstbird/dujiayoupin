@@ -41,7 +41,6 @@ jQuery(document).ready(function () {
                 }
                 jQuery('#nbd-custom-design-wrap').prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');
                 nbd_append_iframe = true;
-                alert('show Design done1');
             }
         }else{
             if(is_nbd_upload_without_design){
@@ -49,7 +48,6 @@ jQuery(document).ready(function () {
                 if( nbu_advanced_upload == '1' ){
                     enableAdvancedUpload = true;
                 }
-                alert('show Design done2');
             }else if( is_nbd_upload == 0 && use_our_template == 0 && hire_us_design_for_you == 0 ){
                 if( !nbd_append_iframe ){
                     var iframe_src = jQuery('#container-online-designer').attr('data-iframe');
@@ -58,7 +56,6 @@ jQuery(document).ready(function () {
                     }
                     jQuery('#nbd-m-custom-design-wrap').prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');        
                     nbd_append_iframe = true;
-                    alert('show Design done33');
                 }
                 jQuery('#nbd-m-custom-design-wrap').addClass('is-visible');
             }
@@ -69,13 +66,51 @@ jQuery(document).ready(function () {
         if(jQuery(this).hasClass('nbdesigner_disable')){
             alert(nbds_frontend.check_invalid_fields);
         }else{
-            alert('triggerDesign11');
             showDesignFrame();
             var frame = document.getElementById('onlinedesigner-designer');
             if( frame ){
+                frame.onload = function(){
+                    // 等待iframe内容完全加载
+                    var checkIframeReady = setInterval(function(){
+                        if(frame.contentWindow.document.readyState === 'complete'){
+                            console.log('iframe content loaded');
+                            // 隐藏loading
+                            // if(document.getElementById('nbd_processing')){
+                            //     document.getElementById('nbd_processing').style.display = 'none';
+                            //     // 恢复滚动
+                            //     document.body.style.overflow = 'auto';
+                            // }
+                            clearInterval(checkIframeReady);
+                        }
+                    }, 100);
+                    
+                    // 添加超时保护
+                    setTimeout(function(){
+                        if(document.getElementById('nbd_processing')){
+                            console.log('Force hide loading after timeout');
+                            jQuery("#closeFrameDesign").hide();
+                            if( enableAdvancedUpload ){
+                                jQuery(document).triggerHandler('close_advanced_upload_popup');
+                            }
+                            document.getElementById('nbd_processing').style.display = 'none';
+                            document.body.style.overflow = 'auto';
+                            jQuery('#onlinedesigner-designer').attr('scrolling', 'yes');
+                            // jQuery('#nbd-m-custom-design-wrap').removeClass('is-visible');
+                            jQuery('.nbd-popup-wrap').removeClass('is-hidden');
+                        }
+               
+                        clearInterval(checkIframeReady);
+                    }, 5000);
+                };
                 frame.contentWindow.postMessage('change_nbo_options', window.location.origin);
-                // jQuery("#nbd_processing").hide();
             }
+            // hide_iframe_design();
+            // var height = -jQuery(window).height();
+            // jQuery('#container-online-designer').removeClass('show');
+            // jQuery('#container-online-designer').stop().animate({
+            //     top: height,
+            //     opacity: 0
+            // }, 500);
         }
     });
     jQuery('#closeFrameDesign').on('click', function () {
@@ -117,7 +152,9 @@ jQuery(document).ready(function () {
     hideDesignFrame = function (mes) {
         jQuery('body, html').removeClass('nbd-prevent-scroll');
         jQuery('#container-online-designer').removeClass('is-visible');
-        backtoOption();
+        jQuery('#nbd-m-upload-design-wrap').removeClass('is-visible');
+        jQuery('#nbd-m-custom-design-wrap').removeClass('is-visible');
+        jQuery('.nbd-popup-wrap').removeClass('is-hidden');
         if (mes != null) {
             setTimeout(function () {
                 alert(mes);
@@ -405,6 +442,7 @@ jQuery(document).ready(function () {
     function nbd_form_submit(e, container){
         var wrapper = ( typeof container != 'undefined' ) ? container + ' ' : '';
         if( window.preventSubmitFormCart && !_nbd_stored_design ){
+            console.log('nbd_form_submit ---');
             e.preventDefault();
             jQuery(jQuery(this).parents('form')).addClass( 'processing' ).block( {
                 message: null,
@@ -1249,10 +1287,10 @@ var NBDESIGNERPRODUCT = {
                 obj = 'real3dflipbook_' + _class.substring(_class.length - 1);  
             var options = window[obj];
             var json_str = options.replace(/&quot;/g, '"');
-            json_str = json_str.replace(/“/g, '"');
-            json_str = json_str.replace(/”/g, '"');
-            json_str = json_str.replace(/″/g, '"');
-            json_str = json_str.replace(/„/g, '"');
+            json_str = json_str.replace(/" /g, '"');
+            json_str = json_str.replace(/ " /g, '"');
+            json_str = json_str.replace(/""/g, '"');
+            json_str = json_str.replace(/"" /g, '"');
 
             json_str = json_str.replace(/«&nbsp;/g, '"');
             json_str = json_str.replace(/&nbsp;»/g, '"');
@@ -1471,6 +1509,7 @@ var NBDESIGNERPRODUCT = {
         photoswipe.init();
     },
     nbdesigner_ready: function(){
+        // alert('nbdesigner_ready');
         if(jQuery('form input[name="variation_id"]').length > 0){
             var vid = jQuery('form input[name="variation_id"]').val();
             if( ( "undefined" != typeof is_nbd_bulk_variation) || ( vid != '' &&  parseInt(vid) > 0 ) ) {
@@ -1482,6 +1521,7 @@ var NBDESIGNERPRODUCT = {
         jQuery('.nbdesigner-img-loading').addClass('hide');
     },
     nbdesigner_unready: function(){
+        // alert('nbdesigner_unready');
         jQuery('#triggerDesign').addClass('nbdesigner_disable');
         jQuery('.nbdesigner-img-loading').removeClass('hide');
     },

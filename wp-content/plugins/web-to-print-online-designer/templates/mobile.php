@@ -8,7 +8,7 @@
         <meta content="Online Designer - HTML5 Designer - Online Print Solution" name="description" />
         <meta content="Online Designer" name="keywords" />
         <meta content="Netbaseteam" name="author"> 
-        <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300italic,300' rel='stylesheet' type='text/css'>
+        <!-- mzl mod <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300italic,300' rel='stylesheet' type='text/css'> -->
         <style type="text/css">
             html {
                 width: 100%;

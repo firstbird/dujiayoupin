@@ -269,21 +269,22 @@
     var selected_fonts= <?php echo $selected_fonts; ?>;
     var ggFonts = <?php echo file_get_contents(NBDESIGNER_PLUGIN_DIR. '/data/google-fonts-ttf.json'); ?>;
     jQuery(document).ready(function($){
-        var google_font  = <?php echo $list_all_google_font; ?>;
-        $( "#nbdesigner_google_font_seach" ).autocomplete({
-            source: google_font,
-            select: function(event, ui){
-                $('.nbdesigner_google_preview').show();
-                $('#nbdesigner_google_preview').html('');
-                $('#nbdesigner_head').remove();
-                var _name = ui.item.value;
-                name1 = _name.replace(' ', '+');
-                var head    = '<link id="nbdesigner_head" href="https://fonts.googleapis.com/css?family='+ name1 +'" rel="stylesheet" type="text/css">';
-                var html    = '<span style="font-family: \''+ _name +'\', sans-serif ;font-size: 30px;">Abc Xyz</span>';
-                $('head').append(head);
-                $('#nbdesigner_google_preview').append(html);
-            }
-        });
+        // mzl mod
+        // var google_font  = <?php echo $list_all_google_font; ?>;
+        // $( "#nbdesigner_google_font_seach" ).autocomplete({
+        //     source: google_font,
+        //     select: function(event, ui){
+        //         $('.nbdesigner_google_preview').show();
+        //         $('#nbdesigner_google_preview').html('');
+        //         $('#nbdesigner_head').remove();
+        //         var _name = ui.item.value;
+        //         name1 = _name.replace(' ', '+');
+        //         var head    = '<link id="nbdesigner_head" href="https://fonts.googleapis.com/css?family='+ name1 +'" rel="stylesheet" type="text/css">';
+        //         var html    = '<span style="font-family: \''+ _name +'\', sans-serif ;font-size: 30px;">Abc Xyz</span>';
+        //         $('head').append(head);
+        //         $('#nbdesigner_google_preview').append(html);
+        //     }
+        // });
     });
     var fontApp = angular.module('font-app', []);
     fontApp.controller('fontCtrl', ['$scope', 'fontObject', 'filterFontFilter', function($scope, fontObject, filterFontFilter){
@@ -468,19 +469,23 @@
                 preview: '='
             },
             link: function(scope, element) {
-                var font_id = scope.font.replace(/\s/gi, '').toLowerCase();
-                if( !jQuery('#' + font_id).length ){
-                    jQuery('head').append('<link id="' + font_id + '" href="https://fonts.googleapis.com/css?family='+ scope.font.replace(/\s/gi, '+') +'" rel="stylesheet" type="text/css">');
-                }
-                var font = new FontFaceObserver(scope.font);             
-                font.load(scope.preview, 1E4).then(function () {
-                    element.find(".font-loading").remove();
-                    element.find(".font-preview").show();
-                    element.parent('.gg-font-preview-inner').find('span.action ').removeClass('disable');
-                }, function () {
-                    console.log('Font '+scope.font+' is not available');
-                });
+                // var font_id = scope.font.replace(/\s/gi, '').toLowerCase();
+                // if( !jQuery('#' + font_id).length ){
+                //     // mzl mod jQuery('head').append('<link id="' + font_id + '" href="https://fonts.googleapis.com/css?family='+ scope.font.replace(/\s/gi, '+') +'" rel="stylesheet" type="text/css">');
+                // }
+                // var font = new FontFaceObserver(scope.font);             
+                // font.load(scope.preview, 1E4).then(function () {
+                //     element.find(".font-loading").remove();
+                //     element.find(".font-preview").show();
+                //     element.parent('.gg-font-preview-inner').find('span.action ').removeClass('disable');
+                // }, function () {
+                //     console.log('Font '+scope.font+' is not available');
+                // });
+                // mzl mod
                 element.append('<span class="font-loading"><?php esc_html_e('Loading...', 'web-to-print-online-designer');?></span>')
+                element.find(".font-loading").remove();
+                element.find(".font-preview").show();
+                element.parent('.gg-font-preview-inner').find('span.action ').removeClass('disable');
             }
         }
     }]);

@@ -93,7 +93,6 @@ class NBDesigner_Artwork_Actions {
     }
     public function nbo_artwork_action( $action, $field ){
         global $wp_query;
-        echo 'nbo_artwork_action do';
         if( isset( $wp_query->query_vars['request-design'] ) || isset( $wp_query->query_vars['upload-design'] ) ){
             $action_val = isset( $wp_query->query_vars['request-design'] ) ? 'h' : 'u';
             foreach( $field['general']['attributes']["options"] as $k => $option ){
@@ -105,7 +104,6 @@ class NBDesigner_Artwork_Actions {
         return $action;
     }
     public function maybe_hide_cart_item_design_section( $_show_design, $cart_item ){
-        echo 'maybe_hide_cart_item_design_section do';
         if( isset( $cart_item['nbo_meta'] ) ){
             $options                = $cart_item['nbo_meta']['options'];
             if( nbd_is_base64_string( $options['fields'] ) ){

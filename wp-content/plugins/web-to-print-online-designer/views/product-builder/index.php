@@ -16,7 +16,7 @@
         <script type="text/javascript">
             var nbds_frontend = [];
         </script>
-        <link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'>
+        <!-- mzl mod<link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
         <style type="text/css" >
             body, html {
                 font-family: 'Poppins';

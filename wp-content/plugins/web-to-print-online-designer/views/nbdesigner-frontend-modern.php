@@ -58,9 +58,9 @@
             }
         ?>
         <link type="text/css" href="<?php echo NBDESIGNER_PLUGIN_URL .'assets/css/jquery-ui.min.css'; ?>" rel="stylesheet" media="all" />
-        <link href='https://fonts.googleapis.com/css?family=<?php echo( $_default_font ); ?>:400,400i,700,700i' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i' rel='stylesheet' type='text/css'>
+        <!-- mzl mod <link href='https://fonts.googleapis.com/css?family=<?php echo( $_default_font ); ?>:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
+        <!-- <link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
+        <!-- <link href='https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
         <link type="text/css" href="<?php echo NBDESIGNER_PLUGIN_URL .'assets/css/bootstrap.min.css'; ?>" rel="stylesheet" media="all"/>
 <!--        <link type="text/css" href="<?php echo NBDESIGNER_PLUGIN_URL .'assets/css/bundle.css'; ?>" rel="stylesheet" media="all"/>-->
         <link type="text/css" href="<?php echo NBDESIGNER_PLUGIN_URL .'assets/css/tooltipster.bundle.min.css'; ?>" rel="stylesheet" media="all"/>
@@ -223,8 +223,6 @@
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery-ui.min.js'; ?>"></script>
         <?php endif; ?>
         <?php if(!NBDESIGNER_MODE_DEV): ?>
-        <script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-        <?php else: ?>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/angular-1.6.9.min.js'; ?>"></script>
         <?php endif; ?>
         <!-- <script type="text/javascript" src="<?php //echo NBDESIGNER_PLUGIN_URL .'assets/js/fabric.3.4.0.js'; ?>"></script> -->

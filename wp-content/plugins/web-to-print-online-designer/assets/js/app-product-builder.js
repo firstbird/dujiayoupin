@@ -378,7 +378,7 @@ nbdpbApp.controller('nbpbCtrl', ['$scope', 'FabricWindow', 'NBDDataFactory', '$w
         $scope.insertFontScript = function( font ){
             if( !jQuery('#nbpb' + font.id ).length ){
                 if( font.type == 'google' ){
-                    jQuery('head').append('<link id="nbpb' + font.id + '" href="https://fonts.googleapis.com/css?family='+ font.alias.replace(/\s/gi, '+') +':400,400i,700,700i" rel="stylesheet" type="text/css">');
+                    // mzl mod jQuery('head').append('<link id="nbpb' + font.id + '" href="https://fonts.googleapis.com/css?family='+ font.alias.replace(/\s/gi, '+') +':400,400i,700,700i" rel="stylesheet" type="text/css">');
                 }else{
                     var css = "<style type='text/css' id='nbpb" + font.id  + "' >";
                     _.each(font.file, function (file, index) {

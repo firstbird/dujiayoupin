@@ -125,28 +125,6 @@ class Nbdesigner_IO {
         $day = !@date('d') ? gmdate('d') : date('d');
         $date_path     .= $day . '/';
         if (!file_exists($upload_path . $date_path)) mkdir($upload_path . $date_path);
-        // $date_path = '';
-        // echo 'upload path: ' . $upload_path . '\n';
-        // if (!file_exists($upload_path))
-        //     mkdir($upload_path);
-        // // $year = @date() === false ? gmdate('Y') : date('Y');
-        // $currentDate = date('Y-m-d');
-        // list($year, $month, $day) = explode('-', $currentDate);
-        // $date_path .= '/' . $year . '/';
-        // echo 'upload full path: ' . $upload_path . $date_path;
-        // if (!file_exists($upload_path . $date_path))
-        //     mkdir($upload_path . $date_path);
-        // // $month = @date() === false ? gmdate('m') : date('m');
-        // $date_path .= $month . '/';
-        // echo 'upload month path: ' . $upload_path . $date_path . '\n';
-        // if (!file_exists($upload_path . $date_path))
-        //     mkdir($upload_path . $date_path);
-        // // $day = @date() === false ? gmdate('d') : date('d');
-        // $date_path .= $day . '/';
-        // echo 'upload day path: ' . $upload_path . $date_path . '\n';
-        // if (!file_exists($upload_path . $date_path))
-        //     mkdir($upload_path . $date_path);
-
         $file_path      = $upload_path . $date_path . $filename;
         $file_counter   = 1;
         $real_filename  = $filename;
@@ -337,72 +315,20 @@ class Nbdesigner_IO {
 }
 class NBD_Image {
     public static function nbdesigner_resize_imagepng( $file, $w, $h, $path = '' ){
-        try {
-            // 检查文件是否存在且可读
-            if(!file_exists($file) || !is_readable($file)) {
-                echo 'Source file is not readable: ' . $file;
-                return '';
-            }
-            
-            // 检查GD库是否已安装
-            if(!extension_loaded('gd')) {
-                echo 'GD Library is not installed';
-                return '';
-            }
-            
-            // 增加内存限制
-            ini_set('memory_limit', '256M');
-            
-            list($width, $height) = getimagesize($file);
-            if($path != '') $h = round($w / $width * $height);
-            
-            // 创建源图像
-            $src = @imagecreatefrompng($file);
-            if(!$src) {
-                echo 'Failed to create image from PNG: ' . $file;
-                return '';
-            }
-            
-            // 创建目标图像
-            $dst = imagecreatetruecolor($w, $h);
-            if(!$dst) {
-                echo 'Failed to create destination image';
-                return '';
-            }
-            
-            // 保持PNG透明度
-            imagesavealpha($dst, true);
-            $color = imagecolorallocatealpha($dst, 255, 255, 255, 127);
-            imagefill($dst, 0, 0, $color);
-            
-            // 调整图像大小
-            if(!imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height)) {
-                echo 'Failed to resize image';
-                return '';
-            }
-            
-            imagedestroy($src);
-            
-            if($path == '') {
-                return $dst;
-            } else {
-                // 确保目标目录存在
-                $dir = dirname($path);
-                if(!is_dir($dir)) {
-                    mkdir($dir, 0755, true);
-                }
-                
-                // 保存图像
-                if(!imagepng($dst, $path)) {
-                    echo 'Failed to save image to: ' . $path;
-                }
-                imagedestroy($dst);
-                return '';
-            }
-            
-        } catch(Exception $e) {
-            echo 'NBD Image resize error: ' . $e->getMessage();
-            return '';
+        list($width, $height)   = getimagesize( $file );
+        if( $path != '' ) $h    = round( $w / $width * $height );
+        $src = imagecreatefrompng( $file );
+        $dst = imagecreatetruecolor( $w, $h );
+        imagesavealpha( $dst, true );
+        $color = imagecolorallocatealpha( $dst, 255, 255, 255, 127 );
+        imagefill( $dst, 0, 0, $color );
+        imagecopyresampled( $dst, $src, 0, 0, 0, 0, $w, $h, $width, $height );
+        imagedestroy( $src );
+        if( $path == '' ){
+            return $dst;
+        } else{
+            imagepng( $dst, $path );
+            imagedestroy( $dst );
         }
     }
     public static function nbdesigner_resize_imagejpg( $file, $w, $h, $path = '' ) {
@@ -1240,7 +1166,7 @@ function nbdesigner_get_default_setting( $key = false ){
         
         'nbdesigner_turn_off_persistent_cart'           => 'no',
         'nbdesigner_enable_ajax_cart'                   => 'no',
-        'nbdesigner_option_display'                     => '1',
+        'nbdesigner_option_display'                     => 'yes',
         'nbdesigner_enbale_rich_snippet_price'          => 'no',
         'nbdesigner_hide_add_cart_until_form_filled'    => 'no',
         'nbdesigner_enable_clear_cart_button'           => 'no',
@@ -4392,3 +4318,44 @@ function nbd_sort_file_by_side( $files ){
     uasort( $files, "nbd_sort_file_by_side_callback" );
     return $files;
 }
+
+add_action('wp_enqueue_scripts', function() {
+    // 强制移除并重新加载 Angular
+    // wp_deregister_script('angularjs');
+    // wp_register_script('angularjs', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js', array('jquery'), '1.6.9', false);
+    // wp_enqueue_script('angularjs');
+    
+    // 添加加载超时处理
+    add_action('wp_footer', function() {
+        ?>
+        <script>
+        // setTimeout(function() {
+        //     if(document.getElementById('nbd_processing')) {
+        //         document.getElementById('nbd_processing').style.display = 'none';
+                
+        //         // 恢复滚动功能
+        //         document.body.style.overflow = 'auto';
+                
+        //         // 如果使用了 Perfect Scrollbar，重新初始化
+        //         if(typeof PerfectScrollbar !== 'undefined') {
+        //             var containers = document.querySelectorAll('.nbd-perfect-scroll');
+        //             containers.forEach(function(container) {
+        //                 new PerfectScrollbar(container, {
+        //                     suppressScrollX: true,
+        //                     wheelPropagation: true
+        //                 });
+        //             });
+        //         }
+                
+        //         // 确保设计区域可以滚动
+        //         var designArea = document.querySelector('.nbd-main-bar');
+        //         if(designArea) {
+        //             designArea.style.overflow = 'auto';
+        //             designArea.style.height = '100%';
+        //         }
+        //     }
+        // }, 10000); // 10秒后强制隐藏加载动画
+        </script>
+        <?php
+    }, 999);
+}, 999);
