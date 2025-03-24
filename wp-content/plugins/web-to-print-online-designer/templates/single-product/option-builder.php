@@ -2638,10 +2638,9 @@ if( $cart_item_key != ''){ ?>
         $scope.fields = $scope.options["fields"];
         $scope.price = "<?php echo $price; ?>";
         $scope.type = "<?php echo $type; ?>";
-        $scope.width = parseFloat(<?php echo $width; ?>);
-        $scope.height = parseFloat(<?php echo $height; ?>);
-        $scope.variations = <?php echo $variations; ?>;
-        $scope.dimensions = <?php echo $dimensions; ?>;
+        $scope.width = parseFloat(<?php echo $width ?? 500; ?>);
+        $scope.height = parseFloat(<?php echo $height ?? 600; ?>);        $scope.variations = <?php echo $variations; ?>;
+        $scope.dimensions = <?php echo !empty($dimensions) ? $dimensions : '{"width":500,"height":600,"unit":"px"}'; ?>;
         $scope.form_values = <?php echo json_encode( $form_values ); ?>;
         $scope.is_sold_individually = "<?php echo $is_sold_individually; ?>";
         $scope.artwork_action = "<?php echo $artwork_action; ?>";

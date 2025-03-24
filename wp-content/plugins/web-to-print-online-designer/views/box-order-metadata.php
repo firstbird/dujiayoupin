@@ -35,7 +35,7 @@
                 <?php endif; ?>
             </h4>
             <?php if($nbd_item_key): ?>
-            <p><b><?php esc_html_e('Custom design','web-to-print-online-designer') ?></b></p>
+            <p><b><?php esc_html_e('Custom design cc','web-to-print-online-designer') ?></b></p>
             <div class="nbdesigner_container_item_order <?php if(isset($data_designs[$index_accept])) { $status = ($data_designs[$index_accept] == 'accept') ? 'approved' : 'declined'; echo( $status );}; ?>">
             <?php 
                 $list_images = Nbdesigner_IO::get_list_images(NBDESIGNER_CUSTOMER_DIR .'/'. $nbd_item_key .'/preview', 1);

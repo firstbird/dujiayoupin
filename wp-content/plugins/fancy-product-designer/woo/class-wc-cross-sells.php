@@ -49,7 +49,6 @@ if(!class_exists('FPD_WC_Cross_Sells')) {
 
 		//save overlay data uri in cart item for cart display
 		public function add_cart_item_data( $cart_item_meta, $product_id ) {
-
 			if( isset($_POST['fpd_cross_sell_image']) )
 				$cart_item_meta['fpd_cross_sell_image'] = strip_tags( $_POST['fpd_cross_sell_image'] );
 

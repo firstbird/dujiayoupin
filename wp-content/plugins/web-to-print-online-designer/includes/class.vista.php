@@ -100,7 +100,7 @@ if(!class_exists('NBDESIGNER_VISTA_LAYOUT')) {
                         }
                         $default_font = nbd_get_default_font();
                         $_default_font = str_replace(" ", "+", json_decode($default_font)->alias);
-                        wp_enqueue_style( 'nbd-default-font', 'https://fonts.googleapis.com/css?family='.$_default_font.':400,400i,700,700i', false );
+                        // mzl mod wp_enqueue_style( 'nbd-default-font', 'https://fonts.googleapis.com/css?family='.$_default_font.':400,400i,700,700i', false );
                     }
                 }
             });

@@ -19,16 +19,16 @@ if( !class_exists('FPD_Fonts') ) {
 			//google webfonts
 			$google_webfonts = get_option( 'fpd_google_webfonts' );
 
-			if( !empty($google_webfonts) && is_array($google_webfonts) ) {
-				foreach($google_webfonts as $google_webfont) {
+			// mzl mod if( !empty($google_webfonts) && is_array($google_webfonts) ) {
+			// 	foreach($google_webfonts as $google_webfont) {
 
-					$google_webfont = strpos($google_webfont, ':') === false ? $google_webfont : substr($google_webfont, 0, strpos($google_webfont, ':'));
-					$google_webfont = str_replace('+', ' ', $google_webfont);
+			// 		$google_webfont = strpos($google_webfont, ':') === false ? $google_webfont : substr($google_webfont, 0, strpos($google_webfont, ':'));
+			// 		$google_webfont = str_replace('+', ' ', $google_webfont);
 
-					if(!in_array($google_webfont, $all_fonts))
-						$all_fonts['https://fonts.googleapis.com/css?family='.$google_webfont] = $google_webfont;
-				}
-			}
+			// 		if(!in_array($google_webfont, $all_fonts))
+			// 			$all_fonts['https://fonts.googleapis.com/css?family='.$google_webfont] = $google_webfont;
+			// 	}
+			// }
 
 			//directory fonts
 			$directory_fonts = get_option( 'fpd_fonts_directory' );

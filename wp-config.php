@@ -37,7 +37,7 @@ define( 'DB_CHARSET', 'utf8mb4' );
 /** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
-define( 'WP_MEMORY_LIMIT', '512M' );
+define( 'WP_MEMORY_LIMIT', '1024M' );
 
 /**#@+
  * Authentication unique keys and salts.
@@ -81,8 +81,10 @@ $table_prefix = 'wp_';
  *
  * @link https://wordpress.org/support/article/debugging-in-wordpress/
  */
-define( 'WP_DEBUG', false );
-
+// define( 'WP_DEBUG', false );
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);
 /* Add any custom values between this line and the "stop editing" line. */
 
 /* That's all, stop editing! Happy publishing. */

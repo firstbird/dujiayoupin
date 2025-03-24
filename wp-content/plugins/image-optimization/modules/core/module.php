@@ -156,12 +156,12 @@ class Module extends Module_Base {
 	}
 
 	public function enqueue_global_assets() {
-		wp_enqueue_style(
-			'image-optimization-admin-fonts',
-			'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
-			[],
-			IMAGE_OPTIMIZATION_VERSION
-		);
+		// mzl mod wp_enqueue_style(
+		// 	'image-optimization-admin-fonts',
+		// 	'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
+		// 	[],
+		// 	IMAGE_OPTIMIZATION_VERSION
+		// );
 
 		wp_enqueue_style(
 			'image-optimization-core-style-admin',

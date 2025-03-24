@@ -1,8 +1,11 @@
 <?php if (!defined('ABSPATH')) exit; // Exit if accessed directly  ?>
 <!DOCTYPE html>
 <?php 
+    error_log('[nbdesigner-frontend-modern] Start loading design page');
+    
     global $is_IE, $nbd_printing_options, $is_iphone;
     if( $is_IE ){
+        error_log('[nbdesigner-frontend-modern] IE browser detected, showing notification');
         include NBDESIGNER_PLUGIN_DIR . 'views/editor_components/ie_notify.php';
         die();
     }
@@ -13,24 +16,29 @@
     $lang_code      = str_replace( '-', '_', get_locale() );
     $locale         = substr( $lang_code, 0, 2 );
     $product_id     = ( isset( $_GET['product_id'] ) &&  $_GET['product_id'] != '' ) ? absint( $_GET['product_id'] ) : 0;
+    $variation_id   = ( isset( $_GET['variation_id'] ) &&  $_GET['variation_id'] != '' ) ? absint( $_GET['variation_id'] ) : 0;
+    error_log("[nbdesigner-frontend-modern] Loading design page - Product ID: $product_id, Variation ID: $variation_id");
     if( !is_nbd_product( $product_id ) && ! ( isset( $_GET['design_type'] ) && $_GET['design_type'] == 'edit_order' ) ){
+        error_log("[nbdesigner-frontend-modern] Invalid product ID: $product_id");
         global $wp_query;
         $wp_query->set_404();
         status_header( 404 );
         get_template_part( 404 ); exit();
     }
-    $variation_id  = ( isset( $_GET['variation_id'] ) &&  $_GET['variation_id'] != '' ) ? absint( $_GET['variation_id'] ) : 0;
     $default_font  = nbd_get_default_font();
     $_default_font = str_replace( " ", "+", json_decode( $default_font)->alias );
     $_product      = wc_get_product( $product_id );
     $nbd_printing_options->get_product_option( $product_id );
     if( !is_object( $_product ) ){
+        error_log('[nbdesigner-frontend-modern] Product not found');
         wp_redirect( untrailingslashit( get_option( 'home' ) ) );
         exit;
     }
+    error_log('[nbdesigner-frontend-modern] Product loaded successfully');
     $product_type   = $_product->get_type();
     $task           = (isset($_GET['task']) &&  $_GET['task'] != '') ? $_GET['task'] : 'new';
     $task2          = (isset($_GET['task2']) &&  $_GET['task2'] != '') ? $_GET['task2'] : '';
+    error_log("[nbdesigner-frontend-modern] Task: $task, Task2: $task2");
     $ui_mode        = is_nbd_design_page() ? 2 : 1;/*1: Iframe popup, 2: Editor page, 3: Div in detail product*/
     if(wp_is_mobile() && $hide_on_mobile == 'yes'):
     nbdesigner_get_template( 'mobile.php', array( 'lang_code' => $lang_code, 'ui_mode' => $ui_mode ) );
@@ -45,8 +53,11 @@
             $option_id = get_transient( 'nbo_product_'.$product_id );
         }
     }
-    $show_nbo_option    =  (($option_id || $product_type == 'variable') && $ui_mode == 2 && ($task == 'new' || $task2 == 'update') ) ? true : false;
+    // $show_nbo_option    =  (($option_id || $product_type == 'variable') && $ui_mode == 2 && ($task == 'new' || $task2 == 'update') ) ? true : false;
+    // mzl 决定设计界面是否显示options
+    $show_nbo_option    =  false;
     $valid_license      = nbd_check_license();
+    error_log("[nbdesigner-frontend-modern] License check result: " . ($valid_license ? 'valid' : 'invalid'));
 ?>
 <html lang="<?php echo( $lang_code ); ?>">
     <head>
@@ -121,8 +132,9 @@
             }
             */
             $total_template     = nbd_count_total_template( $product_id, $variation_id );
+            error_log("[nbdesigner-frontend-modern] Templates loaded - Total templates: $total_template");
             $product_data       = nbd_get_product_info( $product_id, $variation_id, $nbd_item_key, $task, $task2, $reference, false, $cart_item_key );
-            
+            error_log('[nbdesigner-frontend-modern] Product configuration loaded: ' . json_encode($product_data));
             $link_get_options   = add_query_arg(
                 urlencode_deep( array(
                     'wc-api'  => 'NBO_Quick_View',
@@ -166,13 +178,14 @@
 
             $layout             = 'modern';
             include NBDESIGNER_PLUGIN_DIR . 'views/editor_components/js_config.php';
-
+            error_log('[nbdesigner-frontend-modern] Design configuration loaded');
             $enable_3d_preview          = 0;
             $enable_sticker_preview     = 0;
             if( $nbes_settings ){
                 $_nbes_settings         = unserialize( $nbes_settings );
                 $enable_3d_preview      = isset( $_nbes_settings['td_preview'] ) && $_nbes_settings['td_preview'] == 1 ? 1 : 0;
                 $enable_sticker_preview = isset( $_nbes_settings['sticker_preview'] ) && $_nbes_settings['sticker_preview'] == 1 ? 1 : 0;
+                error_log("[nbdesigner-frontend-modern] Preview settings - 3D: $enable_3d_preview, Sticker: $enable_sticker_preview");
             }
         ?>
     </head>
@@ -212,19 +225,9 @@
         </div>
         <?php include 'modern/loading-page.php';?>
         <?php do_action( 'nbd_editor_extra_section', $ui_mode ); ?>
-        <?php if(!NBDESIGNER_MODE_DEV): ?>
-        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <?php else: ?>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery.min.js'; ?>"></script>
-        <?php endif; ?>
-        <?php if(!NBDESIGNER_MODE_DEV): ?>
-        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-        <?php else: ?>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery-ui.min.js'; ?>"></script>
-        <?php endif; ?>
-        <?php if(!NBDESIGNER_MODE_DEV): ?>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/angular-1.6.9.min.js'; ?>"></script>
-        <?php endif; ?>
         <!-- <script type="text/javascript" src="<?php //echo NBDESIGNER_PLUGIN_URL .'assets/js/fabric.3.4.0.js'; ?>"></script> -->
         <script type="text/javascript" src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/js/bundle-modern.min.js'; ?>"></script>
         

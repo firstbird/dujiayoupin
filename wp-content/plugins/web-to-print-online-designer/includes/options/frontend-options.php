@@ -42,7 +42,7 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             add_filter( 'woocommerce_add_to_cart_redirect', array( $this, 'add_to_cart_redirect' ), 9999, 1 );
             // Calculate totals on remove from cart/update
             //add_action( 'woocommerce_before_calculate_totals', array( $this, 'on_calculate_totals' ), 1, 1 );
-            add_action( 'woocommerce_cart_loaded_from_session', array( $this, 're_calculate_price' ), 1, 1 );
+            // mzl mod add_action( 'woocommerce_cart_loaded_from_session', array( $this, 're_calculate_price' ), 1, 1 );
             // Add meta to order
             add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'order_line_item' ), 50, 3 );
             // Gets saved option when using the order again function
@@ -376,13 +376,21 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             }
         }
         public function cart_item_thumbnail( $image = "", $cart_item = array() ){
-            if( isset($cart_item['nbo_meta']) && $cart_item['nbo_meta']['option_price']['cart_image'] != '' ){
+            error_log('cart_item_thumbnail apply done src: ' . $image);
+            
+
+            if( isset($cart_item['nbo_meta']) ){//&& $cart_item['nbo_meta']['option_price']['cart_image'] != ''
                 $size = 'shop_thumbnail';
+                //$cart_item['nbo_meta']['option_price']['cart_image']
+                $preview_url = isset(WC()->cart->cart_contents['cart_item_key']['preview_url']) 
+                ? WC()->cart->cart_contents['cart_item_key']['preview_url'] 
+                : 'not set';
                 $dimensions = wc_get_image_size( $size ); 
-                $image = '<img src="'.$cart_item['nbo_meta']['option_price']['cart_image']
+                $image = '<img src="'. $preview_url
                         . '" width="' . esc_attr( $dimensions['width'] )
                         . '" height="' . esc_attr( $dimensions['height'] )
                         . '" class="nbo-thumbnail woocommerce-placeholder wp-post-image" />';
+                error_log('cart_item_thumbnail apply done src: ' . $preview_url);
             }
             $image = apply_filters('nbo_cart_item_thumbnail', $image, $cart_item);
             return $image;
@@ -460,25 +468,89 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             }
             return $var;
         }
+        // mzl mod add to cart 走的是这个函数, key在前面已经产生了
         public function add_to_cart( $cart_item_key = "", $product_id = "", $quantity = "", $variation_id = "", $variation = "", $cart_item_data = "" ){
-            if ( $this->cart_edit_key ) {
-                $this->new_add_to_cart_key = $cart_item_key;
-                $nbd_session = WC()->session->get('nbd_session_removed');               
-                if( $nbd_session ){
-                    WC()->session->set($cart_item_key. '_nbd', $nbd_session);
-                    WC()->session->__unset('nbd_session_removed');
-                }
-            }else{
-                if (is_array($cart_item_data) && isset($cart_item_data['nbo_meta'])) {
-                    $cart_contents = WC()->cart->cart_contents;
-                    if (
-                        is_array($cart_contents) &&
-                        isset($cart_contents[$cart_item_key]) &&
-                        !empty($cart_contents[$cart_item_key]) &&
-                        !isset($cart_contents[$cart_item_key]['nbo_cart_item_key'])) {
-                        WC()->cart->cart_contents[$cart_item_key]['nbo_cart_item_key'] = $cart_item_key;
-                    }
-                }
+            // $nbd_session = WC()->session->get('nbd_session_saved');
+            error_log('frontend-options add_to_cart ------'
+             . ' $cart_item_key ' . $cart_item_key . ' cart_edit_key: ' . $this->cart_edit_key);
+            // if( $nbd_session ){
+            //     // mzl cart save cart_item_key -- session
+            //     WC()->session->set($cart_item_key. '_nbd', $nbd_session);
+            //     // WC()->session->__unset('nbd_session_removed');
+            // }
+            // 参数验证
+            if (empty($cart_item_key)) {
+                error_log('Error: cart_item_key is empty');
+                return;
+            }
+
+            // 获取购物车内容
+            if (!isset(WC()->cart) || !is_object(WC()->cart)) {
+                error_log('Error: WC()->cart is not available');
+                return;
+            }
+            
+            $cart_contents = WC()->cart->cart_contents;
+            error_log('Current cart_item_key: ' . $cart_item_key);
+            
+            // 检查购物车内容是否是数组
+            if (!is_array($cart_contents)) {
+                error_log('Error: cart_contents is not an array');
+                $cart_contents = array();
+            }
+
+            // 检查并初始化购物车项
+            if (!isset($cart_contents[$cart_item_key])) {
+                // 如果购物车项不存在，创建新的购物车项
+                error_log('Case 1: Cart item does not exist, creating new one');
+                
+                $cart_contents[$cart_item_key] = array(
+                    'product_id' => $product_id,
+                    'variation_id' => $variation_id,
+                    'variation' => $variation,
+                    'quantity' => $quantity,
+                    'data' => $cart_item_data,
+                    'nbo_cart_item_key' => $cart_item_key
+                );
+                
+                WC()->cart->cart_contents = $cart_contents;
+                error_log('Created new cart item');
+            } 
+            else if (empty($cart_contents[$cart_item_key])) {
+                // 如果购物车项存在但为空，更新购物车项
+                error_log('Case 2: Cart item exists but is empty');
+                
+                $cart_contents[$cart_item_key] = array(
+                    'product_id' => $product_id,
+                    'variation_id' => $variation_id,
+                    'variation' => $variation,
+                    'quantity' => $quantity,
+                    'data' => $cart_item_data,
+                    'nbo_cart_item_key' => $cart_item_key
+                );
+                
+                WC()->cart->cart_contents = $cart_contents;
+                error_log('Initialized empty cart item');
+            }
+            else if (!isset($cart_contents[$cart_item_key]['nbo_cart_item_key'])) {
+                // 如果购物车项存在但缺少nbo_cart_item_key，添加nbo_cart_item_key
+                error_log('Case 3: Cart item exists but missing nbo_cart_item_key');
+                
+                WC()->cart->cart_contents[$cart_item_key]['nbo_cart_item_key'] = $cart_item_key;
+                error_log('Added nbo_cart_item_key to existing item');
+            }
+            else {
+                // 购物车项已经正确设置
+                error_log('Case 4: Cart item already properly set up');
+                error_log('Existing cart item: ' . print_r($cart_contents[$cart_item_key], true));
+            }
+
+            // 确保更改被保存
+            try {
+                WC()->cart->set_session();
+                error_log('Cart session updated successfully');
+            } catch (Exception $e) {
+                error_log('Error saving cart session: ' . $e->getMessage());
             }
         }
         public function cart_item_name($title = "", $cart_item = array(), $cart_item_key = ""){
@@ -533,21 +605,32 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             }
             return $item_data;
         }
-        public function get_cart_item_from_session( $cart_item, $values ){
-            if ( isset( $values['nbo_meta'] ) ) {
+        public function get_cart_item_from_session($cart_item, $values) {
+            // error_log('Session values: ' . print_r($values, true));
+            // error_log('Cart item before: ' . print_r($cart_item, true));
+            
+            // if (isset($values['nbo_meta'])) {
                 $cart_item['nbo_meta'] = $values['nbo_meta'];
-                // set the product price (if needed)
-                $cart_item = $this->set_product_prices( $cart_item );
-            }
-            return $cart_item;            
+            // } else {
+            //     error_log('nbo_meta not found in session cart_item ' . print_r($cart_item, true));
+            // }
+            
+            return $cart_item;
         }
         public function add_cart_item_data( $cart_item_data, $product_id, $variation_id, $quantity ){
+            error_log('frontend-options add_cart_item_data called with:');
+            error_log('Cart Item Data: ' . print_r($cart_item_data, true));
+            error_log('Product ID: ' . $product_id);
+            error_log('Variation ID: ' . $variation_id);
+            error_log('Quantity: ' . $quantity);
             $post_data = $_POST;
             $option_id = $this->get_product_option($product_id);
             if( !$option_id ){
                 return $cart_item_data;
             }
+            error_log('frontend-options add_cart_item_data option_id: ' . $option_id);
             if( isset($post_data['nbd-field']) || isset($post_data['nbo-add-to-cart']) ){
+                error_log('frontend-options add_cart_item_data post_data');
                 $options = $this->get_option($option_id);
                 $option_fields = unserialize($options['fields']);
                 $nbd_field = isset($post_data['nbd-field']) ? $post_data['nbd-field'] : array();
@@ -571,7 +654,9 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
                 $product = $variation_id ? wc_get_product( $variation_id ) : wc_get_product( $product_id );
                 $original_price = $this->format_price( $product->get_price('edit') );
                 $option_price = $this->option_processing( $options, $original_price, $nbd_field, $quantity );
+                error_log('frontend-options add_cart_item_data check nbdpb-folder: ' . isset($post_data['nbdpb-folder']));
                 if( isset($post_data['nbdpb-folder']) ){
+                    error_log('frontend-options add_cart_item_data nbdpb-folder in ');
                     $cart_item_data['nbo_meta']['nbdpb'] = $post_data['nbdpb-folder'];
                     $path = NBDESIGNER_CUSTOMER_DIR . '/' . $post_data['nbdpb-folder'] . '/preview';
                     $images = Nbdesigner_IO::get_list_images($path, 1);
@@ -737,43 +822,56 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             }
             return $valid_fields;
         }
-        public function option_processing($options, $original_price, $fields, $quantity) {
-            // 初始化返回值
-            $result = array(
-                'total_price' => 0,
-                'discount_price' => 0,
-                'fields' => array(),
-                'cart_image' => ''
-            );
+        public function option_processing($options, $original_price, $fields, $quantity = 1) {
+            // 记录函数调用
+            error_log('option_processing called with:');
+            error_log('Options: ' . print_r($options, true));
+            error_log('Original Price: ' . $original_price);
+            error_log('Fields: ' . print_r($fields, true));
+            error_log('Quantity: ' . $quantity);
             
-            // 检查参数有效性
-            if(!is_array($options)) {
-                error_log('NBD Options Error: $options is not an array');
-                return $result;
-            }
+            // 记录调用栈以追踪来源
+            error_log('Called from: ' . print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2), true));
             
-            // 确保fields存在且为数组
-            $option_fields = isset($options['fields']) ? unserialize($options['fields']) : array();
-            if(!is_array($option_fields)) {
-                error_log('NBD Options Error: Invalid option fields format');
-                return $result;
-            }
-            
-            $option_fields = $this->recursive_stripslashes($option_fields);
-            $quantity_break = $this->get_quantity_break($option_fields, $quantity);
-            $xfactor = 1;
-            $total_price = 0;
-            $discount_price = 0;
-            $_fields = array();
-            $cart_image = '';
-            
-            // 检查fields参数
-            if(!is_array($fields)) {
-                error_log('NBD Options Error: $fields is not an array');
-                return $result;
-            }
+            // 记录当前页面信息
+            error_log('Current page: ' . $_SERVER['REQUEST_URI']);
             
             try {
+                // 初始化返回值
+                $result = array(
+                    'total_price' => 0,
+                    'discount_price' => 0,
+                    'fields' => array(),
+                    'cart_image' => ''
+                );
+                
+                // 检查参数有效性
+                if(!is_array($options)) {
+                    error_log('NBD Options Error: $options is not an array');
+                    return $result;
+                }
+                
+                // 确保fields存在且为数组
+                $option_fields = isset($options['fields']) ? unserialize($options['fields']) : array();
+                if(!is_array($option_fields)) {
+                    error_log('NBD Options Error: Invalid option fields format');
+                    return $result;
+                }
+                
+                $option_fields = $this->recursive_stripslashes($option_fields);
+                $quantity_break = $this->get_quantity_break($option_fields, $quantity);
+                $xfactor = 1;
+                $total_price = 0;
+                $discount_price = 0;
+                $_fields = array();
+                $cart_image = '';
+                
+                // 检查fields参数
+                if(!is_array($fields)) {
+                    error_log('NBD Options Error: $fields is not an array');
+                    return $result;
+                }
+                
                 foreach($fields as $key => $val) {
                     $origin_field = $this->get_field_by_id($option_fields, $key);
                     if(!$origin_field) {
@@ -824,10 +922,12 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
                     'fields' => $_fields,
                     'cart_image' => $cart_image
                 );
-                
-            } catch(Exception $e) {
-                error_log('NBD Options Error: ' . $e->getMessage());
-                return $result;
+            } catch (Exception $e) {
+                error_log('Error in option_processing: ' . $e->getMessage());
+                return array(
+                    'total_price' => 0,
+                    'discount_price' => 0
+                );
             }
         }
         public function calculate_price_base_measurement( $mesure_range, $width, $height){
@@ -898,8 +998,9 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
         }
         public function set_product_prices( $cart_item ){
             if ( isset( $cart_item['nbo_meta'] )){
-                $new_price = (float) $cart_item['nbo_meta']['price'];
-                $cart_item['data']->set_price( $new_price );
+                // mzl mod not set price
+                // $new_price = (float) $cart_item['nbo_meta']['price'];
+                // $cart_item['data']->set_price( $new_price );
             }
             return $cart_item;
         }
@@ -1103,6 +1204,7 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
         }
         public function get_product_option($product_id){
             $enable = get_post_meta($product_id, '_nbo_enable', true);
+            error_log('get_product_option enable: ' . $enable . ' product_id: ' . $product_id);
             if( !$enable ) return false;
             $option_id = get_transient( 'nbo_product_'.$product_id );
             if( false === $option_id ){
@@ -1110,6 +1212,7 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
                 $sql = "SELECT id, priority, apply_for, product_ids, product_cats, date_from, date_to FROM {$wpdb->prefix}nbdesigner_options WHERE published = 1";
                 $options = $wpdb->get_results($sql, 'ARRAY_A');
                 if($options){
+                    error_log('get_product_option wpdb options: ' . print_r($options, true));
                     $_options = array();
                     foreach( $options as $option ){
                         $execute_option = true;
@@ -1122,13 +1225,13 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
                             $to_date = empty( $option['date_to'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $option['date_to'] ), false ) );
                         }
                         $now  = current_time( 'timestamp' );
-			if ( $from_date && $to_date && !( $now >= $from_date && $now <= $to_date ) ) {
-                            $execute_option = false;
-			} elseif ( $from_date && !$to_date && !( $now >= $from_date ) ) {
-                            $execute_option = false;
-			} elseif ( $to_date && !$from_date && !( $now <= $to_date ) ) {
-                            $execute_option = false;
-			}
+                        if ( $from_date && $to_date && !( $now >= $from_date && $now <= $to_date ) ) {
+                                        $execute_option = false;
+                        } elseif ( $from_date && !$to_date && !( $now >= $from_date ) ) {
+                                        $execute_option = false;
+                        } elseif ( $to_date && !$from_date && !( $now <= $to_date ) ) {
+                                        $execute_option = false;
+                        }
                         if( $execute_option ){
                             if( $option['apply_for'] == 'p' ){
                                 $products = unserialize($option['product_ids']);
@@ -1154,6 +1257,7 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
                         }
                     }
                     if( $option_id ){
+                        error_log('get_product_option wpdb option_id: ' . $option_id);
                         set_transient( 'nbo_product_'.$product_id , $option_id );
                     }
                 }
@@ -1567,6 +1671,98 @@ if(!class_exists('NBD_FRONTEND_PRINTING_OPTIONS')){
             }
             
             return $this->process_quantity_breaks($options);
+        }
+
+        public function get_option_fields($option_id) {
+            try {
+                global $wpdb;
+                
+                // 直接从数据库获取字段数据
+                $fields_data = $wpdb->get_var($wpdb->prepare(
+                    "SELECT fields FROM {$wpdb->prefix}nbdesigner_options WHERE id = %d",
+                    intval($option_id)
+                ));
+                
+                if (!$fields_data) {
+                    error_log("NBD Options Debug: No data found for option ID {$option_id}");
+                    return array();
+                }
+                
+                // 记录原始数据用于调试
+                error_log("NBD Options Debug: Raw fields data for ID {$option_id}: " . substr($fields_data, 0, 100));
+                
+                // 清理和修复数据
+                $fields_data = $this->clean_serialized_data($fields_data);
+                
+                // 尝试反序列化
+                $fields = $this->safe_unserialize($fields_data);
+                
+                if (empty($fields)) {
+                    error_log("NBD Options Warning: Empty fields after unserialize for option ID {$option_id}");
+                    return array();
+                }
+                
+                return $fields;
+                
+            } catch (Exception $e) {
+                error_log("NBD Options Error: " . $e->getMessage());
+                return array();
+            }
+        }
+        
+        /**
+         * 清理序列化的数据
+         */
+        private function clean_serialized_data($data) {
+            if (empty($data)) return '';
+            
+            // 移除 BOM 和其他不可见字符
+            $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $data);
+            $data = preg_replace('/^\xef\xbb\xbf/', '', $data);
+            
+            // 修复 UTF-8 编码问题
+            if (!mb_check_encoding($data, 'UTF-8')) {
+                $data = mb_convert_encoding($data, 'UTF-8', 'ASCII,UTF-8,ISO-8859-1');
+            }
+            
+            // 修复序列化字符串长度
+            $data = preg_replace_callback('!s:(\d+):"(.*?)";!s', function($match) {
+                return 's:' . strlen($match[2]) . ':"' . $match[2] . '";';
+            }, $data);
+            
+            return $data;
+        }
+        
+        /**
+         * 安全的反序列化
+         */
+        private function safe_unserialize($data) {
+            if (empty($data)) return array();
+            
+            // 首先尝试直接反序列化
+            $unserialized = @unserialize($data);
+            if ($unserialized !== false) {
+                return $unserialized;
+            }
+            
+            // 如果失败，尝试 base64 解码（有些数据可能被编码）
+            $decoded = @base64_decode($data);
+            if ($decoded) {
+                $unserialized = @unserialize($decoded);
+                if ($unserialized !== false) {
+                    return $unserialized;
+                }
+            }
+            
+            // 如果还是失败，尝试 JSON 解码（可能是 JSON 格式）
+            $json_decoded = json_decode($data, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $json_decoded;
+            }
+            
+            // 所有尝试都失败，返回空数组
+            error_log("NBD Options Debug: All unserialize attempts failed for data: " . substr($data, 0, 100));
+            return array();
         }
     }
 }

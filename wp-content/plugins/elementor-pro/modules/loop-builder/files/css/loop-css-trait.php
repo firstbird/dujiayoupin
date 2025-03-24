@@ -105,11 +105,11 @@ trait Loop_Css_Trait {
 	private function print_fonts_links() {
 		$google_fonts = Plugin::elementor()->frontend->get_list_of_google_fonts_by_type();
 
-		if ( ! empty( $google_fonts['google'] ) ) {
-			$stable_google_fonts_url = Plugin::elementor()->frontend->get_stable_google_fonts_url( $google_fonts['google'] );
+		// mzl mod if ( ! empty( $google_fonts['google'] ) ) {
+		// 	$stable_google_fonts_url = Plugin::elementor()->frontend->get_stable_google_fonts_url( $google_fonts['google'] );
 
-			echo '<link rel="stylesheet" id="fonts-' . esc_attr( $this->get_file_handle_id() ) . '" href="' . esc_attr( $stable_google_fonts_url ) . '" />';
-		}
+		// 	echo '<link rel="stylesheet" id="fonts-' . esc_attr( $this->get_file_handle_id() ) . '" href="' . esc_attr( $stable_google_fonts_url ) . '" />';
+		// }
 
 		if ( ! empty( $google_fonts['early'] ) ) {
 			$this->print_early_access_google_font_link_tags( $google_fonts['early'] );

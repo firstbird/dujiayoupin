@@ -100,6 +100,8 @@ if (!function_exists('envo_shop_setup')) :
             ),
         ));
         
+        // 添加 NBDesigner 配置钩子
+        add_filter('nbdesigner_frontend_config', 'envo_shop_nbdesigner_config', 10, 1);
     }
 
 endif;
@@ -633,3 +635,52 @@ function envo_shop_skip_link() {
 }
 
 add_action( 'wp_body_open', 'envo_shop_skip_link', 5 );
+
+// 配置回调函数
+function envo_shop_nbdesigner_config($config) {
+    // 记录日志以确认函数被调用
+    error_log('NBDesigner config filter called');
+    
+    // 设置基础配置
+    $config['art_url'] = NBDESIGNER_ASSETS_URL . '/arts/';
+    $config['product_data'] = array(
+        'option' => array(
+            'art_cats' => array()
+        )
+    );
+    
+    // 设置保存后跳转URL
+    $product_id = get_the_ID();
+    if($product_id) {
+        $config['redirect_url'] = get_permalink($product_id);
+        error_log('NBDesigner redirect URL set to: ' . $config['redirect_url']);
+    }
+    
+    return $config;
+}
+
+// 确保钩子在插件加载后执行
+add_action('init', function() {
+    if(class_exists('Nbdesigner_Plugin')) {
+        add_filter('nbdesigner_frontend_config', 'envo_shop_nbdesigner_config', 20, 1);
+    }
+});
+
+// 在主题初始化完成后添加钩子
+add_action('after_setup_theme', function() {
+    if(class_exists('Nbdesigner_Plugin')) {
+        add_filter('nbdesigner_frontend_config', function($config) {
+            // 获取当前产品ID
+            $product_id = get_the_ID();
+            if($product_id) {
+                $config['redirect_url'] = get_permalink($product_id);
+                
+                // 添加调试日志
+                error_log('NBDesigner config modified for product ' . $product_id);
+                error_log('Redirect URL set to: ' . $config['redirect_url']);
+            }
+            
+            return $config;
+        }, 30);
+    }
+});

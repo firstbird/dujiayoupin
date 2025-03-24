@@ -777,6 +777,12 @@ class My_Design_Endpoint {
         }
         wp_send_json($result);
     }
+    public static function nbd_delete_my_design_inner($product_id, $variation_id, $folder){
+        global $wpdb;
+        $re = $wpdb->delete("{$wpdb->prefix}nbdesigner_mydesigns", array('product_id' => $product_id, 'variation_id' => $variation_id, 'folder' => $folder));
+
+        return $re;
+    }
     public static function get_favourite_templates(){
         $templates = array();
         if( WC()->session->__isset('nbd_favourite_templates') ){
@@ -1207,6 +1213,7 @@ class My_Design_Endpoint {
         wp_send_json($result);
     }
     public function nbd_add_design_to_cart(){
+        error_log('nbd_add_design_to_cart ----');
         if ((!wp_verify_nonce($_POST['nonce'], 'save-design') && NBDESIGNER_ENABLE_NONCE) || !isset( $_POST['design_id'] ) ){
             die('Security error');
         }
@@ -1227,6 +1234,11 @@ class My_Design_Endpoint {
             WC()->session->set('nbd_item_key_'.$nbd_item_cart_key, $item_folder);
             $product_status    = get_post_status( $product_id );
             //if ( false !== WC()->cart->add_to_cart( $product_id, $quantity, $variation_id ) && 'publish' === $product_status ) {
+            error_log('nbd_add_design_to_cart nbd_add_to_cart ---- '.json_encode(array(
+                'product_id' => $product_id,
+                'variation_id' => $variation_id,
+                'quantity' => $quantity
+            )));
             if( nbd_add_to_cart(  $product_id, $variation_id, $quantity  ) ){
                 do_action( 'woocommerce_ajax_added_to_cart', $product_id );
                 $result['flag'] = 1;
@@ -1236,5 +1248,52 @@ class My_Design_Endpoint {
             }
         }
         wp_send_json($result); 
+    }
+    /**
+     * 获取用户的设计数据
+     * 
+     * @param int $user_id 用户ID
+     * @param int $product_id 产品ID
+     * @param int $variation_id 变体ID
+     * @return array|false 返回设计数据数组或false
+     */
+    public static function nbdesigner_get_my_designs($user_id, $product_id, $variation_id = 0) {
+        global $wpdb;
+        
+        // 记录日志
+        error_log('Fetching designs for user: ' . $user_id . ', product: ' . $product_id . ', variation: ' . $variation_id);
+        
+        // 构建查询
+        $table_name = $wpdb->prefix . 'nbdesigner_mydesigns';
+        
+        $sql = $wpdb->prepare(
+            "SELECT folder, created_date 
+             FROM {$table_name} 
+             WHERE user_id = %d 
+             AND product_id = %d 
+             AND variation_id = %d 
+             ORDER BY created_date DESC",
+            $user_id,
+            $product_id,
+            $variation_id
+        );
+        
+        // 执行查询
+        $results = $wpdb->get_results($sql, ARRAY_A);
+        
+        // 记录查询结果
+        error_log('Query results: ' . print_r($results, true));
+        
+        if ($results === false) {
+            error_log('Database error: ' . $wpdb->last_error);
+            return false;
+        }
+        
+        if (empty($results)) {
+            error_log('No designs found');
+            return array();
+        }
+        
+        return $results;
     }
 }

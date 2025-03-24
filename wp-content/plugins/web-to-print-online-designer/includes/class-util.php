@@ -18,12 +18,65 @@ class Nbdesigner_IO {
      * @param int $level level scan dir
      * @return array Array path images in folder
      */
-    public static function get_list_images( $path, $level = 100 ){
-        $list       = array();
-        $_list      = self::get_list_files($path, $level);
-        $list       = preg_grep('/\.(jpg|jpeg|png|gif)(?:[\?\#].*)?$/i', $_list);
+    public static function get_list_images($path, $level = 100) {
+        error_log('Getting image list from path: ' . $path);
+        
+        $list = array();
+        $image_extensions = array('jpg', 'jpeg', 'png', 'gif');
+        
+        // 检查路径是否存在且可读
+        if (!is_dir($path)) {
+            error_log('Directory does not exist: ' . $path);
+            return $list;
+        }
+        
+        // 使用 opendir 并添加错误检查
+        $dir_handle = @opendir($path);
+        if ($dir_handle === false) {
+            error_log('Cannot open directory: ' . $path);
+            return $list;
+        }
+        
+        try {
+            while (false !== ($file = readdir($dir_handle))) {
+                if ($file != '.' && $file != '..') {
+                    $full_path = rtrim($path, '/') . '/' . $file;
+                    
+                    if (is_file($full_path)) {
+                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                        if (in_array($ext, $image_extensions)) {
+                            // 添加完整路径到列表
+                            $list[] = $full_path;
+                        }
+                    } elseif (is_dir($full_path) && $level > 0) {
+                        // 递归搜索子目录
+                        $sub_images = self::get_list_images($full_path, $level - 1);
+                        $list = array_merge($list, $sub_images);
+                    }
+                }
+            }
+            
+            // 只在目录句柄有效时关闭
+            if (is_resource($dir_handle)) {
+                closedir($dir_handle);
+            }
+            
+        } catch (Exception $e) {
+            error_log('Error reading directory: ' . $e->getMessage());
+            if (is_resource($dir_handle)) {
+                closedir($dir_handle);
+            }
+        }
+        
+        error_log('Found image files: ' . print_r($list, true));
         return $list;
     }
+    // public static function get_list_images( $path, $level = 100 ){
+    //     $list       = array();
+    //     $_list      = self::get_list_files($path, $level);
+    //     $list       = preg_grep('/\.(jpg|jpeg|png|gif)(?:[\?\#].*)?$/i', $_list);
+    //     return $list;
+    // }
     public static function get_list_files_by_type($path, $level = 100, $type){
         $list       = array();
         $_list      = self::get_list_files($path, $level);
@@ -31,26 +84,53 @@ class Nbdesigner_IO {
         return $list;
     }
     public static function get_list_files( $folder = '', $levels = 100 ) {
-        if ( empty( $folder ) ) return false;
-        if ( !$levels ) return false;
-        $files = array();
-        if ( $dir = @opendir( $folder ) ) {
-            while ( ( $file = readdir( $dir ) ) !== false ) {
-                if ( in_array( $file, array( '.', '..' ) ) )
-                    continue;
-                if ( is_dir( $folder . '/' . $file ) ) {
-                    $files2 = self::get_list_files( $folder . '/' . $file, $levels - 1 );
-                    if ( $files2 )
-                        $files = array_merge( $files, $files2 );
-                    else
-                        $files[] = $folder . '/' . $file . '/';
-                } else {
-                    $files[] = $folder . '/' . $file;
+        // 添加错误处理和日志
+        error_log('Getting list files from path: ' . $folder);
+        
+        $list = array();
+        
+        // 检查路径是否存在且可读
+        if (!is_dir($folder)) {
+            error_log('Directory does not exist: ' . $folder);
+            return $list;
+        }
+        
+        // 使用 opendir 并添加错误检查
+        $dir_handle = @opendir($folder);
+        if ($dir_handle === false) {
+            error_log('Cannot open directory: ' . $folder);
+            return $list;
+        }
+        
+        try {
+            while (false !== ($file = readdir($dir_handle))) {
+                if ($file != '.' && $file != '..') {
+                    if (empty($exts)) {
+                        $list[] = $file;
+                    } else {
+                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                        if (in_array($ext, $exts)) {
+                            $list[] = $file;
+                        }
+                    }
                 }
             }
+            
+            // 只在目录句柄有效时关闭
+            if (is_resource($dir_handle)) {
+                closedir($dir_handle);
+            }
+            
+        } catch (Exception $e) {
+            error_log('Error reading directory: ' . $e->getMessage());
+            // 确保在发生错误时也关闭目录句柄
+            if (is_resource($dir_handle)) {
+                closedir($dir_handle);
+            }
         }
-        @closedir( $dir );
-        return $files;
+        
+        error_log('Found files: ' . print_r($list, true));
+        return $list;
     }
     public static function get_list_folder( $folder = '', $levels = 100 ){
         if ( empty( $folder ) ) return false;
@@ -159,6 +239,7 @@ class Nbdesigner_IO {
         $basedir    = $upload_dir['basedir'];
         $arr        = explode('/', $basedir);
         $upload     = $arr[count($arr) - 1];
+        error_log('nbdesigner convert_path_to_url ------$upload ' . $upload . ' ' . $basedir . 'upload_dir ' . $upload_dir);
         if( is_multisite() && !is_main_site() ) $upload = $arr[count($arr) - 3].'/'.$arr[count($arr) - 2].'/'.$arr[count($arr) - 1];
         return content_url( substr( $path, strrpos( $path, '/' . $upload . '/nbdesigner' ) ) );
     }
@@ -1632,12 +1713,26 @@ function nbd_get_template_by_folder( $folder ){
     return $data;
 }
 function nbd_get_product_info( $product_id, $variation_id, $nbd_item_key = '', $task, $task2 = '', $reference = '', $need_templates = false, $cart_item_key = '' ){
+    error_log('[nbdesigner-class-util] nbd_get_product_info product_id: ' . $product_id . ' variation_id: ' . $variation_id . ' nbd_item_key: ' . $nbd_item_key . ' task: ' . $task);
     $data = array();
     if($variation_id > 0){
         $variation_id = get_wpml_original_id($variation_id);
     }
     $nbd_item_cart_key = ($variation_id > 0) ? $product_id . '_' . $variation_id : $product_id; 
-    $_nbd_item_key = WC()->session->get('nbd_item_key_'.$nbd_item_cart_key);  
+    $_nbd_item_key = WC()->session->get('nbd_item_key_'.$nbd_item_cart_key);
+    $cart_design_ids = array();
+    foreach(WC()->cart->cart_contents as $cart_item_key => $cart_item) {
+        if(isset($cart_item['nbd_design_id'])) {
+            // error_log('nbd_get_user_designs cart_design_id: ' . $cart_item['nbd_design_id']);
+            $cart_design_ids[] = $cart_item['nbd_design_id'];
+        }
+    }
+    if (count($cart_design_ids) > 0) {
+        if (in_array($_nbd_item_key, $cart_design_ids)) {
+            $_nbd_item_key = '';
+        }
+    }
+    error_log('[nbdesigner-class-util] nbd_get_product_info $_nbd_item_key: ' . $_nbd_item_key);
     if( $_nbd_item_key && $task2 == '' && $nbd_item_key == '' && $task != 'create' ) $nbd_item_key = $_nbd_item_key;
 //    if( $cart_item_key != '' && WC()->session->get($cart_item_key . '_nbd') ) {
 //        $nbd_item_key = WC()->session->get($cart_item_key . '_nbd');
@@ -1734,6 +1829,7 @@ function nbd_get_product_info( $product_id, $variation_id, $nbd_item_key = '', $
     return $data;
 }
 function nbd_get_product_pre_builder( $option_id, $nbo_cart_item_key ){
+    error_log('nbd_get_product_pre_builder ' . $option_id . ' ' . $nbo_cart_item_key);
     $data = array();
     if( $nbo_cart_item_key != '' ){
         $cart_item = WC()->cart->get_cart_item( $nbo_cart_item_key );
@@ -2992,6 +3088,7 @@ function nbd_convert_files( $nbd_item, $type = 'jpg', $dpi = 300 ){
     }
 }
 function nbd_add_to_cart( $product_id, $variation_id, $quantity ){
+    error_log('util nbd_add_to_cart ----');
     if( $variation_id > 0) {
         $adding_to_cart = wc_get_product( $product_id );
         $variation_data = wc_get_product_variation_attributes( $variation_id );

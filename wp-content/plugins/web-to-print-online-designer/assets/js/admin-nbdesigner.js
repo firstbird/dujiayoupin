@@ -48,7 +48,12 @@ jQuery(document).ready(function ($) {
         scroll.animate({ scrollTop: scroll.prop("scrollHeight") }, 'slow'); 
         $(this).hide();
     });
+    // add art cat trigger2
     $('#nbdesigner_add_art_cat').on('click', function () {
+        if (!checkUserLogin()) {
+            console.log('请先登录后再操作');
+            return;
+        }
         var html = '<input class="form-required nbdesigner_art_name" type="text" id="nbdesigner_name_art_newcat"><br /><br />';
         html += '<input type="button" id="nbdesigner_save_art_cat" onclick="NBDESIGNADMIN.add_art_cat(this)" value="Add new" class="button-primary">';
         html += '<input type="button" id="nbdesigner_cancel_add_art_cat" onclick="NBDESIGNADMIN.cancel_add_art_cat()" value="Cancel" class="button-primary">';

@@ -485,10 +485,21 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_current_item( $request ) {
+		error_log( 'class-wp-rest-users-controller.php get_current_item' );
 		$current_user_id = get_current_user_id();
 
 		if ( empty( $current_user_id ) ) {
-			return new WP_Error(
+			$stack = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
+			foreach ($stack as $trace) {
+				error_log(sprintf(
+					"File: %s\nLine: %d\nFunction: %s\nClass: %s\n",
+					isset($trace['file']) ? $trace['file'] : 'unknown',
+					isset($trace['line']) ? $trace['line'] : 'unknown',
+					isset($trace['function']) ? $trace['function'] : 'unknown',
+					isset($trace['class']) ? $trace['class'] : 'unknown'
+				));
+			}			
+				return new WP_Error(
 				'rest_not_logged_in',
 				__( 'You are not currently logged in.' ),
 				array( 'status' => 401 )

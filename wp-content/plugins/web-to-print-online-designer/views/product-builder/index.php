@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link type="text/css" href="<?php echo NBDESIGNER_ASSETS_URL.'css/spectrum.css'; ?>" rel="stylesheet" media="all"/>
         <link type="text/css" href="<?php echo NBDESIGNER_ASSETS_URL.'css/app-product-builder.css'; ?>" rel="stylesheet" media="all"/>
-        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+        <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL . 'assets/libs/jquery.min.js'; ?>"></script>
+        <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL . 'assets/libs/angular.min.js'; ?>"></script>
         <script type='text/javascript' src="<?php echo WC()->plugin_url().'/assets/js/accounting/accounting.min.js'; ?>"></script>
         <?php
             $is_nbpb_creating_task = true;

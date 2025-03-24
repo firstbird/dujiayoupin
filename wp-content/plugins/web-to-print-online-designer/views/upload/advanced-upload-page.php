@@ -88,6 +88,9 @@ if( $cart_item_key != '' ){
             $option_id = get_transient( 'nbo_product_'.$product_id );
         }
         $show_nbo_option = ( $option_id || $product_type == 'variable' ) ? true : false;
+        console.log('advanced product_type: ', $product_type);
+        console.log('advanced option_id: ', $option_id);
+        console.log('advanced show_nbo_option: ', $show_nbo_option);
         $wc_add_to_cart_params = array(
             'wc_ajax_url'                      => WC_AJAX::get_endpoint( '%%endpoint%%' ),
             'i18n_no_matching_variations_text' => esc_attr__( 'Sorry, no products matched your selection. Please choose a different combination.', 'woocommerce' ),
@@ -113,8 +116,25 @@ if( !$error_redirec ){ ?>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- mzl mod <link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
-        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+        <!-- 使用 jQuery 1.8.3 -->
+        <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL . 'assets/libs/jquery.min.js'; ?>"></script>
+        <!-- 然后加载 jQuery UI 1.10.4 -->
+        <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL . 'assets/libs/jquery-ui.min.js'; ?>"></script>
+        
+        <script type="text/javascript">
+            window.jQuery = jQuery;
+            window.$ = jQuery;
+            var jQuery_1_8_3 = jQuery;
+            window.jQuery_1_8_3 = jQuery_1_8_3;
+        </script>
+
+        <!-- 加载其他脚本 -->
+        <?php if(isset($js_bundle)): ?>
+        <script type='text/javascript' src="<?php echo $js_bundle; ?>"></script>
+        <?php endif; ?>
+        
+        <!-- 最后加载 AngularJS -->
+        <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL . 'assets/libs/angular.min.js'; ?>"></script>
         <title><?php echo get_bloginfo( 'name' ); ?> - <?php _e('Upload photos', 'web-to-print-online-designer'); ?></title>
         <style type="text/css" >
             body, html {

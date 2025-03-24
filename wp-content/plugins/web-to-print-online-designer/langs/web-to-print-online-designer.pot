@@ -2056,7 +2056,7 @@ msgstr ""
 
 #: includes/class.nbdesigner.php:3720 includes/class.nbdesigner.php:6463
 #: templates/single-product/nbd-section.php:66 views/box-order-metadata.php:38
-msgid "Custom design"
+msgid "Custom design aa"
 msgstr ""
 
 #: includes/class.nbdesigner.php:3755 includes/class.nbdesigner.php:6478

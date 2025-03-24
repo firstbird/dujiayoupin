@@ -66,7 +66,7 @@ class CartController {
 				'cart_item_data' => [],
 			]
 		);
-
+		error_log( 'add_to_cart request: ' . print_r($request, true));
 		$request = $this->filter_request_data( $this->parse_variation_data( $request ) );
 		$product = $this->get_product_for_cart( $request );
 		$cart_id = $cart->generate_cart_id(

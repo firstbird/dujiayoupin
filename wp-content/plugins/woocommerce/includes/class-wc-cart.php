@@ -983,7 +983,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 */
 	public function generate_cart_id( $product_id, $variation_id = 0, $variation = array(), $cart_item_data = array() ) {
 		$id_parts = array( $product_id );
-
+		error_log('wc-cart generate_cart_id product_id ' . $product_id . ' variation_id ' . $variation_id);
 		if ( $variation_id && 0 !== $variation_id ) {
 			$id_parts[] = $variation_id;
 		}
@@ -992,18 +992,22 @@ class WC_Cart extends WC_Legacy_Cart {
 			$variation_key = '';
 			foreach ( $variation as $key => $value ) {
 				$variation_key .= trim( $key ) . trim( $value );
+				error_log('wc-cart generate_cart_id loop variation $key ' . $key . ' $value ' . $value);
 			}
 			$id_parts[] = $variation_key;
 		}
 
 		if ( is_array( $cart_item_data ) && ! empty( $cart_item_data ) ) {
+			error_log('wc-cart generate_cart_id cart_item_data not mepty');
 			$cart_item_data_key = '';
 			foreach ( $cart_item_data as $key => $value ) {
 				if ( is_array( $value ) || is_object( $value ) ) {
 					$value = http_build_query( $value );
 				}
-				$cart_item_data_key .= trim( $key ) . trim( $value );
-
+				if ($key != null && $value != null) {
+					$cart_item_data_key .= trim( $key ) . trim( $value );
+					error_log('wc-cart generate_cart_id loop cart_item_data key: ' . $key . ' value: ' . $value);
+				}
 			}
 			$id_parts[] = $cart_item_data_key;
 		}
@@ -1022,11 +1026,22 @@ class WC_Cart extends WC_Legacy_Cart {
 	 * @param array $cart_item_data extra cart item data we want to pass into the item.
 	 * @return string|bool $cart_item_key
 	 */
+	// mzl mod add to cart
 	public function add_to_cart( $product_id = 0, $quantity = 1, $variation_id = 0, $variation = array(), $cart_item_data = array() ) {
 		try {
 			$product_id   = absint( $product_id );
 			$variation_id = absint( $variation_id );
 
+			error_log('wc-cart add_to_cart product_id ' . $product_id . ' variation_id ' . $variation_id);
+
+			$backtrace = debug_backtrace();
+			$call_stack = array();
+			foreach($backtrace as $trace) {
+				if(isset($trace['file']) && isset($trace['line'])) {
+					$call_stack[] = $trace['file'] . ':' . $trace['line'];
+				}
+			}
+			error_log('WC_Cart::add_to_cart() call stack: ' . print_r($call_stack, true));
 			// Ensure we don't add a variation to the cart directly by variation ID.
 			if ( 'product_variation' === get_post_type( $product_id ) ) {
 				$variation_id = $product_id;

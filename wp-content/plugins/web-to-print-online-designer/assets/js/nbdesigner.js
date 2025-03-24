@@ -1,4 +1,83 @@
 jQuery(document).ready(function () {
+    console.log('nbdesinger product page onready');
+    // mzl mod - 修改 AJAX 错误处理和设置
+    // jQuery(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+    //     console.log('AJAX Error:', {
+    //         status: jqxhr.status,
+    //         statusText: jqxhr.statusText,
+    //         responseText: jqxhr.responseText,
+    //         url: settings.url
+    //     });
+        
+    //     if(document.getElementById('nbd_processing')){
+    //         document.getElementById('nbd_processing').style.display = 'none';
+    //         document.body.style.overflow = 'auto';
+    //     }
+        
+    //     // 解除所有 block 状态
+    //     jQuery('.processing').removeClass('processing').unblock();
+        
+    //     if(jqxhr.status === 500) {
+    //         alert('服务器内部错误，请稍后重试');
+    //     } else {
+    //         alert('保存失败，请重试 (' + jqxhr.status + ')');
+    //     }
+    // });
+    // 添加消息监听
+    window.addEventListener('message', function(event) {
+        console.log('[nbdesigner] Received message:', event.data);
+
+        if (event.data && event.data.type === 'nbdesigner_design_saved') {
+            var currentUrl = window.location.href;
+
+        var frame = document.getElementById('onlinedesigner-designer');
+            if (frame) {
+                // 使用 postMessage 发送消息
+                var variation_id = jQuery('[name="variation_id"]').length > 0 ? jQuery('[name="variation_id"]').attr('value') : 0;
+                frame.contentWindow.postMessage({
+                    type: 'update_redirect_url',
+                    variation_id: variation_id,
+                    url: currentUrl,
+                    design: event.data.design
+                }, '*');
+
+                // console.log('Sending design data:', {
+                //     type: 'nbdesigner_design_saved',
+                //     url: window.location.href,
+                //     design: event.data.design
+                // });
+            }
+            
+            console.log('[nbdesigner] Posted message with URL:', currentUrl);
+            var variation_id = jQuery('[name="variation_id"]').length > 0 ? jQuery('[name="variation_id"]').attr('value') : 0;
+            if( variation_id ){
+                updateDesignData(variation_id);
+                if (frame) {
+                    if( enableAdvancedUpload ){
+                        jQuery(document).triggerHandler('close_advanced_upload_popup');
+                    }
+                    hideDesignFrame();
+                    console.log('nbdesigner hideDesignFrame reload designer iframe');
+                }
+            }
+        }
+    });
+    // 修改 AJAX 设置
+    jQuery.ajaxSetup({
+        timeout: 30000, // 增加到30秒
+        cache: false,
+        headers: {
+            'X-WP-Nonce': nbds_frontend.nonce,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        beforeSend: function(xhr, settings) {
+            // 添加随机参数防止缓存
+            if (settings.url.indexOf('admin-ajax.php') > -1) {
+                settings.url += (settings.url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
+            }
+        }
+    });
+    
     if( navigator.vendor && navigator.vendor.indexOf('Apple') > -1 && navigator.userAgent.indexOf("Safari") != -1 && navigator.userAgent.indexOf("CriOS") == -1 ){
         jQuery('#nbd-chat-app').addClass('safari');
     }
@@ -11,18 +90,31 @@ jQuery(document).ready(function () {
         jQuery('.nbd-popup-wrap').addClass('is-hidden');
         jQuery('#nbd-m-upload-design-wrap').addClass('is-visible');
     });
+    // startDesign trigger1
     jQuery('#startDesign').on('click', function () {
+        if (!checkUserLogin()) {
+            console.log('nbdesigner startDesign 请先登录后再操作');
+            return;
+        }
+        console.log('nbdesigner startDesign1 click --');
         jQuery('body, html').addClass('nbd-prevent-scroll');
         jQuery('#container-online-designer').addClass('is-visible');
         jQuery('.nbd-popup-wrap').addClass('is-hidden');
-        if( !nbd_append_iframe ){
+        // 加载设计器iframe
+        // if( !nbd_append_iframe ){
+            console.log('nbdesigner startDesign1 nbd_append_iframe false');
             var iframe_src = jQuery('#container-online-designer').attr('data-iframe');
             if( jQuery('form input[name="variation_id"]').length ){
                 iframe_src = addParameter(iframe_src, 'variation_id', jQuery('form input[name="variation_id"]').val(), false);
             }
-            jQuery('#nbd-m-custom-design-wrap').prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');
+            var design_id = jQuery('#nbd-design-id-value').text();
+            if (design_id) {
+                iframe_src = addParameter(iframe_src, 'design_id', design_id, false);
+            }
+            console.log('nbdesigner startDesign1 design_id: ' + design_id);
+            jQuery('#nbd-m-custom-design-wrap').empty().prepend('<iframe id="onlinedesigner-designer"  width="100%" height="100%" scrolling="no" frameborder="0" noresize="noresize" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" src="'+iframe_src+'"></iframe>');
             nbd_append_iframe = true;
-        }
+        // }
         jQuery('#nbd-m-custom-design-wrap').addClass('is-visible');
     });
     var width = jQuery(window).innerWidth();
@@ -35,6 +127,7 @@ jQuery(document).ready(function () {
         jQuery('body, html').addClass('nbd-prevent-scroll');
         if( nbd_layout == 'c' ){
             if( !nbd_append_iframe ){
+                console.log('[nbdesigner.js] showDesignFrame c');
                 var iframe_src = jQuery('#container-online-designer').attr('data-iframe');
                 if( jQuery('form input[name="variation_id"]').length ){
                     iframe_src = addParameter(iframe_src, 'variation_id', jQuery('form input[name="variation_id"]').val(), false);
@@ -44,12 +137,15 @@ jQuery(document).ready(function () {
             }
         }else{
             if(is_nbd_upload_without_design){
+                console.log('[nbdesigner.js] showDesignFrame not c is_nbd_upload_without_design');
                 jQuery('#nbd-m-upload-design-wrap').addClass('is-visible');
                 if( nbu_advanced_upload == '1' ){
                     enableAdvancedUpload = true;
                 }
             }else if( is_nbd_upload == 0 && use_our_template == 0 && hire_us_design_for_you == 0 ){
+                console.log('[nbdesigner.js] showDesignFrame not c is_nbd_upload == 0');
                 if( !nbd_append_iframe ){
+                    console.log('[nbdesigner.js] showDesignFrame not c is_nbd_upload == 0 nbd_append_iframe false');
                     var iframe_src = jQuery('#container-online-designer').attr('data-iframe');
                     if( jQuery('form input[name="variation_id"]').length ){
                         iframe_src = addParameter(iframe_src, 'variation_id', jQuery('form input[name="variation_id"]').val(), false);
@@ -62,7 +158,21 @@ jQuery(document).ready(function () {
         };
         jQuery('#container-online-designer').addClass('is-visible');
     };
+    // startDesign trigger2
     jQuery('#triggerDesign, #startDesign').on('click', function () {
+        // 阻止默认行为
+        $isLogin = checkUserLogin();
+        console.log('nbdesigner triggerDesign click, is_user_logged_in: ' + $isLogin);        
+        // 检查用户是否登录
+        if (!$isLogin) {
+            if(window.confirm('请先登录后再操作')) {
+                // window.location.href = nbds_frontend.login_url + '?redirect_to=' + encodeURIComponent(window.location.href);
+                // todo mzl
+                window.location.href = 'https://www.dujiayoupin.com/?page_id=9';
+            }
+            return;
+        }
+
         if(jQuery(this).hasClass('nbdesigner_disable')){
             alert(nbds_frontend.check_invalid_fields);
         }else{
@@ -100,9 +210,14 @@ jQuery(document).ready(function () {
                         }
                
                         clearInterval(checkIframeReady);
-                    }, 5000);
+                    }, 1000);
                 };
                 frame.contentWindow.postMessage('change_nbo_options', window.location.origin);
+                var variation_id = jQuery('[name="variation_id"]').length > 0 ? jQuery('[name="variation_id"]').attr('value') : 0;
+                frame.contentWindow.postMessage({
+                    type: 'update_variation_id',
+                    variation_id: variation_id
+                }, window.location.origin);
             }
             // hide_iframe_design();
             // var height = -jQuery(window).height();
@@ -150,23 +265,34 @@ jQuery(document).ready(function () {
         jQuery('.nbd-popup-wrap').removeClass('is-hidden');
     };
     hideDesignFrame = function (mes) {
-        jQuery('body, html').removeClass('nbd-prevent-scroll');
+        // 1. 移除滚动限制的关键时overflow
+        jQuery('body, html').removeClass('nbd-prevent-scroll').css('overflow', 'auto');
         jQuery('#container-online-designer').removeClass('is-visible');
         jQuery('#nbd-m-upload-design-wrap').removeClass('is-visible');
         jQuery('#nbd-m-custom-design-wrap').removeClass('is-visible');
         jQuery('.nbd-popup-wrap').removeClass('is-hidden');
-        if (mes != null) {
-            setTimeout(function () {
-                alert(mes);
-            }, 700);
-        }
-        enableAdvancedUpload = false;
-        NBDESIGNERPRODUCT.scrollToAddToCart();
+        // console.log('hideDesignFrame begin');
+
+        // // 获取产品 URL
+        // var productUrl = '';
+        
+        // // 从 NBDESIGNCONFIG 获取
+        // if (typeof NBDESIGNCONFIG !== 'undefined' && NBDESIGNCONFIG.product_url) {
+        //     productUrl = NBDESIGNCONFIG.product_url;
+        // } else {
+        //     // 如果没有配置，则构建产品 URL
+        //     var productTag = NBDESIGNERPRODUCT.product_id ? 'product=' + NBDESIGNERPRODUCT.product_id : '';
+        //     productUrl = 'https://www.dujiayoupin.com/?' + productTag;
+        // }
+        
+        // console.log('Redirecting to product URL:', productUrl);
+        // window.location.href = productUrl;
     };
     hideUploadFrame = function(){
         if( jQuery('.upload-design-preview img').length > 0 ){
             if( nbds_frontend.auto_add_cart == 'yes' && nbds_frontend.page_design_tool == 1 && nbds_frontend.edit_option_mode != 1 ){
                 var product_id = jQuery('[name="nbd-add-to-cart"]').attr('value');
+                console.log('nbdesigner hideUploadFrame cart submit ------ product_id: ' + product_id);
                 jQuery('.variations_form, form.cart').append('<input name="add-to-cart" type="hidden" value="' + product_id + '" />');
                 jQuery('.variations_form, form.cart').append('<input name="nbd-auto-add-to-cart-in-detail-page" type="hidden" value="1" />');
                 jQuery('.variations_form, form.cart').submit();
@@ -188,6 +314,35 @@ jQuery(document).ready(function () {
         });
         jQuery('#nbdesigner_upload_preview').html('').append(html);
     };
+    // 添加 session 数据获取方法
+    const NBD_Session = {
+        checkSession: function() {
+            return new Promise((resolve, reject) => {
+                jQuery.ajax({
+                    url: nbds_frontend.url,
+                    type: 'POST',
+                    data: {
+                        action: 'nbd_check_session',
+                        nonce: nbds_frontend.nonce
+                    },
+                    success: function(response) {
+                        console.log('nbdesigner checkSession response: ' + JSON.stringify(response, null, 2));
+                        if(response.success) {
+                            console.log('nbdesigner checkSession response.data: ' + JSON.stringify(response.data, null, 2));
+                            resolve(response.data);
+                        } else {
+                            reject(response.message || '获取session失败');
+                        }
+                    },
+                    error: function(error) {
+                        console.log('nbdesigner checkSession error: ' + error);
+                        reject(error);
+                    }
+                });
+            });
+        }
+    };
+
     jQuery('#nbdesign-new-template').on('click', function(){
         showDesignFrame();
     });
@@ -439,7 +594,36 @@ jQuery(document).ready(function () {
         });
     };
     var _nbd_stored_design = false, _nbd_prevent_ajax = false;
-    function nbd_form_submit(e, container){
+    function nbd_form_submit(e, container) {
+        // 添加调试日志
+        console.log('nbd_form_submit triggered');
+        console.log('Form data before:', jQuery(e.target).serialize());
+        
+        // 获取design_id (可以从span元素中获取)
+        var design_id = jQuery('#nbd-design-id-value').text();
+        console.log('Current design_id:', design_id);
+
+        // 如果存在design_id，添加到表单
+        if (design_id) {
+            // 检查是否已存在input
+            if (jQuery('input[name="nbd_design_id"]').length === 0) {
+                // 如果不存在，创建新的input
+                jQuery(e.target).append(
+                    jQuery('<input>', {
+                        type: 'hidden',
+                        name: 'nbd_design_id',
+                        value: design_id
+                    })
+                );
+            } else {
+                // 如果已存在，更新值
+                jQuery('input[name="nbd_design_id"]').val(design_id);
+            }
+        }
+
+        // 添加调试日志查看最终表单数据
+        console.log('Form data after:', jQuery(e.target).serialize());
+        
         var wrapper = ( typeof container != 'undefined' ) ? container + ' ' : '';
         if( window.preventSubmitFormCart && !_nbd_stored_design ){
             console.log('nbd_form_submit ---');
@@ -455,6 +639,7 @@ jQuery(document).ready(function () {
             scope.saveData();
             return false;
         }else if( nbds_frontend.ajax_cart == 'yes' && !_nbd_prevent_ajax ){
+            console.log('nbd_form_submit ajax_cart ---');
             e.preventDefault();
             var formData =  new FormData();
             cartForm = jQuery(wrapper + 'form.cart, ' + wrapper + 'form.variations_form'),
@@ -468,6 +653,11 @@ jQuery(document).ready(function () {
             if( typeof cartFormData['nbd-add-to-cart'] == 'undefined' ){
                 formData.append('nbd-add-to-cart', cartForm.find('[name="add-to-cart"]').val());
             }
+            if (jQuery('#nbd-design-id-value').length) {
+                console.log('nbd_form_submit nbd_design_id: ', jQuery('#nbd-design-id-value').text());
+                formData.append('nbd_design_id', jQuery('#nbd-design-id-value').text());
+            }
+
             jQuery.each(cartForm.find("input[type='file']"), function (i, tag) {
                 jQuery.each(jQuery(tag)[0].files, function (i, file) {
                     formData.append(tag.name, file);
@@ -486,9 +676,10 @@ jQuery(document).ready(function () {
             } );
             return false;
         }
+        console.log('nbd_form_submit return true -----');
         return true;
     };
-    function nbo_ajax_cart( form, beFunc, comFunc ){
+    function nbo_ajax_cart(form, beFunc, comFunc) {
         jQuery.ajax({
             url: nbds_frontend.url + '?action=nbo_ajax_cart',
             type: 'POST',
@@ -496,63 +687,73 @@ jQuery(document).ready(function () {
             data: form,
             contentType: false,
             processData: false,
-            beforeSend: function () {
+            beforeSend: function() {
                 if(typeof beFunc == 'function') beFunc();
             },
-            complete: function () {
+            complete: function() {
                 if(typeof comFunc == 'function') comFunc();
             },
-            success: function (response) {
-                if ('success' === response.result) {
-                    if( typeof response.redirect != 'undefined' ){
-                        window.location.href = response.redirect;
-                    }else{
-                        jQuery('#nbd-ajax-cart-alert-content').html(response.messages);
-                        if( response.result == 'success' ){
-                            jQuery('#nbd-ajax-cart-alert-title .failure').hide();
+            success: function(response) {
+                try {
+                    if(response && response.result === 'success') {
+                        if( typeof response.redirect != 'undefined' ){
+                            window.location.href = response.redirect;
                         }else{
-                            jQuery('#nbd-ajax-cart-alert-title .success').hide();
-                        }
-                        if( jQuery('#nbo-quick-view-popup').length ){
-                            jQuery('#nbo-quick-view-popup').find('.close-popup').triggerHandler('click');
-                        }
-                        jQuery('#nbd-ajax-cart-alert').showAlert();
-                        if( response.data.fragments ){
-                            var fragments = response.data.fragments;
-                            jQuery.each(fragments, function (key) {
-                                jQuery(key).addClass('updating').fadeTo('400', '0.6').block({
-                                    message: null,
-                                    overlayCSS: {
-                                        opacity: 0.6
-                                    }
-                                });
-                            });
-                            jQuery.each(fragments, function (key, value) {
-                                jQuery(key).replaceWith(value);
-                                jQuery(key).stop(true).css('opacity', '1').unblock();
-                            });
-                            if( nbds_frontend.show_favicon_badge == 'yes' && nbds_frontend.is_mobile != 1 ){
-                                try{
-                                    var nbd_favicon = nbd_favicon || new Favico({
-                                        animation:'slide'
+                            jQuery('#nbd-ajax-cart-alert-content').html(response.messages);
+                            if( response.result == 'success' ){
+                                jQuery('#nbd-ajax-cart-alert-title .failure').hide();
+                            }else{
+                                jQuery('#nbd-ajax-cart-alert-title .success').hide();
+                            }
+                            if( jQuery('#nbo-quick-view-popup').length ){
+                                jQuery('#nbo-quick-view-popup').find('.close-popup').triggerHandler('click');
+                            }
+                            jQuery('#nbd-ajax-cart-alert').showAlert();
+                            if( response.data.fragments ){
+                                var fragments = response.data.fragments;
+                                jQuery.each(fragments, function (key) {
+                                    jQuery(key).addClass('updating').fadeTo('400', '0.6').block({
+                                        message: null,
+                                        overlayCSS: {
+                                            opacity: 0.6
+                                        }
                                     });
-                                    if ( fragments && fragments['nbo_cart_item_count'] ){
-                                        var badge = parseInt( fragments['nbo_cart_item_count'] );
-                                        nbd_favicon.badge(badge);
+                                });
+                                jQuery.each(fragments, function (key, value) {
+                                    jQuery(key).replaceWith(value);
+                                    jQuery(key).stop(true).css('opacity', '1').unblock();
+                                });
+                                if( nbds_frontend.show_favicon_badge == 'yes' && nbds_frontend.is_mobile != 1 ){
+                                    try{
+                                        var nbd_favicon = nbd_favicon || new Favico({
+                                            animation:'slide'
+                                        });
+                                        if ( fragments && fragments['nbo_cart_item_count'] ){
+                                            var badge = parseInt( fragments['nbo_cart_item_count'] );
+                                            nbd_favicon.badge(badge);
+                                        }
+                                    } catch( err ) {
+                                        console.log( err );
                                     }
-                                } catch( err ) {
-                                    console.log( err );
                                 }
                             }
                         }
+                    } else {
+                        throw new Error(response.messages || '未知错误');
                     }
+                } catch(err) {
+                    console.error('Response processing error:', err);
+                    alert('处理响应时出错：' + err.message);
                 }
-                if ('failure' === response.result) {
-                    alert( response.messages );
-                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Ajax request failed:', {
+                    status: jqXHR.status,
+                    error: errorThrown
+                });
             }
         });
-    };
+    }
     function nbo_quick_view( product_id, beFunc, comFunc ){
         jQuery.ajax({
             url: nbds_frontend.nbo_qv_url + '&product=' + product_id,
@@ -585,15 +786,16 @@ jQuery(document).ready(function () {
     jQuery('form .single_add_to_cart_button').on('click', function(e){
         nbd_form_submit( e );
     });
-    jQuery('.variations_form, form.cart').on('submit', function(e){
-        nbd_form_submit( e );
-    });
+    // jQuery('.variations_form, form.cart').on('submit', function(e){
+    //     nbd_form_submit( e );
+    // });
     jQuery(document).on('nbd_design_stored', function( e, data ){
         _nbd_stored_design = true;
         if( data._type != 'quote' ){
             if( typeof data.prevent_ajax != 'undefined' ){
                 _nbd_prevent_ajax = true;
             }
+            console.log('nbdesigner nbd_design_stored cart submit ------');
             jQuery('.variations_form, form.cart').submit();
         }
     });
@@ -606,6 +808,7 @@ jQuery(document).ready(function () {
         }
     });
     jQuery('.nbo_ajax_add_to_cart').on('click', function(e){
+        console.log('nbo_ajax_add_to_cart click -----');
         e.preventDefault();
         var self = jQuery(this),
         product_id = self.attr('data-product_id');
@@ -1022,6 +1225,270 @@ jQuery(document).ready(function () {
         window.parent.jQuery( window.parent.document ).triggerHandler( 'nbd_redirect_login' );
         return true;
     });
+    function updateDesignData(variation_id) {
+        // 从 localStorage 获取设计预览数据
+        try {
+            // var savedDesign = localStorage.getItem('nbd_design_preview');
+            var product_id;
+
+            //方法1: 从表单中获取
+            if (jQuery('input[name="add-to-cart"]').length) {
+                product_id = jQuery('input[name="add-to-cart"]').val();
+            }
+            // 方法2: 从URL参数获取
+            else if (NBDESIGNCONFIG && NBDESIGNCONFIG.product_id) {
+                product_id = NBDESIGNCONFIG.product_id;
+            }
+            // var nbdConfig = window.NBDESIGNCONFIG;
+            // var product_id = jQuery(this).attr('data-product_id');
+            // nbdConfig['product_id'] = product_id;
+            
+            // 获取variation_id
+            // var variation_id = jQuery('[name="variation_id"]').length > 0 ? jQuery('[name="variation_id"]').attr('value') : 0;
+            // var variation_id = jQuery('input.variation_id').val();
+            // var variation_id = jQuery(this).attr('data-variation_id');
+            console.log('[nbdesigner] product page onready product_id', product_id, 'variation_id', variation_id);
+            // // 清除图片缓存
+            // // 首先移除所有图片元素
+            // jQuery('.nbd-section-content img').remove();
+            // // 清空容器内容
+            // jQuery('.nbd-section-content').empty();
+            
+            // // 强制浏览器释放内存中的图片缓存
+            // jQuery('.nbd-section-content').html('');
+            
+            // 可以考虑添加垃圾回收
+            if (window.CollectGarbage) {
+                window.CollectGarbage();
+            }
+            var now = new Date().getTime();
+            var response = jQuery.ajax({
+                url: nbds_frontend.url,
+                type: 'POST',
+                async: false, // 设置为同步请求
+                cache: false,
+                data: {
+                    action: 'nbd_get_user_designs',
+                    product_id: product_id,
+                    variation_id: variation_id,
+                    nonce: nbds_frontend.nonce,
+                    _: now
+                }
+            }).responseJSON;
+            var showTitle = false;
+            console.log('product page onready response', response);
+            if (response.success == true && response.data.designs && response.data.designs.length > 0) {
+                // var designData = JSON.parse(savedDesign);
+                var created_date = response.data.designs[0].created_date;
+                var imageUrl = response.data.designs[0].src + '?t=' + now;
+                var id = response.data.designs[0].id;
+                console.log('product page onready created_date', created_date, 'imageUrl', imageUrl, 'id', id);
+                // 检查数据是否过期（例如30分钟）
+                // var now = new Date().getTime();
+                // if (now - created_date < 30 * 60 * 1000) {
+                    // 显示预览图片
+                    // jQuery.each(designData.images, function(key, imageUrl) {
+                        var img_con = jQuery('<div class="img-con"></div>');
+                        var img = jQuery('<img src="' + imageUrl + '" class="nbd-artwork-preview"/>');
+                        img_con.append(img);
+                        jQuery('.nbd-section-content').empty().append(img_con);
+                    // });
+                    jQuery('#nbd-design-id-value').text(id);
+
+                    jQuery('.nbd-artwork-preview-wrap').show();
+                    showTitle = true;
+                    // 清除已使用的数据
+                    // localStorage.removeItem('nbd_design_preview');
+                // }
+                // if (!showTitle) {
+                //     var previewTitle = jQuery('#nbd-artwork-preview-title');
+                //     previewTitle.hide();
+                //     console.log('Design preview data null or expired, hiding title');
+                // } else {
+                    var previewTitle = jQuery('#nbd-artwork-preview-title');
+                    previewTitle.show();
+                    var deleteDesign = jQuery('#nbd-delete-design');
+                    deleteDesign.show();
+                    console.log('Design preview valid, showing title');
+                // }
+            } else {
+                jQuery('.nbd-section-content').html('');
+                jQuery('#nbd-design-id-value').text('');
+
+                jQuery('.nbd-artwork-preview-wrap').hide();
+                console.log('Design preview data null or expired, hiding title');
+                var previewTitle = jQuery('#nbd-artwork-preview-title');
+                previewTitle.hide();
+            }
+        } catch (e) {
+            console.error('Error loading from localStorage:', e);
+        }
+    }
+    // 方法1: 监听变体选择
+    jQuery('form.variations_form').on('found_variation', function(event, variation) {
+        var variation_id = variation.variation_id;
+        console.log('Variation selected:', variation_id);
+
+        // 更新设计数据请求
+        updateDesignData(variation_id);
+    });
+    
+    // 方法2: 监听变体ID输入框
+    jQuery('input.variation_id').on('change', function() {
+        var variation_id = jQuery(this).val();
+        if(variation_id > 0) {
+            console.log('Variation ID changed:', variation_id);
+            
+            // 更新设计数据请求  
+            updateDesignData(variation_id);
+        }
+    });
+// not in mod
+    NBDESIGNERPRODUCT.show_design_thumbnail = function(images, task){
+        console.log('show_design_thumbnail images.length --- ', images.length);
+        if(images.length > 0){
+            jQuery.each(images, function(key, val){
+                // 创建artwork缩略图容器
+                var img_con = jQuery('<div class="img-con"></div>');
+                
+                // 添加artwork图片
+                var img = jQuery('<img src="'+val+'" class="nbd-artwork-preview"/>');
+                img_con.append(img);
+                
+                // 添加到预览区域
+                jQuery('.nbd-artwork-preview-wrap').append(img_con);
+            });
+            
+            // 显示预览区域
+            jQuery('.nbd-artwork-preview-wrap').show();
+        }
+    }
+
+    // 修改原有的登录检查函数
+    // function checkUserLogin() {
+    //     return NBD_Session.checkSession().then(data => {
+    //         $res = data.customer_id != null && data.logged_in === true;
+    //         console.log('nbdesigner checkUserLogin res: ' + $res);
+    //         return $res;
+    //     }).catch(error => {
+    //         console.error('检查登录状态失败:', error);
+    //         return false;
+    //     });
+    // }
+    function checkUserLogin() {
+        console.log('checkUserLogin called -----');
+        try {
+            // 同步 AJAX 请求检查登录状态
+            var response = jQuery.ajax({
+                url: nbds_frontend.url,
+                type: 'POST',
+                async: false, // 设置为同步请求
+                data: {
+                    action: 'nbd_check_session',
+                    nonce: nbds_frontend.nonce
+                }
+            }).responseJSON;
+    
+            // 打印响应数据
+            console.log('Session response:', JSON.stringify(response, null, 2));
+            
+            // 检查响应
+            if (response && response.success === true) {
+                //return response.data.customer_id != null&& response.data.logged_in === true;
+                return response.data.logged_in === true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Login check error:', error);
+            return false;
+        }
+    }
+
+    // 显示 toast 消息
+    // function showLoginToast() {
+    //     const toast = jQuery('<div/>', {
+    //         class: 'nbd-toast',
+    //         text: '请先登录后再操作'
+    //     }).css({
+    //         'position': 'fixed',
+    //         'top': '20px',
+    //         'right': '20px',
+    //         'background': '#333',
+    //         'color': '#fff',
+    //         'padding': '12px 24px',
+    //         'border-radius': '4px',
+    //         'z-index': '999999'
+    //     });
+
+    //     jQuery('body').append(toast);
+    //     setTimeout(() => toast.fadeOut('slow', function() { 
+    //         jQuery(this).remove(); 
+    //     }), 3000);
+    // }
+
+    // 重定向到登录页面
+    function redirectToLogin() {
+        window.location.href = nbds_frontend.login_url;
+    }
+
+    // 拦截 Custom design 按钮点击
+    // jQuery('.start-design').on('click', function(e) {
+    //     // 阻止默认行为
+    //     e.preventDefault();
+        
+    //     // 检查用户是否登录
+    //     if(nbds_frontend.is_user_logged_in !== '1') {
+    //         // 显示提示
+    //         var $toast = jQuery('<div/>', {
+    //             class: 'nbd-toast',
+    //             text: '请先登录后再操作'
+    //         }).css({
+    //             'position': 'fixed',
+    //             'top': '20px',
+    //             'right': '20px',
+    //             'background': '#333',
+    //             'color': '#fff',
+    //             'padding': '12px 24px',
+    //             'border-radius': '4px',
+    //             'z-index': '999999'
+    //         });
+
+    //         jQuery('body').append($toast);
+            
+    //         // 3秒后移除提示
+    //         setTimeout(function() {
+    //             $toast.fadeOut('slow', function() {
+    //                 jQuery(this).remove();
+    //             });
+    //         }, 3000);
+
+    //         // 1.5秒后跳转到登录页面
+    //         setTimeout(function() {
+    //             window.location.href = nbds_frontend.login_url;
+    //         }, 1500);
+            
+    //         return false;
+    //     }
+    // });
+
+    // 拦截加入购物车按钮点击
+    // add to cart trigger
+    jQuery('form .single_add_to_cart_button').on('click', function(e) {
+        console.log('single_add_to_cart_button click -----');
+        if (!checkUserLogin()) {
+            e.preventDefault();
+            // showLoginToast();
+            if(window.confirm('请先登录后再操作')) {
+                //window.location.href = nbds_frontend.login_url + '?redirect_to=' + encodeURIComponent(window.location.href);
+                // todo mzl
+                window.location.href = 'https://www.dujiayoupin.com/?page_id=9';
+            }
+            // setTimeout(redirectToLogin, 1500);
+            return false;
+        }
+        nbd_form_submit(e);
+    });
 });
 (function ($, window) {
     $.fn.nbdlNav = function (options) {
@@ -1238,6 +1705,7 @@ var NBDESIGNERPRODUCT = {
         }, 500);
     },
     show_design_thumbnail: function (arr, task, config) {
+        console.log('show_design_thumbnail ---');
         if( ( jQuery('#triggerDesign').length > 0 || jQuery('#startDesign').length > 0 ) ){
             jQuery('button[type="submit"].single_add_to_cart_button').show();
         };
@@ -1634,6 +2102,7 @@ var NBDESIGNERPRODUCT = {
         }
     },
     add_design_to_cart: function(e){
+        alert('add_design_to_cart called  -----');
         var sefl = jQuery(e),
         design_id = sefl.attr('data-design');
         jQuery('.container-design').addClass( 'processing' ).block( {

@@ -453,11 +453,12 @@ class WC_AJAX {
 	 */
 	public static function add_to_cart() {
 		ob_start();
-
+		error_log('wc-ajax add_to_cart begin');
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! isset( $_POST['product_id'] ) ) {
 			return;
 		}
+		error_log('wc-ajax add_to_cart product_id ' . $_POST['product_id']);
 
 		$product_id        = apply_filters( 'woocommerce_add_to_cart_product_id', absint( $_POST['product_id'] ) );
 		$product           = wc_get_product( $product_id );

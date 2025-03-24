@@ -159,7 +159,7 @@
                 font_id = fontName.replace(/\s/gi, '').toLowerCase();
                 if( !jQuery('#' + font_id).length ){
                     if( font.type == 'google' ){
-                        jQuery('head').append('<link id="' + font_id + '" href="https://fonts.googleapis.com/css?family='+ fontName.replace(/\s/gi, '+') +':400,400i,700,700i" rel="stylesheet" type="text/css">');
+                        // mzl modjQuery('head').append('<link id="' + font_id + '" href="https://fonts.googleapis.com/css?family='+ fontName.replace(/\s/gi, '+') +':400,400i,700,700i" rel="stylesheet" type="text/css">');
                     }else{
                         if( font.file.r == '1' ){
                             var font_url = font.url;

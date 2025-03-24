@@ -790,6 +790,16 @@ switch ( $action ) {
 
 		$user = wp_get_current_user();
 
+		if (WC()->session) {
+			// 清除 customer_id
+			WC()->session->__unset('customer_id');
+			
+			// 清除用户数据
+			WC()->session->__unset('nbd_user_data');
+			
+			// 确保 session 被保存
+			WC()->session->save_data();
+		}
 		wp_logout();
 
 		if ( ! empty( $_REQUEST['redirect_to'] ) ) {
@@ -1292,6 +1302,20 @@ switch ( $action ) {
 				if ( get_user_option( 'use_ssl', $user->ID ) ) {
 					$secure_cookie = true;
 					force_ssl_admin( true );
+				}
+				if ( WC()->session ) {
+					// 设置customer_id
+					WC()->session->set('customer_id', $user->ID);
+					
+					// 设置其他用户信息
+					$user_data = array(
+						'id' => $user->ID,
+						'name' => $user->display_name,
+						'email' => $user->user_email,
+						'is_admin' => user_can($user->ID, 'manage_options'),
+						'logged_in' => true
+					);
+					WC()->session->set('nbd_user_data', $user_data);
 				}
 			}
 		}

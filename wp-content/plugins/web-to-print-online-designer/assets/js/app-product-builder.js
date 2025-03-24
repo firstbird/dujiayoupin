@@ -4,7 +4,7 @@ var appConfig = {
 var nbdpbApp = angular.module('nbdpbApp', []);
 nbdpbApp.controller('nbpbCtrl', ['$scope', 'FabricWindow', 'NBDDataFactory', '$window', '$timeout',
     function ($scope, FabricWindow, NBDDataFactory, $window, $timeout) {
-        $scope.isStartDesign = false;
+        // $scope.isStartDesign = false;
         $scope.onloadTemplate = false;
         $scope.init = function () {
             $scope.initSettings();

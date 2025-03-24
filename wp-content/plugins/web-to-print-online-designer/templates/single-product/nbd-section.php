@@ -62,8 +62,8 @@ $template_gallery_url   = add_query_arg( array(
             <?php if( !$_enable_upload_without_design ): ?>
             <div class="nbd-action-wrap">
                 <a class="button alt nbdesign-button start-design" id="startDesign">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff"  d="M23 7V1h-6v2H7V1H1v6h2v10H1v6h6v-2h10v2h6v-6h-2V7h2zM3 3h2v2H3V3zm2 18H3v-2h2v2zm12-2H7v-2H5V7h2V5h10v2h2v10h-2v2zm4 2h-2v-2h2v2zM19 5V3h2v2h-2zm-5.27 9h-3.49l-.73 2H7.89l3.4-9h1.4l3.41 9h-1.63l-.74-2zm-3.04-1.26h2.61L12 8.91l-1.31 3.83z"/></svg>
-                    <span><?php esc_html_e( 'Custom design', 'web-to-print-online-designer' ); ?></span>
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff"  d="M23 7V1h-6v2H7V1H1v6h2v10H1v6h6v-2h10v2h6v-6h-2V7h2zM3 3h2v2H3V3zm2 18H3v-2h2v2zm12-2H7v-2H5V7h2V5h10v2h2v10h-2v2zm4 2h-2v-2h2v2zM19 5V3h2v2h-2zm-5.27 9h-3.49l-.73 2H7.89l3.4-9h1.4l3.41 9h-1.63l-.74-2zm-3.04-1.26h2.61L12 8.91l-1.31 3.83z"/></svg> -->
+                    <span><?php esc_html_e('定制设计', 'web-to-print-online-designer' ); ?></span>
                 </a>
             </div>
             <?php endif; ?>
@@ -181,4 +181,175 @@ $template_gallery_url   = add_query_arg( array(
 <script>
     var nbd_create_own_page = "<?php echo getUrlPageNBD('create') ?>"; 
     var nbu_advanced_upload = "<?php if( $advanced_upload ) echo '1'; else echo '0'; ?>";
+</script>
+
+<div class="nbd-section">
+    <!-- 添加预览容器 -->
+    <div class="nbd-section-item">
+        <div class="nbd-artwork-preview-wrap" style="display:none;">
+            <div class="nbd-section-title">
+                <h3 id="nbd-artwork-preview-title" style="display: none;">
+                    <?php _e('我的定制设计', 'web-to-print-online-designer'); ?>
+                </h3>
+                <div class="nbd-design-id-wrap">
+                    <label for="nbd-design-id"><?php _e('最新设计编号:', 'web-to-print-online-designer'); ?></label>
+                    <br/>
+                    <span id="nbd-design-id-value"></span>
+                    <button id="nbd-delete-design" class="nbd-delete-design-btn" type="button">
+                    <span class="dashicons dashicons-trash"></span>
+                        <?php _e('删除设计', 'web-to-print-online-designer'); ?>
+                    </button>
+                </div>
+            </div>
+            <div class="nbd-section-content">
+                <!-- 添加预览内容 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 添加样式 */
+.nbd-artwork-preview-wrap {
+    margin: 15px 0;
+}
+
+.nbd-artwork-preview-wrap .nbd-section-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+}
+
+.nbd-artwork-preview-wrap .img-con {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 320px; /* 设置最小宽度 */
+    min-height: 320px; /* 设置最小高度 */
+}
+
+.nbd-artwork-preview-wrap img.nbd-artwork-preview {
+    max-width: 300px; /* 增加最大宽度 */
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain; /* 保持图片比例 */
+    image-rendering: -webkit-optimize-contrast; /* 提高清晰度 - Webkit */
+    image-rendering: crisp-edges; /* 提高清晰度 - Firefox */
+    -ms-interpolation-mode: nearest-neighbor; /* 提高清晰度 - IE */
+}
+
+.nbd-delete-design-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.nbd-delete-design-btn:hover {
+    background-color: #c82333;
+}
+
+.nbd-delete-design-btn .dashicons {
+    margin-right: 5px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+</style>
+
+<script>
+jQuery(document).ready(function($) {
+    $('#nbd-delete-design').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!confirm('确定要删除当前设计吗？此操作不可恢复。')) {
+            return false;
+        }
+
+        var designId = $('#nbd-design-id-value').text();
+        if (!designId) return false;
+
+        $.ajax({
+            url: nbds_frontend.url,
+            type: 'POST',
+            data: {
+                action: 'nbd_delete_design',
+                design_id: designId,
+                nonce: nbds_frontend.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    // 清除预览图和相关元素
+                    $('.nbd-section-content').empty();
+                    $('#nbd-design-id-value').text('');
+                    $('#nbd-artwork-preview-title').hide();
+                    $('#nbd-delete-design').hide();
+                    $('.nbd-artwork-preview-wrap').hide();
+
+                    // 清除可能存在的WooCommerce消息
+                    $('.woocommerce-message').remove();
+                    
+                    // // 显示成功消息
+                    // var successMessage = $('<div class="nbd-success-message" style="margin: 1em 0; padding: 1em; background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; border-radius: 4px;">设计已成功删除</div>');
+                    // $('.nbd-section-content').before(successMessage);
+                    
+                    // // 3秒后淡出消息
+                    // setTimeout(function() {
+                    //     successMessage.fadeOut(function() {
+                    //         $(this).remove();
+                    //     });
+                    // }, 2000);
+
+                    // 重新加载设计列表（如果有的话）
+                    if(typeof loadUserDesigns === 'function') {
+                        loadUserDesigns();
+                    }
+
+                    // 重置相关状态或变量（如果有的话）
+                    if(typeof resetDesignState === 'function') {
+                        resetDesignState();
+                    }
+
+                    // 触发自定义事件，以便其他相关组件可以响应删除操作
+                    // $(document).trigger('nbd_design_deleted', [designId]);
+                    alert('删除成功');
+                    var frame = document.getElementById('onlinedesigner-designer');
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.location.reload();
+                        console.log('[nbd-section] reload designer iframe');
+                    }
+
+                } else {
+                    alert('删除失败：' + (response.data.message || '未知错误'));
+                }
+            },
+            error: function() {
+                alert('删除请求失败，请稍后重试');
+            }
+        });
+        
+        return false;
+    });
+
+    // 可选：添加自定义事件监听器
+    $(document).on('nbd_design_deleted', function(event, designId) {
+        // 在这里处理设计删除后的其他UI更新
+        console.log('Design deleted:', designId);
+    });
+});
 </script>

@@ -294,6 +294,11 @@ class Checkout extends _base.default {
         messages.remove();
         if (code.logged_in) {
           location.reload();
+            // 保存到 WC session
+          if (WC() && WC().session) {
+              WC().session.set('customer_id', username);
+              console.log('保存到 WC session');
+          }
         } else {
           this.elements.$checkoutForm.before(code.message);
           elementorFrontend.elements.$body.trigger('checkout_error', [code.message]);

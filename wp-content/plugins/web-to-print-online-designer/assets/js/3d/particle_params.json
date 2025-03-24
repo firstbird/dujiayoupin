@@ -1,0 +1,10 @@
+{
+    "count": 5000,
+    "lifetime": 50.0,
+    "emit_from": "FACE",
+    "velocity": 0.019999999552965164,
+    "physics": {
+        "gravity": 1.0,
+        "mass": 1.0
+    }
+}

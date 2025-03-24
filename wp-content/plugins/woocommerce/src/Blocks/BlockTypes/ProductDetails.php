@@ -65,7 +65,8 @@ class ProductDetails extends AbstractBlock {
 			esc_attr( $classes_and_styles['classes'] ),
 			esc_attr( $classname ),
 			esc_attr( $classes_and_styles['styles'] ),
-			$tabs
+			$tabs,
+			$content
 		);
 	}
 

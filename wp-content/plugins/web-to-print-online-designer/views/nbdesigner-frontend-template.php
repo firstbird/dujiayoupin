@@ -302,12 +302,10 @@
             </div> 
             <?php endif; ?>
             <?php if(!NBDESIGNER_MODE_DEV): ?>
-            <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
             <?php else: ?>
             <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery.min.js'; ?>"></script>
             <?php endif; ?>
             <?php if(!NBDESIGNER_MODE_DEV): ?>
-            <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
             <?php else: ?>
             <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery-ui.min.js'; ?>"></script>
             <?php endif; ?>

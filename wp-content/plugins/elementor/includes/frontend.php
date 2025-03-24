@@ -1037,13 +1037,13 @@ class Frontend extends App {
 		}
 
 		// Print used fonts
-		if ( ! empty( $google_fonts['google'] ) ) {
-			$this->google_fonts_index++;
+		// if ( ! empty( $google_fonts['google'] ) ) {
+		// 	$this->google_fonts_index++;
 
-			$fonts_url = $this->get_stable_google_fonts_url( $google_fonts['google'] );
+		// 	$fonts_url = $this->get_stable_google_fonts_url( $google_fonts['google'] );
 
-			wp_enqueue_style( 'google-fonts-' . $this->google_fonts_index, $fonts_url ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
-		}
+		// 	wp_enqueue_style( 'google-fonts-' . $this->google_fonts_index, $fonts_url ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		// }
 
 		if ( ! empty( $google_fonts['early'] ) ) {
 			$early_access_font_urls = $this->get_early_access_google_font_urls( $google_fonts['early'] );

@@ -211,12 +211,12 @@ abstract class Editor_Base_Loader implements Editor_Loader_Interface {
 			'4.0.6-rc.1'
 		);
 
-		wp_register_style(
-			'google-font-roboto',
-			'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700',
-			[],
-			ELEMENTOR_VERSION
-		);
+		// mzl mod wp_register_style(
+		// 	'google-font-roboto',
+		// 	'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700',
+		// 	[],
+		// 	ELEMENTOR_VERSION
+		// );
 
 		wp_register_style(
 			'flatpickr',

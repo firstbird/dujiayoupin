@@ -192,7 +192,7 @@
                                     <?php if( !$is_google_font ): ?>
                                     @font-face {font-family: <?php echo( $alias ); ?>;src: local('☺'), url('<?php echo esc_url( $fonturl ); ?>')}
                                     <?php else: ?>
-                                    @import url(https://fonts.googleapis.com/css?family=<?php echo str_replace(' ', '+', $alias) ?>);
+                                    /* mzl mod @import url(https://fonts.googleapis.com/css?family=<?php echo str_replace(' ', '+', $alias) ?>); */
                                     <?php endif; ?>
                                 </style>
                                 <td style="font-family: <?php echo( $alias ); ?>;"><?php echo( $layer->text ); ?></td>

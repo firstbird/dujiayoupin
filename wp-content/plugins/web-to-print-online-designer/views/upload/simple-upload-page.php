@@ -16,6 +16,9 @@
                 $option_id = get_transient( 'nbo_product_'.$product_id );
             }
             $show_nbo_option = ( $option_id || $product_type == 'variable' ) ? true : false;
+            console.log('product_type: ', $product_type);
+            console.log('option_id: ', $option_id);
+            console.log('show_nbo_option: ', $show_nbo_option);
             if( $show_nbo_option ){
                 $wc_add_to_cart_params = array(
                     'wc_ajax_url'                      => WC_AJAX::get_endpoint( '%%endpoint%%' ),

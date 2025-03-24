@@ -126,7 +126,8 @@ class CartItemSchema extends ItemSchema {
 		}
 		//echo wc_get_template( 'single-product/product-image.php' );
 
-		return [
+    // 获取基础响应数据
+    	$response =  [
 			'key'                  => $cart_item['key'],
 			'id'                   => $product->get_id(),
 			'type'                 => $product->get_type(),
@@ -156,6 +157,14 @@ class CartItemSchema extends ItemSchema {
 			'catalog_visibility'   => $product->get_catalog_visibility(),
 			self::EXTENDING_KEY    => $this->get_extended_data( self::IDENTIFIER, $cart_item ),
 		];
+		// 添加定制化预览图片
+		if (isset($cart_item['nbo_meta']) && isset($cart_item['nbo_meta']['cart_image'])) {
+			$response['custom_image'] = [
+				'src' => $cart_item['nbo_meta']['cart_image'],
+				'alt' => __('Custom design preview', 'web-to-print-online-designer'),
+			];
+		}
+		return $response;
 	}
 
 	/**
