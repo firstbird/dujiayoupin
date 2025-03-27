@@ -45,13 +45,26 @@ class NBD3DPreview {
     this.scene.background = new THREE.Color('#808080');
 
     // 调整环境光，降低强度以增加对比度
-    var ambient = new THREE.AmbientLight(0xffffff, 0.35);  // 降低环境光强度
+    var ambient = new THREE.AmbientLight(0xffffff, 0.8);  // 降低环境光强度 old: 0.35
     this.scene.add(ambient);
 
     // 调整底部补光，使其更柔和
     var bottomLight = new THREE.DirectionalLight(0xffffff, 0.2);  // 降低强度
     bottomLight.position.set(0, -2, 0.5);  // 稍微偏前
     this.scene.add(bottomLight);
+
+    // 添加平行光（比聚光灯更容易控制）
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight1.position.set(0, 5, 5);
+    this.scene.add(directionalLight1);
+
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight2.position.set(5, 5, -5);
+    this.scene.add(directionalLight2);
+
+    // 添加半球光
+    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+    this.scene.add(hemisphereLight);
 
     // 重新设置主要打光
     for(let i = 0; i < 4; i++){
@@ -63,19 +76,28 @@ class NBD3DPreview {
         x = 0;
         y = 2.5;
         z = 2.5;
-        spotLight.intensity = 2.0;     // 增加主光源强度
-        spotLight.angle = 0.5;         // 缩小光照角度使光线更集中
-        spotLight.penumbra = 0.2;      // 减小半影区域增加对比度
-        spotLight.decay = 1.2;         // 减小衰减
+        spotLight.intensity = 4.0;
+        spotLight.angle = 0.8;
+        spotLight.penumbra = 0.1;
+        spotLight.decay = 1.0;
+        
+        // 确保光源能投射阴影
+        spotLight.castShadow = true;
+        // 设置阴影属性
+        spotLight.shadow.mapSize.width = 1024;
+        spotLight.shadow.mapSize.height = 1024;
+        spotLight.shadow.camera.near = 0.1;
+        spotLight.shadow.camera.far = 10;
+        spotLight.layers.enableAll();  // 让光源作用于所有层
+
       } else if (i === 1) {
         // 右上方辅助光源：作为轮廓光
-        x = 2;
-        y = 2;
-        z = -0.5;                      // 移到后方制造轮廓光
-        spotLight.intensity = 0.8;
-        spotLight.angle = 0.4;
-        spotLight.penumbra = 0.3;
-        spotLight.decay = 1.8;         // 增加衰减
+        x = 0;
+        y = 3;                         // 稍微提高位置
+        z = 0;
+        spotLight.intensity = 3.5;     // 增加上方光源强度到3.5
+        spotLight.angle = 0.9;         // 增大角度以覆盖更多区域
+        spotLight.penumbra = 0.15;     // 稍微增加半影
       } else if (i === 2) {
         // 左上方辅助光源：作为填充光
         x = -1.5;
@@ -123,8 +145,12 @@ class NBD3DPreview {
         spotLight.target.position.set(0, 0.5, 0);  // 填充光目标点
       }
       // 设置光源不影响特定材质
-      spotLight.layers.set(1);  // 将聚光灯设置到不同的层
+      // spotLight.layers.set(0);  // 将聚光灯设置到不同的层
+      spotLight.position.set(x, y, z);
+      spotLight.target.position.set(0, 0, 0);  // 确保光源指向模型
       this.scene.add(spotLight);
+      this.scene.add(spotLight.target);  // 不要忘记添加target
+      
       this.spotLights.push(spotLight);
     }
     
@@ -307,162 +333,162 @@ class NBD3DPreview {
       root.traverse((obj) => {
         console.log('obj.name ---- ', obj.name , ' obj.isMesh: ', obj.isMesh);
         if (obj.isMesh) {
-          if(obj.name == 'Ossito' ||
-            obj.name == 'Cube.001_1' ||
-            obj.name == 'Sphere' ||
-            obj.name == 'Sphere001' ||
-            obj.name == 'Sphere002'
-          ){
-            console.log('found mesh Ossito ---- ');
-            let textureObject = obj;
-            let old_material = textureObject.material;
+          // if(obj.name == 'Ossito' ||
+          //   obj.name == 'Cube.001_1' ||
+          //   obj.name == 'Sphere' ||
+          //   obj.name == 'Sphere001' ||
+          //   obj.name == 'Sphere002'
+          // ){
+          //   console.log('found mesh Ossito ---- ');
+          //   let textureObject = obj;
+          //   let old_material = textureObject.material;
             
-            let texture = old_material.map;
-            console.log('Material texture:', texture);
+          //   let texture = old_material.map;
+          //   console.log('Material texture:', texture);
             
-            if (!texture) {
-              texture = old_material.bumpMap || 
-                       old_material.normalMap || 
-                       old_material.roughnessMap || 
-                       old_material.metalnessMap;
-            }
-            const materialColor = old_material.color || new THREE.Color(1, 1, 1);
+          //   if (!texture) {
+          //     texture = old_material.bumpMap || 
+          //              old_material.normalMap || 
+          //              old_material.roughnessMap || 
+          //              old_material.metalnessMap;
+          //   }
+          //   const materialColor = old_material.color || new THREE.Color(1, 1, 1);
 
-            if (!texture) {
-              console.log('No texture found, creating default texture');
-              const width = 1;
-              const height = 1;
-              const data = new Uint8Array(width * height * 4);
+          //   if (!texture) {
+          //     console.log('No texture found, creating default texture');
+          //     const width = 1;
+          //     const height = 1;
+          //     const data = new Uint8Array(width * height * 4);
                             
-              data[0] = Math.floor(materialColor.r * 255);
-              data[1] = Math.floor(materialColor.g * 255);
-              data[2] = Math.floor(materialColor.b * 255);
-              data[3] = 255;
-              console.log('texture color data: ---- ', data[0], ' ', data[1], ' ', data[2]);
-              texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
-              texture.needsUpdate = true;
-            }
+          //     data[0] = Math.floor(materialColor.r * 255);
+          //     data[1] = Math.floor(materialColor.g * 255);
+          //     data[2] = Math.floor(materialColor.b * 255);
+          //     data[3] = 255;
+          //     console.log('texture color data: ---- ', data[0], ' ', data[1], ' ', data[2]);
+          //     texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+          //     texture.needsUpdate = true;
+          //   }
 
-            const createFurMaterial = (layerIndex, totalLayers) => {
-              return new THREE.ShaderMaterial({
-                //new THREE.Color(0.98, 0.95, 0.92)
-                //255,240,245
-                uniforms: {
-                  furTexture: { value: texture },
-                  furColor: { value: new THREE.Color(materialColor.r, materialColor.g, materialColor.b) },
-                  uNoiseTexture: { value: this.uNoiseTexture },
-                  furLength: { value: 0.05 },
-                  layerIndex: { value: layerIndex },
-                  totalLayers: { value: totalLayers },
-                  time: { value: 0.0 },
+          //   const createFurMaterial = (layerIndex, totalLayers) => {
+          //     return new THREE.ShaderMaterial({
+          //       //new THREE.Color(0.98, 0.95, 0.92)
+          //       //255,240,245
+          //       uniforms: {
+          //         furTexture: { value: texture },
+          //         furColor: { value: new THREE.Color(materialColor.r, materialColor.g, materialColor.b) },
+          //         uNoiseTexture: { value: this.uNoiseTexture },
+          //         furLength: { value: 0.05 },
+          //         layerIndex: { value: layerIndex },
+          //         totalLayers: { value: totalLayers },
+          //         time: { value: 0.0 },
 
-                  lightPosition: { value: new THREE.Vector3(1, 2, 1) },  // 添加光照位置
-                  specularStrength: { value: 0.0 },   // 添加高光强度
-                  ambientStrength: { value: 0.3 }     // 添加环境光强度
-                },
-                vertexShader: this.furVertexShader,
-                fragmentShader: this.furFragmentShader,
-                transparent: layerIndex > 0,
-                side: THREE.DoubleSide,
-                depthWrite: true,        // 所有层都写入深度
-                blending: THREE.NormalBlending
-              });
-            };
+          //         lightPosition: { value: new THREE.Vector3(1, 2, 1) },  // 添加光照位置
+          //         specularStrength: { value: 0.0 },   // 添加高光强度
+          //         ambientStrength: { value: 0.3 }     // 添加环境光强度
+          //       },
+          //       vertexShader: this.furVertexShader,
+          //       fragmentShader: this.furFragmentShader,
+          //       transparent: layerIndex > 0,
+          //       side: THREE.DoubleSide,
+          //       depthWrite: true,        // 所有层都写入深度
+          //       blending: THREE.NormalBlending
+          //     });
+          //   };
             
-            // 保存原始 mesh 的变换和父节点
-            const originalParent = obj.parent;
-            const originalPosition = obj.position.clone();
-            const originalRotation = obj.rotation.clone();
-            const originalScale = obj.scale.clone();
+          //   // 保存原始 mesh 的变换和父节点
+          //   const originalParent = obj.parent;
+          //   const originalPosition = obj.position.clone();
+          //   const originalRotation = obj.rotation.clone();
+          //   const originalScale = obj.scale.clone();
             
-            // 清除之前的毛发层（如果存在）
-            if (this.furMeshesGroups[obj.name]) {
-              this.furMeshesGroups[obj.name].forEach(mesh => {
-                mesh.parent.remove(mesh);
-              });
-            }
-            this.furMeshesGroups[obj.name] = [];
+          //   // 清除之前的毛发层（如果存在）
+          //   if (this.furMeshesGroups[obj.name]) {
+          //     this.furMeshesGroups[obj.name].forEach(mesh => {
+          //       mesh.parent.remove(mesh);
+          //     });
+          //   }
+          //   this.furMeshesGroups[obj.name] = [];
             
-            // 创建一个新的组来保持毛发层
-            const furGroup = new THREE.Group();
-            furGroup.position.copy(originalPosition);
-            furGroup.rotation.copy(originalRotation);
-            furGroup.scale.copy(originalScale);
-            originalParent.add(furGroup);
+          //   // 创建一个新的组来保持毛发层
+          //   const furGroup = new THREE.Group();
+          //   furGroup.position.copy(originalPosition);
+          //   furGroup.rotation.copy(originalRotation);
+          //   furGroup.scale.copy(originalScale);
+          //   originalParent.add(furGroup);
 
-            const LAYERS = 60;
-            const baseMaterial = createFurMaterial(0, LAYERS);
-            const baseMesh = new THREE.Mesh(obj.geometry, baseMaterial);
-            baseMesh.renderOrder = 1000;
-            furGroup.add(baseMesh);
-            this.furMeshesGroups[obj.name].push(baseMesh);
+          //   const LAYERS = 60;
+          //   const baseMaterial = createFurMaterial(0, LAYERS);
+          //   const baseMesh = new THREE.Mesh(obj.geometry, baseMaterial);
+          //   baseMesh.renderOrder = 1000;
+          //   furGroup.add(baseMesh);
+          //   this.furMeshesGroups[obj.name].push(baseMesh);
 
-            for(let i = 1; i < LAYERS; i++) {
-              const material = createFurMaterial(i, LAYERS);
-              const furMesh = new THREE.Mesh(obj.geometry, material);
-              furMesh.renderOrder = i;
-              furGroup.add(furMesh);
-              this.furMeshesGroups[obj.name].push(furMesh);
-            }
-            // 保持原始mesh可见但完全透明
-            obj.material.transparent = true;
-            obj.material.opacity = 0;
-            obj.material.depthWrite = true;
-            obj.renderOrder = 999;  // 在毛发效果之前渲染
+          //   for(let i = 1; i < LAYERS; i++) {
+          //     const material = createFurMaterial(i, LAYERS);
+          //     const furMesh = new THREE.Mesh(obj.geometry, material);
+          //     furMesh.renderOrder = i;
+          //     furGroup.add(furMesh);
+          //     this.furMeshesGroups[obj.name].push(furMesh);
+          //   }
+          //   // 保持原始mesh可见但完全透明
+          //   obj.material.transparent = true;
+          //   obj.material.opacity = 0;
+          //   obj.material.depthWrite = true;
+          //   obj.renderOrder = 999;  // 在毛发效果之前渲染
 
-            this.texture_materials[obj.name] = obj.material;
-            // obj.visible = false;
-          } else if (obj.name == 'Sphere003' || obj.name == 'Sphere004' || obj.name == 'Sphere005') {
-            // 为 Sphere003 创建金属质感材质
-            let baseObject = obj;
-            let old_material = baseObject.material;
+          //   this.texture_materials[obj.name] = obj.material;
+          //   // obj.visible = false;
+          // } else if (obj.name == 'Sphere003' || obj.name == 'Sphere004' || obj.name == 'Sphere005') {
+          //   // 为 Sphere003 创建金属质感材质
+          //   let baseObject = obj;
+          //   let old_material = baseObject.material;
 
-            var metalMaterial = new THREE.MeshPhysicalMaterial({
-              color: old_material.color || 0x888888,
-              metalness: 0.6,          // 降低金属度，使反射更柔和
-              roughness: 0.2,          // 降低粗糙度，但保持适中以产生扩散效果
-              reflectivity: 0.7,       // 降低反射率，使光晕更自然
-              clearcoat: 0.5,          // 降低清漆层强度
-              clearcoatRoughness: 0.2, // 增加清漆层粗糙度
-              envMapIntensity: 0.8,    // 降低环境贴图强度
-              ior: 1.3,               // 添加折射率参数
-              transmission: 0.2,       // 添加透射效果
-              thickness: 0.5           // 材质厚度
-            });
+          //   var metalMaterial = new THREE.MeshPhysicalMaterial({
+          //     color: old_material.color || 0x888888,
+          //     metalness: 0.6,          // 降低金属度，使反射更柔和
+          //     roughness: 0.2,          // 降低粗糙度，但保持适中以产生扩散效果
+          //     reflectivity: 0.7,       // 降低反射率，使光晕更自然
+          //     clearcoat: 0.5,          // 降低清漆层强度
+          //     clearcoatRoughness: 0.2, // 增加清漆层粗糙度
+          //     envMapIntensity: 0.8,    // 降低环境贴图强度
+          //     ior: 1.3,               // 添加折射率参数
+          //     transmission: 0.2,       // 添加透射效果
+          //     thickness: 0.5           // 材质厚度
+          //   });
 
-            // 创建环境贴图
-            const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
-              minFilter: THREE.LinearMipmapLinearFilter,
-              magFilter: THREE.LinearFilter,
-              generateMipmaps: true,
-              type: THREE.HalfFloatType
-            });            
-            const cubeCamera = new THREE.CubeCamera(0.1, 10, cubeRenderTarget);
-            this.scene.add(cubeCamera);
+          //   // 创建环境贴图
+          //   const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+          //     minFilter: THREE.LinearMipmapLinearFilter,
+          //     magFilter: THREE.LinearFilter,
+          //     generateMipmaps: true,
+          //     type: THREE.HalfFloatType
+          //   });            
+          //   const cubeCamera = new THREE.CubeCamera(0.1, 10, cubeRenderTarget);
+          //   this.scene.add(cubeCamera);
 
-            // 更新环境贴图的函数
-            const updateEnvironmentMap = () => {
-              baseObject.visible = false;
-              cubeCamera.position.copy(baseObject.position);
-              cubeCamera.update(this.renderer, this.scene);
-              baseObject.visible = true;
-              metalMaterial.envMap = cubeRenderTarget.texture;
-            };
+          //   // 更新环境贴图的函数
+          //   const updateEnvironmentMap = () => {
+          //     baseObject.visible = false;
+          //     cubeCamera.position.copy(baseObject.position);
+          //     cubeCamera.update(this.renderer, this.scene);
+          //     baseObject.visible = true;
+          //     metalMaterial.envMap = cubeRenderTarget.texture;
+          //   };
 
-            // 首次更新环境贴图
-            updateEnvironmentMap();
+          //   // 首次更新环境贴图
+          //   updateEnvironmentMap();
 
-            // 添加到渲染循环
-            this.updateEnvironmentMap = updateEnvironmentMap;
+          //   // 添加到渲染循环
+          //   this.updateEnvironmentMap = updateEnvironmentMap;
 
-            baseObject.material = metalMaterial;
-            this.texture_materials[obj.name] = metalMaterial;
+          //   baseObject.material = metalMaterial;
+          //   this.texture_materials[obj.name] = metalMaterial;
 
-            // 确保正确的渲染顺序和深度设置
-            baseObject.renderOrder = 0;
-            baseObject.material.depthWrite = true;
-            baseObject.material.depthTest = true;
-          } else {
+          //   // 确保正确的渲染顺序和深度设置
+          //   baseObject.renderOrder = 0;
+          //   baseObject.material.depthWrite = true;
+          //   baseObject.material.depthTest = true;
+          // } else {
             let baseObject = obj;
             let old_material = baseObject.material;
             
@@ -487,14 +513,24 @@ class NBD3DPreview {
               alphaMap: old_material.alphaMap,
               transparent: old_material.transparent,
               roughness: 0.5,
-              metalness: 0.0
+              metalness: 0.0,
+              // 添加光照相关参数
+              envMapIntensity: 1.2,    // 增加环境光强度
+              clearcoat: 0.4,          // 增加清漆效果
+              clearcoatRoughness: 0.1, // 降低清漆层粗糙度
+              reflectivity: 0.8,       // 增加反射率
+              specularIntensity: 1.0,  // 增加高光强度
+              specularColor: new THREE.Color(1, 1, 1),
+              emissiveIntensity: 0.3   // 增加自发光强度
             });
             baseObject.material = new_base_material;
+            baseObject.castShadow = true;
+            baseObject.receiveShadow = true;
             this.texture_materials[obj.name] = new_base_material;
             obj.renderOrder = 0;  // 最先渲染非毛发mesh
             obj.material.depthWrite = true;
             obj.material.depthTest = true;
-          }
+          // }
         }
       });
 
@@ -502,9 +538,9 @@ class NBD3DPreview {
 
       // 打印场景中的所有对象
       console.log('Scene hierarchy:');
-      this.scene.traverse((object) => {
-          console.log('Object:', object.name, 'Type:', object.type, 'Visible:', object.visible);
-      });
+      // this.scene.traverse((object) => {
+      //     console.log('Object:', object.name, 'Type:', object.type, 'Visible:', object.visible);
+      // });
 
       const box = new THREE.Box3().setFromObject(root);
       const boxSize = box.getSize(new THREE.Vector3()).length();
@@ -603,6 +639,49 @@ class NBD3DPreview {
 
   update_design(design, context){
     const _this = this;
+
+    const applyTextureToOssito = (texture) => {
+        // 确保贴图设置正确
+        texture.flipY = false;
+        texture.encoding = THREE.sRGBEncoding;
+        texture.needsUpdate = true;
+        
+        // 查找Ossito mesh
+        let ossitoFound = false;
+        _this.scene.traverse((object) => {
+            if (object.name === 'Ossito' && object.isMesh) {
+                ossitoFound = true;
+                console.log('found Ossito mesh:', object);
+
+                // 保存原有材质的颜色
+                const originalColor = object.material.color;
+                
+                // 创建新材质
+                const newMaterial = new THREE.MeshStandardMaterial({
+                    color: originalColor,
+                    map: texture,
+                    transparent: false,
+                    side: THREE.DoubleSide,
+                    roughness: 0.5,
+                    metalness: 0.0
+                });
+                
+                // 应用新材质
+                object.material = newMaterial;
+                object.material.needsUpdate = true;
+                
+                console.log('新材质已应用:', newMaterial);
+                console.log('贴图尺寸:', texture.image.width, texture.image.height);
+            }
+        });
+        
+        if (!ossitoFound) {
+            console.warn('not found Ossito mesh');
+        }
+        
+        _this.render();
+    };
+
     if( context == 'on_worker' ){
       console.log('update_design on_worker');
 
@@ -617,7 +696,7 @@ class NBD3DPreview {
             }
           });
         });
-        
+        applyTextureToOssito(_this.texture);// 替换贴图
         _this.texture.needsUpdate = true;
         _this.render();
       });
@@ -634,6 +713,7 @@ class NBD3DPreview {
             }
           });
         });
+        applyTextureToOssito(this.texture);// 替换生效
         _this.texture.needsUpdate = true;
         _this.render();
       };
