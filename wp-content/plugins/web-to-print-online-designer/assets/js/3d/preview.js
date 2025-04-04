@@ -22,6 +22,8 @@ class NBD3DPreview {
     this.furMeshes = [];  // 添加数组来存储毛发网格
     this.furMeshesGroups = {};
     this.texture_materials = {};
+    this.original_custom_materials = {};
+    this.settings = {};
   }
 
   init(data) {
@@ -43,6 +45,7 @@ class NBD3DPreview {
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#808080');
+    this.settings = settings;
 
     // 调整环境光，降低强度以增加对比度
     var ambient = new THREE.AmbientLight(0xffffff, 0.8);  // 降低环境光强度 old: 0.35
@@ -489,47 +492,32 @@ class NBD3DPreview {
           //   baseObject.material.depthWrite = true;
           //   baseObject.material.depthTest = true;
           // } else {
-            let baseObject = obj;
-            let old_material = baseObject.material;
-            
-            // 为每个mesh创建独立的材质和纹理
-            let meshTexture = old_material.map;
-            if (!meshTexture && old_material.color) {
-              const width = 1;
-              const height = 1;
-              const data = new Uint8Array(width * height * 4);
-              const materialColor = old_material.color;
-              data[0] = Math.floor(materialColor.r * 255);
-              data[1] = Math.floor(materialColor.g * 255);
-              data[2] = Math.floor(materialColor.b * 255);
-              data[3] = 255;
-              meshTexture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
-              meshTexture.needsUpdate = true;
-            }
+            console.log('obj.name: ', obj.name, ' settings.meshName: ', settings.meshName);
+            if(obj.name == settings.meshName ){ // custom mesh
+              // let textureObject = obj;
+              // let old_material = textureObject.material;
+              // let new_material = new THREE.MeshPhongMaterial( {color:0xffffff, map:old_material.map, transparent:true} );
+              // this.texture_material = new_material;
+              // this.texture_material.needsUpdate = true;
+              // textureObject.material = new_material;
+              let baseObject = obj;
+              let old_material = baseObject.material;
+              var new_base_material = new THREE.MeshPhongMaterial( {color:old_material.color} );
+              if(old_material.map){
+                new_base_material.map = old_material.map;
+              }
+              baseObject.material = new_base_material;
+              this.original_custom_materials[obj.name] = new_base_material;
 
-            var new_base_material = new THREE.MeshPhysicalMaterial({
-              color: old_material.color,
-              map: meshTexture,  // 使用mesh自己的纹理
-              alphaMap: old_material.alphaMap,
-              transparent: old_material.transparent,
-              roughness: 0.5,
-              metalness: 0.0,
-              // 添加光照相关参数
-              envMapIntensity: 1.2,    // 增加环境光强度
-              clearcoat: 0.4,          // 增加清漆效果
-              clearcoatRoughness: 0.1, // 降低清漆层粗糙度
-              reflectivity: 0.8,       // 增加反射率
-              specularIntensity: 1.0,  // 增加高光强度
-              specularColor: new THREE.Color(1, 1, 1),
-              emissiveIntensity: 0.3   // 增加自发光强度
-            });
-            baseObject.material = new_base_material;
-            baseObject.castShadow = true;
-            baseObject.receiveShadow = true;
-            this.texture_materials[obj.name] = new_base_material;
-            obj.renderOrder = 0;  // 最先渲染非毛发mesh
-            obj.material.depthWrite = true;
-            obj.material.depthTest = true;
+            }else{
+              let baseObject = obj;
+              let old_material = baseObject.material;
+              var new_base_material = new THREE.MeshPhongMaterial( {color:old_material.color} );
+              if(old_material.map){
+                new_base_material.map = old_material.map;
+              }
+              baseObject.material = new_base_material;
+            }
           // }
         }
       });
@@ -538,9 +526,9 @@ class NBD3DPreview {
 
       // 打印场景中的所有对象
       console.log('Scene hierarchy:');
-      // this.scene.traverse((object) => {
-      //     console.log('Object:', object.name, 'Type:', object.type, 'Visible:', object.visible);
-      // });
+      this.scene.traverse((object) => {
+          console.log('Object:', object.name, 'Type:', object.type, 'Visible:', object.visible);
+      });
 
       const box = new THREE.Box3().setFromObject(root);
       const boxSize = box.getSize(new THREE.Vector3()).length();
@@ -640,84 +628,142 @@ class NBD3DPreview {
   update_design(design, context){
     const _this = this;
 
-    const applyTextureToOssito = (texture) => {
-        // 确保贴图设置正确
-        texture.flipY = false;
-        texture.encoding = THREE.sRGBEncoding;
-        texture.needsUpdate = true;
-        
-        // 查找Ossito mesh
-        let ossitoFound = false;
-        _this.scene.traverse((object) => {
-            if (object.name === 'Ossito' && object.isMesh) {
-                ossitoFound = true;
-                console.log('found Ossito mesh:', object);
-
-                // 保存原有材质的颜色
-                const originalColor = object.material.color;
-                
-                // 创建新材质
-                const newMaterial = new THREE.MeshStandardMaterial({
-                    color: originalColor,
-                    map: texture,
-                    transparent: false,
-                    side: THREE.DoubleSide,
-                    roughness: 0.5,
-                    metalness: 0.0
-                });
-                
-                // 应用新材质
-                object.material = newMaterial;
-                object.material.needsUpdate = true;
-                
-                console.log('新材质已应用:', newMaterial);
-                console.log('贴图尺寸:', texture.image.width, texture.image.height);
+    const applyTextureToOssito = (imageSource, ossitoMesh) => {
+        try {
+            console.log('开始处理贴图');
+            // 获取Ossito mesh
+            // const ossitoMesh = _this.scene.getObjectByName('Ossito001');//Ossito
+            if (!ossitoMesh) {
+                console.error('找不到Ossito mesh');
+                return;
             }
-        });
-        
-        if (!ossitoFound) {
-            console.warn('not found Ossito mesh');
+            
+            // 保存原始材质的属性
+            const originalMaterial = ossitoMesh.material;
+            // 创建一个临时canvas用于缩放图片
+            // const width = 1024;
+            // const height = 1024;
+            console.log('imageSource width: ', imageSource.width, ' height: ', imageSource.height);
+            const previewWidth = 400;
+            const previewHeight = 400;
+            const previewCanvas = new OffscreenCanvas(previewWidth, previewHeight);  // 设置为50x50
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            // 将原图缩放到50x50 这里是把图片绘制到previewCanvas上
+            previewCtx.drawImage(imageSource, 0, 0, imageSource.width, imageSource.height);
+            
+            // 创建最终的canvas
+            const canvas = new OffscreenCanvas(1024, 1024);
+            const ctx = canvas.getContext('2d');
+            
+            // 设置原mesh背景
+            const originalColor = originalMaterial.color;
+            console.log('originalColor1: ', originalColor);
+            const hexColor = '#' + originalColor.getHexString();//'#FF66FF'
+            ctx.fillStyle = hexColor;//#FFFFFF originalMaterial.color;//
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 获取原始贴图
+            // const originalTexture = ossitoMesh.material.map;
+            // if (originalTexture && originalTexture.image) {
+            //     // 绘制原始贴图作为背景
+            //     console.log('originalTexture.image: ', originalTexture.image);
+            //     ctx.drawImage(originalTexture.image, 0, 0, canvas.width, canvas.height);
+            // }
+            
+            // 在中心绘制缩放后的图片
+            const x = (canvas.width - imageSource.width) / 2;  // 居中50px宽的图片
+            const y = (canvas.height - imageSource.height) / 2;  // 居中50px高的图片
+            ctx.drawImage(previewCanvas, 100, 100);// 这里把previewCanvas绘制到canvas上
+            
+            // 创建新纹理
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+
+            console.log('originalMaterial2 color: ', originalMaterial.color);
+
+            // 创建新的纹理
+            const newMaterial = new THREE.MeshPhysicalMaterial({
+                // 基础属性
+                color: 0xFFFFFF,//0xFFFFFF：会让下一次打开preview时，背景变白，originalMaterial.color: 会干扰重叠的颜色
+                map: texture,
+                
+                // 光照和反射相关
+                roughness: originalMaterial.roughness || 0.5,
+                metalness: originalMaterial.metalness || 0.1,
+                envMapIntensity: originalMaterial.envMapIntensity || 1.2,
+                reflectivity: originalMaterial.reflectivity || 0.8,
+                
+                // 清漆效果
+                clearcoat: originalMaterial.clearcoat || 0.4,
+                clearcoatRoughness: originalMaterial.clearcoatRoughness || 0.1,
+                
+                // 环境贴图
+                envMap: originalMaterial.envMap,
+                
+                // 其他重要属性
+                emissive: originalMaterial.emissive,
+                emissiveIntensity: originalMaterial.emissiveIntensity || 0.3,
+                
+                // 渲染设置
+                side: THREE.DoubleSide,
+                transparent: false,
+                
+                // 阴影和光照设置
+                shadowSide: THREE.FrontSide,
+                vertexColors: originalMaterial.vertexColors || false,
+                
+                // 确保正确的深度处理
+                depthWrite: true,
+                depthTest: true
+            });
+            
+            // 设置纹理属性
+            texture.encoding = THREE.sRGBEncoding;
+            texture.premultiplyAlpha = true;
+            
+            // 应用新材质
+            ossitoMesh.material = newMaterial;
+            ossitoMesh.material.needsUpdate = true;
+            
+            // 更新材质映射
+            _this.texture_materials['Ossito001'] = newMaterial;//Ossito
+            
+            console.log('贴图已更新');
+            _this.render();
+            
+        } catch (error) {
+            console.error('处理贴图时发生错误:', error);
         }
-        
-        _this.render();
     };
 
-    if( context == 'on_worker' ){
-      console.log('update_design on_worker');
+    if (context == 'on_worker') {
+        console.log('使用worker模式加载图片, design ', design);
+        let loader = new THREE.ImageBitmapLoader();
+        // let ossitoMesh = this.originalMeshes[this.settings.meshName];
+        let ossitoMesh = this.scene.getObjectByName(this.settings.meshName);//Ossito
+        if (ossitoMesh) {
+          ossitoMesh.material = this.original_custom_materials[this.settings.meshName];
+        }
+        // 会导致再次打开时preview不是最新的
+        // if (!ossitoMesh) {
+        //   ossitoMesh = this.scene.getObjectByName(this.settings.meshName);//Ossito
+        //   this.originalMeshes[this.settings.meshName] = ossitoMesh.clone();
+        // }
 
-      let loader = new THREE.ImageBitmapLoader();
-      loader.load(design, function(imageBitmap ) {
-        _this.texture = new THREE.CanvasTexture( imageBitmap );
-        _this.texture.flipY = false;
-        Object.values(_this.furMeshesGroups).forEach(meshGroup => {
-          meshGroup.forEach(mesh => {
-            if(mesh.material.uniforms && mesh.material.uniforms.furTexture) {
-              mesh.material.uniforms.furTexture.value = _this.texture;
-            }
-          });
+        // const ossitoMesh = this.originalMeshes['Ossito001'];
+        loader.load(design, function(imageBitmap) {
+            console.log('ImageBitmap已加载:', imageBitmap);
+            applyTextureToOssito(imageBitmap, ossitoMesh);
         });
-        applyTextureToOssito(_this.texture);// 替换贴图
-        _this.texture.needsUpdate = true;
-        _this.render();
-      });
-    }else{
-      console.log('update_design THREE.Texture');
-      const image = new Image();
-      this.texture = new THREE.Texture(image);
-      this.texture.flipY = false;
-      image.onload = () => {
-        Object.values(this.furMeshesGroups).forEach(meshGroup => {
-          meshGroup.forEach(mesh => {
-            if(mesh.material.uniforms && mesh.material.uniforms.furTexture) {
-              mesh.material.uniforms.furTexture.value = this.texture;
-            }
-          });
-        });
-        applyTextureToOssito(this.texture);// 替换生效
-        _this.texture.needsUpdate = true;
-        _this.render();
-      };
-      image.src = design;
+    } else {
+        console.log('使用普通模式加载图片');
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = () => applyTextureToOssito(image);
+        image.onerror = (err) => {
+            console.error('图片加载失败:', err);
+        };
+        image.src = design;
     }
   }
 }
