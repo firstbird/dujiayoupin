@@ -3387,16 +3387,22 @@ class Nbdesigner_Plugin {
                 $ds_height  = $val["area_design_height"] * $scale;
                 if( $design_format == 'png' ){
                     $image_design = NBD_Image::nbdesigner_resize_imagepng( $p_img, $ds_width, $ds_height );
-                }else{
+                }else if( $design_format == 'jpeg' ){
                     $image_design = NBD_Image::nbdesigner_resize_imagejpg( $p_img, $ds_width, $ds_height );
+                }else if( $design_format == 'svg' ){
+                    error_log('nbdesigner create_preview_design svg');
+                    $image_design = NBD_Image::nbdesigner_resize_imagesvg( $p_img, $ds_width, $ds_height );
                 }
                 $image_product_ext = pathinfo( $val["img_src"] );
                 if( $val["bg_type"] == 'image' ){
                     $path_img_src  = Nbdesigner_IO::convert_url_to_path( $val["img_src"] );
                     if( $image_product_ext['extension'] == "png" ){
                         $image_product = NBD_Image::nbdesigner_resize_imagepng( $path_img_src, $bg_width, $bg_height );
-                    }else{
+                    }else if( $image_product_ext['extension'] == "jpg" || $image_product_ext['extension'] == "jpeg" ){
                         $image_product = NBD_Image::nbdesigner_resize_imagejpg( $path_img_src, $bg_width, $bg_height );
+                    }else if( $image_product_ext['extension'] == "svg" ){
+                        error_log('nbdesigner create_preview_design2 svg');
+                        $image_product = NBD_Image::nbdesigner_resize_imagesvg( $path_img_src, $bg_width, $bg_height );
                     }
                 }
                 if( $val["show_overlay"] == '1' ){
@@ -3422,6 +3428,7 @@ class Nbdesigner_Plugin {
                     imagefilledrectangle($image,0,0,$bg_width,$bg_height,$bg);
                 }
                 if( $val["bg_type"] == 'image' ){
+                    error_log('nbdesigner create_preview_design image_product ' . print_r($image_product, true) . ' image: ' . print_r($image, true));
                     imagecopy( $image, $image_product, 0, 0, 0, 0, $bg_width, $bg_height );
                 } else if( $val["bg_type"] == 'color' ){
                     $show_bg_color = true;
@@ -4257,7 +4264,10 @@ class Nbdesigner_Plugin {
                 if( $val["bg_type"] == 'image' ){
                     if( $image_product_ext['extension'] == "png" ){
                         $image_product = NBD_Image::nbdesigner_resize_imagepng( $val["img_src"], $val["img_src_width"], $val["img_src_height"] );
-                    }else{
+                    } elseif ( $image_product_ext['extension'] == "svg" ) {
+                        error_log('nbdesigner image_product_ext svg');
+                        $image_product = NBD_Image::nbdesigner_resize_imagesvg( $val["img_src"], $val["img_src_width"], $val["img_src_height"] );
+                    } else {
                         $image_product = NBD_Image::nbdesigner_resize_imagejpg( $val["img_src"], $val["img_src_width"], $val["img_src_height"] );
                     }
                 }
@@ -5057,6 +5067,9 @@ class Nbdesigner_Plugin {
                         NBD_Image::nbdesigner_resize_imagepng( $path, $preview_width, $preview_width, $path_preview . $new_name );
                     }else if( $ext == 'jpg' ){
                         NBD_Image::nbdesigner_resize_imagejpg( $path, $preview_width, $preview_width, $path_preview . $new_name );
+                    }else if( $ext == 'svg' ){
+                        error_log('nbdesigner nbd_upload_design_file svg');
+                        NBD_Image::nbdesigner_resize_imagesvg( $path, $preview_width, $preview_width, $path_preview . $new_name );
                     }else if( is_available_imagick() && $ext == 'pdf' ){
                         $jpg_preview = $path_preview . $new_name . '.jpg';
                         NBD_Image::imagick_convert_pdf_to_jpg( $path, $jpg_preview );
@@ -5210,6 +5223,9 @@ class Nbdesigner_Plugin {
                         $path_preview   = $infos['dirname'] . '/' . $infos['filename'] . '_preview.' . $infos['extension'];
                         if( $ext == 'png' ){
                             NBD_Image::nbdesigner_resize_imagepng( $path['full_path'], $preview_size, $preview_size, $path_preview );
+                        } else if( $ext == 'svg' ) {
+                            error_log('nbdesigner nbd_upload_design_file svg');
+                            NBD_Image::nbdesigner_resize_imagesvg( $path['full_path'], $preview_size, $preview_size, $path_preview );
                         } else {
                             NBD_Image::nbdesigner_resize_imagejpg( $path['full_path'], $preview_size, $preview_size, $path_preview );
                         }

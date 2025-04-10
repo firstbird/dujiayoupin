@@ -412,14 +412,103 @@ class NBD_Image {
             imagedestroy( $dst );
         }
     }
+    public static function nbdesigner_resize_imagesvg($file, $w, $h, $path = '') {
+        error_log('nbdesigner_resize_imagesvg input file: ' . $file);
+    
+        // 读取SVG文件内容
+        $svg_content = file_get_contents($file);
+        if ($svg_content === false) {
+            error_log('nbdesigner nbdesigner_resize_imagesvg failed to read file');
+            return false;
+        }
+    
+        // 创建临时PNG文件
+        $temp_png = tempnam(sys_get_temp_dir(), 'svg_');
+        
+        // 使用 Imagick 转换 SVG 到 PNG
+        try {
+            $imagick = new Imagick();
+            $imagick->readImageBlob($svg_content);
+            $imagick->setImageFormat('png');
+            
+            // 设置背景为透明
+            $imagick->setImageBackgroundColor(new ImagickPixel('transparent'));
+            
+            // 调整大小
+            $imagick->resizeImage($w, $h, Imagick::FILTER_LANCZOS, 1);
+            
+            // 写入临时文件
+            $imagick->writeImage($temp_png);
+            $imagick->clear();
+            $imagick->destroy();
+            
+            // 从临时PNG创建GD图像
+            $gd_image = imagecreatefrompng($temp_png);
+            
+            // 如果需要保存到指定路径
+            if ($path !== '') {
+                imagepng($gd_image, $path);
+                error_log('nbdesigner nbdesigner_resize_imagesvg saved to: ' . $path);
+            }
+            
+            // 删除临时文件
+            unlink($temp_png);
+            
+            error_log('nbdesigner nbdesigner_resize_imagesvg created GdImage successfully');
+            
+            // 返回GD图像对象
+            return $gd_image;
+            
+        } catch (Exception $e) {
+            error_log('nbdesigner nbdesigner_resize_imagesvg Imagick error: ' . $e->getMessage());
+            
+            // 如果 Imagick 失败，尝试使用其他方法
+            try {
+                // 使用 inkscape 命令行工具（如果可用）
+                $command = "inkscape --export-type=png --export-filename={$temp_png} --export-width={$w} --export-height={$h} {$file}";
+                exec($command, $output, $return_var);
+                
+                if ($return_var === 0 && file_exists($temp_png)) {
+                    $gd_image = imagecreatefrompng($temp_png);
+                    
+                    if ($path !== '') {
+                        imagepng($gd_image, $path);
+                    }
+                    
+                    unlink($temp_png);
+                    return $gd_image;
+                }
+            } catch (Exception $e2) {
+                error_log('nbdesigner nbdesigner_resize_imagesvg fallback error: ' . $e2->getMessage());
+            }
+            
+            // 如果所有方法都失败，创建一个空白的GD图像
+            $gd_image = imagecreatetruecolor($w, $h);
+            
+            // 设置透明背景
+            $transparent = imagecolorallocatealpha($gd_image, 0, 0, 0, 127);
+            imagefill($gd_image, 0, 0, $transparent);
+            imagesavealpha($gd_image, true);
+            
+            if ($path !== '') {
+                imagepng($gd_image, $path);
+            }
+            
+            return $gd_image;
+        }
+        
+        return false;
+    }
     public static function nbdesigner_resize_imagejpg( $file, $w, $h, $path = '' ) {
         if( is_available_imagick() && $path != '' ){
             self::imagick_resize_image($file, $path, $w, $h );
         } else {
             list($width, $height) = getimagesize($file);
-            if( $path != '' ) $h = round( $w / $width * $height );
+            if( $path != '' ) $h = round( $w / $width * $height );            
+            error_log('nbdesigner nbdesigner_resize_imagejpg file: ' . $file);
             $src = imagecreatefromjpeg($file);
             $dst = imagecreatetruecolor($w, $h);
+            error_log('nbdesigner nbdesigner_resize_imagejpg $w ' . $w . ' $h ' . $h . ' $src ' . $src);
             imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height);
             imagedestroy($src);
             if( $path == '' ){
@@ -3904,8 +3993,8 @@ function nbd_get_client_ip() {
         $ipaddress = $_server['HTTP_FORWARDED_FOR'];
     } else if ( isset( $_server['HTTP_FORWARDED'] ) ) {
         $ipaddress = $_server['HTTP_FORWARDED'];
-    } else if ( isset( $_server['REMOTE_ADDR'] ) ) {
-        $ipaddress = $_server['REMOTE_ADDR'];
+    } else if ( isset( $_server['HTTP_REMOTE_ADDR'] ) ) {
+        $ipaddress = $_server['HTTP_REMOTE_ADDR'];
     } else {
         $ipaddress = 'UNKNOWN';
     }
@@ -4421,7 +4510,11 @@ add_action('wp_enqueue_scripts', function() {
     // wp_deregister_script('angularjs');
     // wp_register_script('angularjs', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js', array('jquery'), '1.6.9', false);
     // wp_enqueue_script('angularjs');
+    // 添加 Ajax action 钩子
+    add_action('wp_ajax_nbd_get_product_info', array('Nbdesigner_Helper', 'nbd_get_product_info'));
+    add_action('wp_ajax_nopriv_nbd_get_product_info', array('Nbdesigner_Helper', 'nbd_get_product_info'));
     
+
     // 添加加载超时处理
     add_action('wp_footer', function() {
         ?>
