@@ -3,13 +3,13 @@ import {OrbitControls} from './OrbitControls.js';
 import {GLTFLoader} from './GLTFLoader.js';
 
 class NBD3DPreview {
-  constructor(){
+  constructor(inputElement, settings) {
     this.renderer;
     this.texture;
     this.texture_material;
     this.camera;
     this.scene;
-    this.inputElement;
+    this.inputElement = inputElement;
     this.controls;
     this.renderRequested = false;
     this.spotLights = [];
@@ -23,7 +23,39 @@ class NBD3DPreview {
     this.furMeshesGroups = {};
     this.texture_materials = {};
     this.original_custom_materials = {};
-    this.settings = {};
+    this.settings = settings;
+
+    // 将captureModelImages函数暴露到window对象
+    // try {
+    //   if (typeof window !== 'undefined') {
+    //     window.NBD3DPreviewCapture = () => {
+    //       console.log('从window对象调用captureModelImages');
+    //       this.captureModelImages();
+    //     };
+    //   }
+    // } catch (error) {
+    //   console.error('暴露函数到window对象时出错:', error);
+    // }
+
+    // // 添加消息监听
+    // console.log('开始设置消息监听器');
+    // window.addEventListener('message', function(event) {
+    //     console.log('preview.js收到消息:', event.data);
+    //     console.log('消息来源:', event.source);
+    //     console.log('消息类型:', event.data.type);
+    //     console.log('消息数据:', event.data.data);
+        
+    //     if (event.data.type === 'capture_model_images') {
+    //         console.log('收到截图请求');
+    //         var design = event.data.data.design;
+    //         if (design) {
+    //             console.log('开始处理设计数据');
+    //             // 处理设计数据
+    //             _this.processDesignData(design);
+    //         }
+    //     }
+    // });
+    // console.log('消息监听器设置完成');
   }
 
   init(data) {
@@ -47,113 +79,49 @@ class NBD3DPreview {
     this.scene.background = new THREE.Color('#808080');
     this.settings = settings;
 
-    // 调整环境光，降低强度以增加对比度
-    var ambient = new THREE.AmbientLight(0xffffff, 0.8);  // 降低环境光强度 old: 0.35
-    this.scene.add(ambient);
+    // 环境光
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    this.scene.add(ambientLight);
 
-    // 调整底部补光，使其更柔和
-    var bottomLight = new THREE.DirectionalLight(0xffffff, 0.2);  // 降低强度
-    bottomLight.position.set(0, -2, 0.5);  // 稍微偏前
-    this.scene.add(bottomLight);
+    // 主光源 - 模拟太阳光
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+    mainLight.position.set(5, 5, 5);
+    mainLight.castShadow = true;
+    this.scene.add(mainLight);
 
-    // 添加平行光（比聚光灯更容易控制）
-    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
-    directionalLight1.position.set(0, 5, 5);
-    this.scene.add(directionalLight1);
+    // 填充光 - 柔和的补光
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    fillLight.position.set(-5, 0, -5);
+    this.scene.add(fillLight);
 
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight2.position.set(5, 5, -5);
-    this.scene.add(directionalLight2);
+    // 背光 - 增加轮廓感
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
+    backLight.position.set(0, -5, -5);
+    this.scene.add(backLight);
 
-    // 添加半球光
-    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
-    this.scene.add(hemisphereLight);
+    // 设置阴影
+    mainLight.shadow.mapSize.width = 2048;
+    mainLight.shadow.mapSize.height = 2048;
+    mainLight.shadow.camera.near = 0.1;
+    mainLight.shadow.camera.far = 100;
+    mainLight.shadow.bias = -0.001;
 
-    // 重新设置主要打光
+    // 启用阴影
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // 这个是保持颜色正常显示的修改
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+
     for(let i = 0; i < 4; i++){
-      let spotLight = new THREE.SpotLight(0xffffff, 0.5);
-      let x, y, z;
-      
-      if (i === 0) {
-        // 正面主光源：更强、更集中
-        x = 0;
-        y = 2.5;
-        z = 2.5;
-        spotLight.intensity = 4.0;
-        spotLight.angle = 0.8;
-        spotLight.penumbra = 0.1;
-        spotLight.decay = 1.0;
-        
-        // 确保光源能投射阴影
-        spotLight.castShadow = true;
-        // 设置阴影属性
-        spotLight.shadow.mapSize.width = 1024;
-        spotLight.shadow.mapSize.height = 1024;
-        spotLight.shadow.camera.near = 0.1;
-        spotLight.shadow.camera.far = 10;
-        spotLight.layers.enableAll();  // 让光源作用于所有层
-
-      } else if (i === 1) {
-        // 右上方辅助光源：作为轮廓光
-        x = 0;
-        y = 3;                         // 稍微提高位置
-        z = 0;
-        spotLight.intensity = 3.5;     // 增加上方光源强度到3.5
-        spotLight.angle = 0.9;         // 增大角度以覆盖更多区域
-        spotLight.penumbra = 0.15;     // 稍微增加半影
-      } else if (i === 2) {
-        // 左上方辅助光源：作为填充光
-        x = -1.5;
-        y = 1.8;
-        z = 1.5;
-        spotLight.intensity = 0.9;
-        spotLight.angle = 0.5;
-        spotLight.penumbra = 0.4;
-        spotLight.decay = 1.5;
-      } else {
-        // 底部补光：更精确的角度
-        x = 0;
-        y = -1;
-        z = 1.2;
-        spotLight.intensity = 0.5;
-        spotLight.angle = 0.6;
-        spotLight.penumbra = 0.6;      // 更柔和的边缘
-        spotLight.decay = 2.0;         // 快速衰减
-        spotLight.castShadow = false;
-      }
-      
-      spotLight.position.set(x, y, z);
-      spotLight.distance = 12;         // 增加光照距离
-      
-      if (i !== 3) {
-        spotLight.castShadow = true;
-        spotLight.shadow.bias = -0.0001;
-        spotLight.shadow.mapSize.width = 1024;
-        spotLight.shadow.mapSize.height = 1024;
-        // 调整阴影相机参数以获得更清晰的阴影
-        spotLight.shadow.camera.near = 0.5;
-        spotLight.shadow.camera.far = 15;
-        spotLight.shadow.camera.fov = 30;
-      }
-      
+      let spotLight = new THREE.SpotLight( 0xffffff, 1 );
+      let x = ( i % 2 == 0 ) ? 1 : - 1;
+      let z = ( i % 4 > 1 ) ? -1 : 1;
+      spotLight.position.set( x, 2, z );
+      spotLight.angle = 0.50;
+      spotLight.penumbra = 0.75;
+      spotLight.intensity = 1;
+      spotLight.decay = 3;
       this.scene.add(spotLight);
-      this.spotLights.push(spotLight);
-      
-      // 精确控制光源方向
-      if (i === 0) {
-        spotLight.target.position.set(0, 0.8, 0);  // 主光源目标点
-      } else if (i === 1) {
-        spotLight.target.position.set(0, 0, 0);    // 轮廓光目标点
-      } else if (i === 2) {
-        spotLight.target.position.set(0, 0.5, 0);  // 填充光目标点
-      }
-      // 设置光源不影响特定材质
-      // spotLight.layers.set(0);  // 将聚光灯设置到不同的层
-      spotLight.position.set(x, y, z);
-      spotLight.target.position.set(0, 0, 0);  // 确保光源指向模型
-      this.scene.add(spotLight);
-      this.scene.add(spotLight.target);  // 不要忘记添加target
-      
       this.spotLights.push(spotLight);
     }
     
@@ -494,28 +462,49 @@ class NBD3DPreview {
           // } else {
             console.log('obj.name: ', obj.name, ' settings.meshName: ', settings.meshName);
             if(obj.name == settings.meshName ){ // custom mesh
-              // let textureObject = obj;
-              // let old_material = textureObject.material;
-              // let new_material = new THREE.MeshPhongMaterial( {color:0xffffff, map:old_material.map, transparent:true} );
-              // this.texture_material = new_material;
-              // this.texture_material.needsUpdate = true;
-              // textureObject.material = new_material;
               let baseObject = obj;
               let old_material = baseObject.material;
-              var new_base_material = new THREE.MeshPhongMaterial( {color:old_material.color} );
-              if(old_material.map){
-                new_base_material.map = old_material.map;
+              
+              // 创建新的StandardMaterial以支持PBR渲染
+              var new_base_material = new THREE.MeshStandardMaterial({
+                color: old_material.color,
+                metalness: old_material.metalness || 0.5,
+                roughness: old_material.roughness || 0.5,
+                envMapIntensity: 1.0
+              });
+
+              // 保留原始材质的所有贴图
+              if(old_material.map) new_base_material.map = old_material.map;
+              if(old_material.normalMap) new_base_material.normalMap = old_material.normalMap;
+              if(old_material.roughnessMap) new_base_material.roughnessMap = old_material.roughnessMap;
+              if(old_material.metalnessMap) new_base_material.metalnessMap = old_material.metalnessMap;
+              if(old_material.emissiveMap) {
+                new_base_material.emissiveMap = old_material.emissiveMap;
+                new_base_material.emissive = old_material.emissive;
+                new_base_material.emissiveIntensity = old_material.emissiveIntensity;
               }
+
+              // 创建环境贴图
+              const pmremGenerator = new THREE.PMREMGenerator(_this.renderer);
+              const envMap = pmremGenerator.fromScene(_this.scene).texture;
+              new_base_material.envMap = envMap;
+              pmremGenerator.dispose();
+
               baseObject.material = new_base_material;
-              this.original_custom_materials[obj.name] = new_base_material;
+              _this.original_custom_materials[obj.name] = new_base_material;
 
             }else{
               let baseObject = obj;
               let old_material = baseObject.material;
-              var new_base_material = new THREE.MeshPhongMaterial( {color:old_material.color} );
-              if(old_material.map){
-                new_base_material.map = old_material.map;
-              }
+              
+              // 对其他物体也使用StandardMaterial
+              var new_base_material = new THREE.MeshStandardMaterial({
+                color: old_material.color,
+                metalness: old_material.metalness || 0.3,
+                roughness: old_material.roughness || 0.7
+              });
+              
+              if(old_material.map) new_base_material.map = old_material.map;
               baseObject.material = new_base_material;
             }
           // }
@@ -602,6 +591,116 @@ class NBD3DPreview {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // 捕获模型不同角度的图像
+  captureModelImages() {
+    console.log('captureModelImages ---- ');
+    // 保存原始相机状态
+    try {
+      // 创建离屏canvas并获取WebGL上下文
+      const offscreenCanvas = new OffscreenCanvas(1024, 1024);
+      const gl = offscreenCanvas.getContext('webgl2') || offscreenCanvas.getContext('webgl');
+      
+      if (!gl) {
+          throw new Error('无法获取WebGL上下文');
+      }
+
+      console.log('创建offscreenRenderer开始');
+      // 创建离屏渲染器时传入完整的参数
+      const offscreenRenderer = new THREE.WebGLRenderer({ 
+          canvas: offscreenCanvas,
+          context: gl,
+          antialias: true,
+          alpha: true,
+          preserveDrawingBuffer: true
+      });
+      console.log('offscreenRenderer:', offscreenRenderer);
+
+      // 手动设置内部属性
+      if (!offscreenRenderer.domElement) {
+          offscreenRenderer.domElement = offscreenCanvas;
+      }
+      
+      // 设置尺寸前先检查
+      if (typeof offscreenRenderer._width === 'undefined') {
+          offscreenRenderer._width = 1024;
+          offscreenRenderer._height = 1024;
+      }
+
+      console.log('设置渲染器尺寸前');
+      // 使用setViewport替代setSize
+      offscreenRenderer.setViewport(0, 0, 1024, 1024);
+      console.log('设置渲染器尺寸后');
+
+      offscreenRenderer.setClearColor(0x000000, 0);
+      offscreenRenderer.outputEncoding = THREE.sRGBEncoding;
+      
+      // 创建离屏相机
+      const offscreenCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+      
+      // 获取模型的包围盒
+      const box = new THREE.Box3().setFromObject(this.scene);
+      const boxCenter = box.getCenter(new THREE.Vector3());
+      const boxSize = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
+      const distance = maxDim * 2;
+      
+      // 定义视图
+      const views = [
+          { name: 'front', position: new THREE.Vector3(0, 0, distance) },
+          { name: 'back', position: new THREE.Vector3(0, 0, -distance) },
+          { name: 'left', position: new THREE.Vector3(-distance, 0, 0) },
+          { name: 'right', position: new THREE.Vector3(distance, 0, 0) },
+          { name: 'top', position: new THREE.Vector3(0, distance, 0) },
+          { name: 'bottom', position: new THREE.Vector3(0, -distance, 0) }
+          // 暂时只测试一个视图
+      ];
+
+      // 捕获图像
+      views.forEach(view => {
+        console.log('渲染视图:', view.name);
+        // 设置相机
+        offscreenCamera.position.copy(view.position);
+        offscreenCamera.lookAt(boxCenter);
+        
+        // 渲染场景
+        offscreenRenderer.render(this.scene, offscreenCamera);
+        
+        // 获取canvas数据
+        offscreenCanvas.convertToBlob({
+            type: 'image/png'
+        }).then(blob => {
+            // 创建ArrayBuffer来传输数据
+            const reader = new FileReader();
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                console.log('post capture_image arrayBuffer ---- ', arrayBuffer);
+                // 发送ArrayBuffer（可转移对象）
+                self.postMessage({
+                    type: 'capture_image',
+                    name: `model_${view.name}.png`,
+                    data: arrayBuffer
+                }, [arrayBuffer]); // 将arrayBuffer作为可转移对象传递
+            };
+            reader.readAsArrayBuffer(blob);
+        });
+      });
+
+      // 清理资源
+      offscreenRenderer.dispose();
+      gl.getExtension('WEBGL_lose_context').loseContext();
+      
+      console.log('捕获完成');
+      self.postMessage({ type: 'capture_complete' });
+
+    } catch (error) {
+        console.error('捕获模型图像时出错:', error);
+        self.postMessage({
+            type: 'capture_error',
+            error: error.message
+        });
+    }
+  }
+
   initParticleSystem(params) {
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(params.count * 3);
@@ -624,116 +723,93 @@ class NBD3DPreview {
     this.particles.geometry.attributes.position.needsUpdate = true;
     console.log('initParticleSystem ---- ', this.particles);
   }
-
+  capture_design(design, context){
+    const _this = this;
+    console.log('capture_design ---- ', design);
+    this.captureModelImages();
+  }
   update_design(design, context){
     const _this = this;
 
     const applyTextureToOssito = (imageSource, ossitoMesh) => {
         try {
-            console.log('开始处理贴图');
-            // 获取Ossito mesh
-            // const ossitoMesh = _this.scene.getObjectByName('Ossito001');//Ossito
-            if (!ossitoMesh) {
-                console.error('找不到Ossito mesh');
-                return;
-            }
+          console.log('开始处理贴图');
+          if (!ossitoMesh) {
+              console.error('找不到Ossito mesh');
+              return;
+          }
+          
+          const originalMaterial = ossitoMesh.material;
+          const previewWidth = 400;
+          const previewHeight = 400;
+          
+          // 创建预览canvas
+          const previewCanvas = new OffscreenCanvas(previewWidth, previewHeight);
+          const previewCtx = previewCanvas.getContext('2d');
+          
+          // 清除canvas并设置为透明
+          previewCtx.clearRect(0, 0, previewWidth, previewHeight);
+          
+          // 将原图绘制到预览canvas，保持透明度
+          previewCtx.globalCompositeOperation = 'source-over';
+          previewCtx.drawImage(imageSource, 0, 0, imageSource.width, imageSource.height);
+          
+          // 创建最终的canvas
+          const canvas = new OffscreenCanvas(1024, 1024);
+          const ctx = canvas.getContext('2d');
+          
+          // 清除canvas并设置为透明
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          // 在中心绘制预览图片，保持透明度
+          const x = (canvas.width - previewWidth) / 2;
+          const y = (canvas.height - previewHeight) / 2;
+          ctx.drawImage(previewCanvas, x, y);
+          
+          // 创建新纹理
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.premultiplyAlpha = true;
+          texture.needsUpdate = true;
+          
+          // 创建新的材质，启用透明
+          const newMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xFFFFFF,
+            map: texture,
+            transparent: true,
+            alphaTest: 0.1,
             
-            // 保存原始材质的属性
-            const originalMaterial = ossitoMesh.material;
-            // 创建一个临时canvas用于缩放图片
-            // const width = 1024;
-            // const height = 1024;
-            console.log('imageSource width: ', imageSource.width, ' height: ', imageSource.height);
-            const previewWidth = 400;
-            const previewHeight = 400;
-            const previewCanvas = new OffscreenCanvas(previewWidth, previewHeight);  // 设置为50x50
-            const previewCtx = previewCanvas.getContext('2d');
+            // 调整这些参数使材质更亮
+            roughness: originalMaterial.roughness || 0.3,     // 降低粗糙度
+            metalness: originalMaterial.metalness || 0.0,     // 降低金属度
+            envMapIntensity: originalMaterial.envMapIntensity || 1.5,  // 增加环境贴图强度
+            reflectivity: originalMaterial.reflectivity || 1.0,        // 增加反射率
+            clearcoat: originalMaterial.clearcoat || 0.3,             // 降低清漆层
+            clearcoatRoughness: originalMaterial.clearcoatRoughness || 0.0,  // 降低清漆层粗糙度
             
-            // 将原图缩放到50x50 这里是把图片绘制到previewCanvas上
-            previewCtx.drawImage(imageSource, 0, 0, imageSource.width, imageSource.height);
+            // 添加发光属性使材质更亮
+            emissive: originalMaterial.emissive || new THREE.Color(0x333333),
+            emissiveIntensity: originalMaterial.emissiveIntensity || 0.2,
             
-            // 创建最终的canvas
-            const canvas = new OffscreenCanvas(1024, 1024);
-            const ctx = canvas.getContext('2d');
-            
-            // 设置原mesh背景
-            const originalColor = originalMaterial.color;
-            console.log('originalColor1: ', originalColor);
-            const hexColor = '#' + originalColor.getHexString();//'#FF66FF'
-            ctx.fillStyle = hexColor;//#FFFFFF originalMaterial.color;//
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // 获取原始贴图
-            // const originalTexture = ossitoMesh.material.map;
-            // if (originalTexture && originalTexture.image) {
-            //     // 绘制原始贴图作为背景
-            //     console.log('originalTexture.image: ', originalTexture.image);
-            //     ctx.drawImage(originalTexture.image, 0, 0, canvas.width, canvas.height);
-            // }
-            
-            // 在中心绘制缩放后的图片
-            const x = (canvas.width - imageSource.width) / 2;  // 居中50px宽的图片
-            const y = (canvas.height - imageSource.height) / 2;  // 居中50px高的图片
-            ctx.drawImage(previewCanvas, 100, 100);// 这里把previewCanvas绘制到canvas上
-            
-            // 创建新纹理
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.needsUpdate = true;
-
-            console.log('originalMaterial2 color: ', originalMaterial.color);
-
-            // 创建新的纹理
-            const newMaterial = new THREE.MeshPhysicalMaterial({
-                // 基础属性
-                color: 0xFFFFFF,//0xFFFFFF：会让下一次打开preview时，背景变白，originalMaterial.color: 会干扰重叠的颜色
-                map: texture,
-                
-                // 光照和反射相关
-                roughness: originalMaterial.roughness || 0.5,
-                metalness: originalMaterial.metalness || 0.1,
-                envMapIntensity: originalMaterial.envMapIntensity || 1.2,
-                reflectivity: originalMaterial.reflectivity || 0.8,
-                
-                // 清漆效果
-                clearcoat: originalMaterial.clearcoat || 0.4,
-                clearcoatRoughness: originalMaterial.clearcoatRoughness || 0.1,
-                
-                // 环境贴图
-                envMap: originalMaterial.envMap,
-                
-                // 其他重要属性
-                emissive: originalMaterial.emissive,
-                emissiveIntensity: originalMaterial.emissiveIntensity || 0.3,
-                
-                // 渲染设置
-                side: THREE.DoubleSide,
-                transparent: false,
-                
-                // 阴影和光照设置
-                shadowSide: THREE.FrontSide,
-                vertexColors: originalMaterial.vertexColors || false,
-                
-                // 确保正确的深度处理
-                depthWrite: true,
-                depthTest: true
-            });
-            
-            // 设置纹理属性
-            texture.encoding = THREE.sRGBEncoding;
-            texture.premultiplyAlpha = true;
-            
-            // 应用新材质
-            ossitoMesh.material = newMaterial;
-            ossitoMesh.material.needsUpdate = true;
-            
-            // 更新材质映射
-            _this.texture_materials['Ossito001'] = newMaterial;//Ossito
-            
-            console.log('贴图已更新');
-            _this.render();
-            
-        } catch (error) {
-            console.error('处理贴图时发生错误:', error);
-        }
+            side: THREE.DoubleSide,
+            shadowSide: THREE.FrontSide
+          });
+          
+          // 设置纹理属性
+          texture.encoding = THREE.sRGBEncoding;
+          
+          // 应用新材质
+          ossitoMesh.material = newMaterial;
+          ossitoMesh.material.needsUpdate = true;
+          
+          // 更新材质映射
+          _this.texture_materials[_this.settings.meshName] = newMaterial;
+          
+          console.log('贴图已更新');
+          _this.render();
+          
+      } catch (error) {
+          console.error('处理贴图时发生错误:', error);
+      }
     };
 
     if (context == 'on_worker') {
@@ -754,6 +830,7 @@ class NBD3DPreview {
         loader.load(design, function(imageBitmap) {
             console.log('ImageBitmap已加载:', imageBitmap);
             applyTextureToOssito(imageBitmap, ossitoMesh);
+            // _this.captureModelImages();
         });
     } else {
         console.log('使用普通模式加载图片');

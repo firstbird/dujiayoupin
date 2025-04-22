@@ -175,6 +175,16 @@
                             preview.update_design(event.data[1], 'on_main');
                         }
                     }
+                    if( event.data[0] && event.data[0] == 'capture_design' ){
+                        if( offscreencanvas ){
+                            worker.postMessage({
+                                type: 'capture_design',
+                                design: event.data[1]
+                            })
+                        } else {
+                            preview.capture_design(event.data[1], 'on_main');
+                        }
+                    }
                 }
             }
 
@@ -207,7 +217,20 @@
                 }, [offscreen]);
 
                 worker.onmessage = function(e) {
-                    if(e.data == 'loaded_3d_model'){
+                    if (e.data.type === 'capture_image') {
+                        // 将ArrayBuffer转换回Blob
+                        const blob = new Blob([e.data.data], {type: 'image/png'});
+                        const url = URL.createObjectURL(blob);
+                        
+                        // 创建下载链接
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = e.data.name;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } else if(e.data == 'loaded_3d_model'){
                         _postMessage( "loaded_3d_model" );
                     }
                 }
