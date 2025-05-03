@@ -9,9 +9,14 @@
         $active_typos       = (!$active_product && !$active_design && !$active_template && $settings["nbdesigner_enable_text"] == "yes") ? true : false;
         $active_cliparts    = (!$active_product && !$active_design && !$active_typos && $settings["nbdesigner_enable_clipart"] == "yes" && !$active_template) ? true : false;
         $active_photos      = (!$active_product && !$active_design && !$active_typos && !$active_cliparts && !$active_template && $settings["nbdesigner_enable_image"] == "yes") ? true : false;
-        $show_elements_tab  = (!($settings["nbdesigner_enable_clipart"] == "yes" || $settings["nbdesigner_enable_qrcode"] == "yes" || $settings["nbdesigner_enable_draw"] == "yes") || $settings["nbdesigner_hide_element_tab"] == "yes" ) ? false: true;
+        $show_elements_tab  = true;//(!($settings["nbdesigner_enable_clipart"] == "yes"
+                              //   || $settings["nbdesigner_enable_qrcode"] == "yes" 
+                              //   || $settings["nbdesigner_enable_draw"] == "yes") 
+                              //   || $settings["nbdesigner_hide_element_tab"] == "yes" ) ? false: true;
         $active_elements    = (!$active_product && !$active_design && !$active_typos && !$active_cliparts && !$active_photos && $show_elements_tab && !$active_template && $settings["nbdesigner_hide_element_tab"] == "no") ? true : false;
-        $active_layers      = (!$active_product && !$active_design && !$active_typos && !$active_cliparts && !$active_photos && !$active_elements && !$active_template && $settings["nbdesigner_hide_layer_tab"] != "no") ? true : false;
+        $active_backgrounds = (!$active_product && !$active_design && !$active_typos && !$active_cliparts && !$active_photos && !$active_elements && !$active_template) ? true : false;
+        $active_layers      = (!$active_product && !$active_design && !$active_typos && !$active_cliparts && !$active_photos && !$active_elements && !$active_backgrounds && !$active_template && $settings["nbdesigner_hide_layer_tab"] != "no") ? true : false;
+        error_log('sidebar show_elements_tab: ', $show_elements_tab);
     ?>
     <?php include 'sidebars/tab-nav.php'; ?>
     <?php include 'sidebars/tab-content.php'; ?>
