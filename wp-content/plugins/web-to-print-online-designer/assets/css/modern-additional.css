@@ -4296,10 +4296,13 @@ ul[data-tab=tab-9] #selectedTab {
     fill: #fff !important;
 }
 .nbd-show-3d-preview {
-    background-color: #fb7552 !important;
+    background-color: #404762 !important;
+}
+.nbd-show-3d-preview.active {
+    background-color: #fb7552;
 }
 .nbd-show-3d-preview:hover {
-    background-color: #404762 !important;
+    background-color: #fb7552 !important;
 }
 .preview-3d-size {
     right: 40px;

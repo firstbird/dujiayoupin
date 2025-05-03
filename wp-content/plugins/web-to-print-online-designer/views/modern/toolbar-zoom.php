@@ -2,8 +2,9 @@
     <div class="zoomer">
         <div class="zoomer-toolbar">
             <ul class="nbd-main-menu">
+                <li class="menu-item zoomer-item zoomer-level" ng-click="enableFullScreenMode()">&nbsp;全屏显示</li>
                 <li class="menu-item zoomer-item zoomer-fullscreen" ng-click="enableFullScreenMode()"><i class="icon-nbd icon-nbd-fullscreen"></i></li>
-                <li class="menu-item zoomer-item zoomer-out" ng-click="zoomStage(stages[currentStage].states.currentScaleIndex - 1)" ng-class="stages[currentStage].states.currentScaleIndex > 0 ? '' : 'nbd-disabled'"><i class="icon-nbd icon-nbd-remove"></i></li>
+                <!-- <li class="menu-item zoomer-item zoomer-out" ng-click="zoomStage(stages[currentStage].states.currentScaleIndex - 1)" ng-class="stages[currentStage].states.currentScaleIndex > 0 ? '' : 'nbd-disabled'"><i class="icon-nbd icon-nbd-remove"></i></li>
                 <li class="menu-item zoomer-item zoomer-level">
                     <span>{{stages[currentStage].states.scaleRange[stages[currentStage].states.currentScaleIndex].value}}</span>
                     <div class="sub-menu zoomer-popover" data-pos="center">
@@ -15,7 +16,7 @@
                         </ul>
                     </div>
                 </li>
-                <li ng-click="zoomStage(stages[currentStage].states.currentScaleIndex + 1)" ng-class="stages[currentStage].states.currentScaleIndex < (stages[currentStage].states.scaleRange.length - 1) ? '' : 'nbd-disabled'" class="menu-item zoomer-item zoomer-in"><i class="icon-nbd icon-nbd-add-black"></i></li>
+                <li ng-click="zoomStage(stages[currentStage].states.currentScaleIndex + 1)" ng-class="stages[currentStage].states.currentScaleIndex < (stages[currentStage].states.scaleRange.length - 1) ? '' : 'nbd-disabled'" class="menu-item zoomer-item zoomer-in"><i class="icon-nbd icon-nbd-add-black"></i></li> -->
             </ul>
         </div>
     </div>

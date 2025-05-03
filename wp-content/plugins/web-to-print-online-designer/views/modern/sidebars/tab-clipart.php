@@ -1,4 +1,4 @@
-<div class="<?php if( $active_cliparts ) echo 'active'; ?> tab nbd-onload" ng-if="settings['nbdesigner_enable_clipart'] == 'yes'" id="tab-svg" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-svg" data-type="clipart" data-offset="20">
+<div class="<?php if( $active_cliparts ) echo 'active'; ?> tab nbd-onload" ng-if="'yes' == 'yes'" id="tab-svg" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-svg" data-type="clipart" data-offset="20">
     <div class="nbd-search">
         <input type="text" name="search" placeholder="<?php esc_html_e('Search clipart', 'web-to-print-online-designer'); ?>" ng-model="resource.clipart.filter.search"/>
         <i class="icon-nbd icon-nbd-fomat-search"></i>
