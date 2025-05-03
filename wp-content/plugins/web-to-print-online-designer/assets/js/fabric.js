@@ -6508,7 +6508,10 @@ if (typeof console !== 'undefined') {
       for (var i = 0, len = styles.length; i < len; i++) {
         // IE9 doesn't support textContent, but provides text instead.
         var styleContents = styles[i].textContent || styles[i].text;
-
+        styleContents = styleContents.trim();
+        if (styleContents === '') {
+          continue;
+        }
         // remove comments
         styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
         if (styleContents.trim() === '') {

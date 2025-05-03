@@ -228,7 +228,6 @@
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery.min.js'; ?>"></script>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/jquery-ui.min.js'; ?>"></script>
         <script type='text/javascript' src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/libs/angular-1.6.9.min.js'; ?>"></script>
-
         <script type="text/javascript" src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/js/bundle-modern.min.js'; ?>"></script>
         
         <?php if( nbdesigner_get_option('nbdesigner_enable_text_check_lang', 'no') == 'yes' || nbdesigner_get_option('nbdesigner_enable_font_to_outlines', 'no') == 'yes' ): ?>
