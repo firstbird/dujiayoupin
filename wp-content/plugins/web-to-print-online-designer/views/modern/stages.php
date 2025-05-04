@@ -1,11 +1,11 @@
 <div class="nbd-stages" id="nbd-stages" nbd-drop-zone="uploadFile(files)">
     <div class="stages-inner">
         <div class="stage" ng-repeat="(stageIndex, stage) in stages" id='stage-container-{{$index}}' ng-mousedown="onClickStage($event)" ng-class="{'_nbd_hidden':$index > 0}" >
-            <?php do_action('nbd_modern_before_stage'); ?>
-            <div ng-click="addRulerGuideLine( $event, 'hors' );$event.stopPropagation();" ng-style="{'padding-left': calcRulerPaddingLeft(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio)}" ng-class="settings.showRuler ? '' : 'nbd-hide nbd-disable-event'" class="nbd-hoz-ruler temporary-hidden">
+        <?php do_action('nbd_modern_before_stage'); ?>
+            <div ng-click="addRulerGuideLine( $event, 'hors' );$event.stopPropagation();" ng-style="{'top': calcRulerPaddingTop(stage.config), 'padding-left': calcRulerPaddingLeft(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio)}" ng-class="settings.showRuler ? '' : 'nbd-hide nbd-disable-event'" class="nbd-hoz-ruler temporary-hidden">
                 <svg class="nbd-prevent-select" ng-style="{'width': calcStyle(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio + 30)}" id="hoz-ruler-{{$index}}" xmlns="http://www.w3.org/2000/svg"></svg>
             </div>
-            <div ng-click="addRulerGuideLine( $event, 'vers' ); $event.stopPropagation()" ng-style="{'padding-top': calcRulerPaddingTop(stage.config)}" ng-class="settings.showRuler ? '' : 'nbd-hide nbd-disable-event'" class="nbd-ver-ruler temporary-hidden">
+            <div ng-click="addRulerGuideLine( $event, 'vers' ); $event.stopPropagation()" ng-style="{'left': calcRulerPaddingLeft(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio), 'padding-top': calcRulerPaddingTop(stage.config)}" ng-class="settings.showRuler ? '' : 'nbd-hide nbd-disable-event'" class="nbd-ver-ruler temporary-hidden">
                 <svg class="nbd-prevent-select" ng-style="{'height': calcStyle(stage.config.cheight * stage.states.scaleRange[stage.states.currentScaleIndex].ratio + 30)}" id="ver-ruler-{{$index}}" xmlns="http://www.w3.org/2000/svg"></svg>
             </div>
             <div ng-if="settings.showDimensions && !settings.is_mobile" class="nbd-dimension x-dimension" ng-style="{'left': calcRulerPaddingLeft(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio), 'width': calcStyle(stage.config.cwidth * stage.states.scaleRange[stage.states.currentScaleIndex].ratio + 1)}"><span>{{settings.product_data.product[$index].product_width + ' ' + settings.nbdesigner_dimensions_unit}}</span></div>

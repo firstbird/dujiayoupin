@@ -577,11 +577,10 @@
 }
 .nbd-hoz-ruler {
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 40px;
+    width: 40px;
     text-align: left;
     cursor: pointer;
+    z-index: 100;
 }
 .nbd-button:hover {
     color: #fff;
@@ -589,16 +588,17 @@
 }
 .nbd-ver-ruler {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 40px;
     text-align: left;
-    margin-left: 5px;
     cursor: pointer;
+    z-index: 100;
 } 
 .nbd-hoz-ruler svg{
-    height: 100%;
-    pointer-events: none;
+    position: absolute;
+    height: 40px;
+    text-align: left;
+    cursor: pointer;
+    z-index: 100;
 }
 .nbd-ver-ruler svg {
     width: 100%;
