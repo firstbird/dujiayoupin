@@ -580,7 +580,7 @@
     width: 40px;
     text-align: left;
     cursor: pointer;
-    z-index: 100;
+    z-index: 50;
 }
 .nbd-button:hover {
     color: #fff;
@@ -591,14 +591,13 @@
     width: 40px;
     text-align: left;
     cursor: pointer;
-    z-index: 100;
+    z-index: 50;
 } 
 .nbd-hoz-ruler svg{
     position: absolute;
     height: 40px;
     text-align: left;
     cursor: pointer;
-    z-index: 100;
 }
 .nbd-ver-ruler svg {
     width: 100%;
@@ -4299,10 +4298,14 @@ ul[data-tab=tab-9] #selectedTab {
     fill: #fff !important;
 }
 .nbd-show-3d-preview {
-    background-color: #404762 !important;
+    background-color: #404762;
+    transition: background-color 0.3s ease;
+}
+.nbd-show-3d-preview.is_open {
+    background-color: #fb7552;
 }
 .nbd-show-3d-preview.active {
-    background-color: #fb7552;
+    background-color: #404762;
 }
 .nbd-show-3d-preview:hover {
     background-color: #fb7552 !important;
