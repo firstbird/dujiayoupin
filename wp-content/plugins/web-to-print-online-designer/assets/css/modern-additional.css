@@ -846,6 +846,20 @@
 .nbd-workspace .main {
     overflow: hidden;
 }
+.nbd-clear-btn {
+    background: #9d9898;
+    color: #fff;
+    border: none;
+    border-radius: 13px;
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.nbd-clear-btn:hover {
+    background: #ff3333;
+}
 .tab-main .loading-photo {
     position: absolute;
     z-index: 99;
@@ -947,7 +961,7 @@
 }
 .clipart-wrap .clipart-item,
 .mansory-wrap .mansory-item {
-    visibility: visible !important; 
+    visibility: visible; 
     width: 33.33%;
     padding: 2px;
     opacity: 0;
