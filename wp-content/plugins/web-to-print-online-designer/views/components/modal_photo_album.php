@@ -1,27 +1,38 @@
-<?php if (!defined('ABSPATH')) exit; // Exit if accessed directly  ?>
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <!-- 相册模态框 -->
-<div class="modal fade" id="nbd-photo-album-modal" tabindex="-1" role="dialog" aria-labelledby="nbd-photo-album-title" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div id="nbd-photo-album" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="nbd-photo-album-title">我的相册</h4>
+                <h4 class="modal-title">我的相册</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="nbd-photo-album-nonce" value="<?php echo wp_create_nonce('nbdesigner_ajax_nonce'); ?>">
-                
-                <div class="photo-upload-area" id="nbd-photo-upload-area">
+                <div class="nbd-upload-area mb-3">
                     <input type="file" id="nbd-photo-upload" accept="image/*" style="display: none;">
-                    <button type="button" class="upload-btn" onclick="document.getElementById('nbd-photo-upload').click();">
-                        <i class="fa fa-upload"></i> 上传照片
+                    <button class="btn btn-primary" onclick="document.getElementById('nbd-photo-upload').click()">
+                        上传图片
                     </button>
-                    <p class="upload-tip">支持jpg、png、gif格式，单个文件不超过5MB</p>
                 </div>
-
-                <div class="photo-grid" id="nbd-photo-grid">
-                    <!-- 照片将通过JavaScript动态加载 -->
+                <div class="nbd-photo-grid" ng-if="!isLoadingPhotos">
+                    <div class="nbd-photo-item" ng-repeat="photo in userPhotos">
+                        <img ng-src="{{photo.url}}" alt="用户照片">
+                        <div class="nbd-photo-actions">
+                            <button class="btn btn-success btn-sm" ng-click="selectPhoto(photo)">选择</button>
+                            <button class="btn btn-danger btn-sm" ng-click="deletePhoto(photo)">删除</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="nbd-loading" ng-if="isLoadingPhotos">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">加载中...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -29,91 +40,47 @@
 </div>
 
 <style>
-.photo-upload-area {
-    border: 2px dashed #ddd;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
-    background: #f9f9f9;
-}
-
-.photo-upload-area.uploading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.upload-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.upload-btn:hover {
-    background: #0056b3;
-}
-
-.upload-tip {
-    margin: 10px 0 0;
-    color: #666;
-    font-size: 12px;
-}
-
-.photo-grid {
+.nbd-photo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    margin-top: 20px;
+    padding: 15px;
 }
 
-.photo-item {
+.nbd-photo-item {
     position: relative;
     border: 1px solid #ddd;
     border-radius: 4px;
     overflow: hidden;
 }
 
-.photo-item img {
+.nbd-photo-item img {
     width: 100%;
-    height: 150px;
+    height: 200px;
     object-fit: cover;
 }
 
-.photo-actions {
+.nbd-photo-actions {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 8px;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
     display: flex;
     justify-content: space-around;
 }
 
-.photo-actions button {
-    background: none;
-    border: 1px solid white;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.photo-actions button:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.loading, .error, .no-photos {
+.nbd-loading {
     text-align: center;
     padding: 20px;
-    color: #666;
 }
 
-.error {
-    color: #dc3545;
+.nbd-upload-area {
+    text-align: center;
+    padding: 20px;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
 }
-</style> 
+</style>
