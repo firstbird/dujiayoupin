@@ -119,6 +119,14 @@
                         </div>
                     </div>
                     <?php endif; ?>
+                    <div class="item" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false">
+                        <div class="main-item">
+                            <div class="item-icon"><i class="icon-nbd icon-nbd-photo-album"></i></div>
+                            <div class="item-info">
+                                <span class="item-name" title="我的相册"><?php esc_html_e('我的相册','web-to-print-online-designer'); ?></span>
+                            </div>
+                        </div>
+                    </div>
                     <?php do_action('nbd_modern_sidebar_photo_icons'); ?>
                 </div>
                 <div class="pointer"></div>
