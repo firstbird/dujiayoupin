@@ -8,6 +8,11 @@ class Nbdesigner_Ajax {
         add_action('wp_ajax_nbdesigner_get_user_photos', array($this, 'nbdesigner_get_user_photos'));
         add_action('wp_ajax_nbdesigner_upload_user_photo', array($this, 'nbdesigner_upload_user_photo'));
         add_action('wp_ajax_nbdesigner_delete_user_photo', array($this, 'nbdesigner_delete_user_photo'));
+        
+        // 为非登录用户添加AJAX处理
+        add_action('wp_ajax_nopriv_nbdesigner_get_user_photos', array($this, 'nbdesigner_get_user_photos'));
+        add_action('wp_ajax_nopriv_nbdesigner_upload_user_photo', array($this, 'nbdesigner_upload_user_photo'));
+        add_action('wp_ajax_nopriv_nbdesigner_delete_user_photo', array($this, 'nbdesigner_delete_user_photo'));
     }
 
     public function nbdesigner_get_user_photos() {
@@ -181,4 +186,16 @@ class Nbdesigner_Ajax {
             wp_send_json_error(array('message' => '删除失败：' . $e->getMessage()));
         }
     }
-} 
+}
+
+// 实例化类
+function nbdesigner_init_ajax() {
+    global $nbdesigner_ajax;
+    if (!isset($nbdesigner_ajax)) {
+        $nbdesigner_ajax = new Nbdesigner_Ajax();
+    }
+    return $nbdesigner_ajax;
+}
+
+// 在插件初始化时调用
+add_action('init', 'nbdesigner_init_ajax'); 

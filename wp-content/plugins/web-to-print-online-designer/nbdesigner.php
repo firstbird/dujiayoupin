@@ -123,6 +123,7 @@ require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class-api.php' );
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class.artwork.actions.php' );
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class.design.guideline.php' );
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class.advanced.upload.php' );
+require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class-nbdesigner-ajax.php' );
 
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/launcher/class.designer.php' );
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/launcher/util.php' );
@@ -162,6 +163,8 @@ $nb_design_endpoint->init();
 
 $nb_compatibility = new Nbdesigner_Compatibility();
 $nb_compatibility->init();
+
+$nb_ajax = new Nbdesigner_Ajax();
 
 require_once( NBDESIGNER_PLUGIN_DIR . 'includes/class-widget.php' );
 
