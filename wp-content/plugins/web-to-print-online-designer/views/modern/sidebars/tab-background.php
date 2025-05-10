@@ -42,9 +42,9 @@
                                 </div>
                                 <span class="term-read"><?php esc_html_e('I accept the terms','web-to-print-online-designer'); ?></span>
                             </div>
-                            <div id="nbd-upload-wrap" ng-show="resource.upload.data.length > 0">
+                            <div id="nbd-background-wrap" ng-show="resource.background.data.length > 0">
                                 <div class="mansory-wrap">
-                                    <div nbd-drag="img.url" nbd-img="img" extenal="false" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; setBackgroundUrl(img.url);" ng-repeat="img in resource.upload.data track by $index" repeat-end="onEndRepeat('upload')"><img ng-src="{{img.url}}"></div>
+                                    <div nbd-drag="img.url" nbd-img="img" extenal="false" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; setBackgroundUrl(img.url);" ng-repeat="img in resource.background.data track by $index" repeat-end="onEndRepeat('background')"><img ng-src="{{img.url}}"></div>
                                 </div>
                             </div>
                         </div>
@@ -54,23 +54,20 @@
                 </div>
                 <div class="nbdesigner-gallery" id="nbdesigner-gallery">
                     <!-- 没有图片时显示默认图片 -->
-                    <div ng-if="!resource.photo.data || (resource.photo.data && resource.photo.data.length == 0)" class="nbdesigner-default-image">
+                    <div ng-if="!resource.background.data || (resource.background.data && resource.background.data.length == 0)" class="nbdesigner-default-image">
                         <img src="https://www.dujiayoupin.com/wp-content/uploads/2025/01/placeholder-289.png" alt="暂无图片" style="width: 120px; opacity: 0.5;">
                         <div style="color: #999; margin-top: 8px;">暂无图片</div>
                     </div>
                     <!-- 有图片时正常显示 -->
-                    <div nbd-drag="img.url" extenal="true" type="image" class="nbdesigner-item" ng-click="resource.addImageContext = 'manual'; setBackgroundUrl(img.url)" ng-repeat="img in resource.photo.data" repeat-end="onEndRepeat('photo')">
-                        <img ng-src="{{img.preview}}">
-                        <span class="photo-desc">{{img.des}}</span>
-                    </div>                
+              
                 </div>
-                <div class="loading-photo" ng-show="false">
+                <div class="loading-photo" ng-show="resource.background.onload">
                     <svg class="circular" viewBox="25 25 50 50">
                         <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
                     </svg>
                 </div>
-                <div class="tab-load-more" style="display: none;" ng-show="!resource.photo.onload && resource.photo.data.length && (resource.photo.filter.totalPage == 0 || resource.photo.filter.currentPage < resource.photo.filter.totalPage)">
-                    <a class="nbd-button" ng-click="scrollLoadMore('#tab-photo', 'photo')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
+                <div class="tab-load-more" ng-show="!resource.background.onload && resource.background.data.length && (resource.background.filter.totalPage == 0 || resource.background.filter.currentPage < resource.background.filter.totalPage)">
+                    <a class="nbd-button" ng-click="scrollLoadMore('#tab-background', 'background')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
                 </div>
             </div>
     </div>

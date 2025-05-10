@@ -2060,6 +2060,7 @@
                 document.getElementById("nbu_upload_dropbox").appendChild(button);
             };
             $scope.getDropboxImage = function( files ){
+                console.log('getDropboxImage --- files:', files);
                 angular.forEach(files, function( file ){
                     $scope.resource.dropbox.images.push({
                         extenal: 1,
@@ -2070,6 +2071,7 @@
                 $scope.updateApp();
             };
             $scope.showLoadingImage = function(){
+                console.log('showLoadingImage --- ');
                 $scope.imageUploading = true;
                 $scope.uploadedImages.push({
                     preview: $scope.config.loading_img,

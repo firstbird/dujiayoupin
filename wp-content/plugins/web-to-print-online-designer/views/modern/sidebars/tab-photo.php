@@ -256,49 +256,14 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="settings['nbdesigner_enable_facebook_photo'] == 'yes'" class="content-item type-facebook" data-type="facebook" id="nbd-facebook-wrap">
-                        <?php if( $fbID != '' ): ?>
-                        <div id="fb-root--"></div>
-                        <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="false" data-scope="user_photos" onlogin="nbdOnFBLogin(null)"></div>
-                        <div class="mansory-wrap">
-                            <div nbd-drag="img.url" extenal="true" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; addImageFromUrl(img.url)" ng-repeat="img in resource.facebook.data | limitTo: resource.facebook.filter.perPage * resource.facebook.filter.currentPage" repeat-end="onEndRepeat('facebook')"><img ng-src="{{img.preview}}"><span class="photo-desc">{{img.des}}</span></div>
-                        </div>
-                        <?php endif; ?>
-                    </div>
                     <?php if( $insID != '' && $insSc != '' ): ?>
-                    <div ng-if="settings['nbdesigner_enable_instagram_photo'] == 'yes'" class="content-item type-instagram button-login" data-type="instagram" id="nbd-instagram-wrap">
-                        <button class="nbd-button nbd-hover-shadow" ng-click="authenticateInstagram()" ng-hide="resource.instagram.token != ''">
-                            <i class="icon-nbd icon-nbd-instagram-logo"></i>
-                            <span><?php esc_html_e('Log in','web-to-print-online-designer'); ?></span>
-                        </button>
-                        <button class="nbd-button nbd-hover-shadow" ng-click="logoutInstagram()" ng-show="resource.instagram.token != ''">
-                            <i class="icon-nbd icon-nbd-instagram-logo"></i>
-                            <span><?php esc_html_e('Log out','web-to-print-online-designer'); ?></span>
-                        </button>
-                        <div class="mansory-wrap">
-                            <div nbd-drag="img.url" extenal="true" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; addImageFromUrl(img.url)" ng-repeat="img in resource.instagram.data | limitTo: resource.instagram.filter.perPage * resource.instagram.filter.currentPage" repeat-end="onEndRepeat('instagram')"><img ng-src="{{img.preview}}"><span class="photo-desc">{{img.des}}</span></div>
-                        </div>
-                    </div>
                     <?php endif; ?>
                     <?php if( $dbID != '' && $settings['nbdesigner_enable_dropbox_photo'] != 'no' ): ?>
-                    <div class="content-item type-dropbox" data-type="dropbox" id="nbd-dropbox-wrap">
-                        <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="<?php echo( $dbID ); ?>"></script>
-                        <script type="text/javascript">
-                            NBDESIGNCONFIG['enable_dropbox'] = true;
-                        </script>
-                        <div id="nbdesigner_dropbox"></div>
-                        <div class="mansory-wrap">
-                            <div nbd-drag="img.url" extenal="true" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; addImageFromUrl(img.url)" ng-repeat="img in resource.dropbox.data | limitTo: resource.dropbox.filter.perPage * resource.dropbox.filter.currentPage" repeat-end="onEndRepeat('dropbox')"><img ng-src="{{img.preview}}"><span class="photo-desc">{{img.des}}</span></div>
-                        </div>
-                    </div>
                     <?php endif; ?>
                     <div class="content-item type-webcam" data-type="webcam">
                         <?php esc_html_e('webcam','web-to-print-online-designer'); ?>
                     </div>
                     <?php do_action('nbd_modern_sidebar_photo_images'); ?>
-                </div>
-                <div class="nbdesigner-gallery" id="nbdesigner-gallery">
-                    <div nbd-drag="img.url" extenal="true" type="image" class="nbdesigner-item" ng-click="resource.addImageContext = 'manual'; addImageFromUrl(img.url)" ng-repeat="img in resource.photo.data" repeat-end="onEndRepeat('photo')"><img ng-src="{{img.preview}}"><span class="photo-desc">{{img.des}}</span></div>
                 </div>
                 <div class="loading-photo" >
                     <svg class="circular" viewBox="25 25 50 50">
