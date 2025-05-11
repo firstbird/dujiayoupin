@@ -289,3 +289,265 @@
         </div>
     </div>
 </div>
+
+<!-- 相册模态框 -->
+<div id="nbd-photo-album-modal" class="nbd-modal">
+    <div class="nbd-modal-container">
+        <div class="nbd-modal-wrapper">
+            <div class="nbd-modal-header">
+                <h4 class="nbd-modal-title">我的相册</h4>
+                <div class="nbd-modal-actions">
+                    <button type="button" class="nbd-button nbd-button-danger" id="nbd-clear-album">清空相册</button>
+                    <button type="button" class="nbd-modal-close">&times;</button>
+                </div>
+            </div>
+            <div class="nbd-modal-content">
+                <?php wp_nonce_field('nbdesigner_get_user_photos', 'nbd-photo-album-nonce', true); ?>
+                <div id="nbd-photo-upload-area" class="upload-area">
+                    <input type="file" id="nbd-photo-upload" accept="image/*">
+                    <div class="upload-tip">点击或拖拽图片到此处上传</div>
+                </div>
+
+                <div id="nbd-photo-grid" class="photo-grid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 模态窗口基础样式 */
+.nbd-modal {
+    z-index: 9999999 !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.nbd-modal.show {
+    display: flex !important;
+    pointer-events: auto;
+}
+
+.nbd-modal-container {
+    z-index: 10000000 !important;
+    margin: 0 auto;
+    max-width: 800px;
+    width: 90%;
+    position: relative;
+    pointer-events: auto;
+}
+
+.nbd-modal-wrapper {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.nbd-modal-header {
+    padding: 8px 20px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+    border-radius: 5px 5px 0 0;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nbd-modal-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.nbd-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nbd-button {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #dc3545;
+    transition: color 0.3s ease;
+}
+
+.nbd-button:hover {
+    color: #c82333;
+}
+
+.nbd-modal-close {
+    position: static;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #666;
+}
+
+.nbd-modal-close:hover {
+    opacity: 1;
+    color: #333;
+}
+
+.nbd-modal-content {
+    padding: 20px;
+    background: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 上传区域样式 */
+.upload-area {
+    text-align: center;
+    padding: 20px;
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    background: #fff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.upload-area:hover {
+    border-color: #007bff;
+}
+
+.upload-area.uploading {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+}
+
+.upload-area input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-tip {
+    margin-top: 10px;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* 照片网格样式 */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(90vh - 200px); /* 减去header和upload-area的高度 */
+}
+
+.photo-item {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    padding: 5px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.photo-actions button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: color 0.3s ease;
+}
+
+.photo-actions button:hover {
+    color: #007bff;
+}
+
+/* 状态提示样式 */
+.loading, .error, .no-photos {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    background: #fff;
+}
+
+.error {
+    color: #dc3545;
+}
+
+/* 确保模态窗口内容可点击 */
+.nbd-modal.show .nbd-modal-container,
+.nbd-modal.show .nbd-modal-wrapper,
+.nbd-modal.show .nbd-modal-header,
+.nbd-modal.show .nbd-modal-content,
+.nbd-modal.show .upload-area,
+.nbd-modal.show .photo-grid,
+.nbd-modal.show .photo-item,
+.nbd-modal.show .photo-actions button {
+    pointer-events: auto;
+}
+
+/* 添加遮罩层 */
+.nbd-modal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    pointer-events: none;
+}
+</style>

@@ -18,7 +18,7 @@
                                     <span class="indicator" ng-style="{'left': 'calc(' + resource.upload.progressBar + '% - 15px)'}">{{resource.upload.progressBar}}</span>
                                 </div>
                             </div>
-                            <div class="form-upload nbd-dnd-file" nbd-dnd-file="setBackgroundFile(files[0])">
+                            <div class="form-upload nbd-dnd-file">
                                 <i class="icon-nbd icon-nbd-cloud-upload"></i>
                                 <span><?php esc_html_e('点击或拖动图片上传','web-to-print-online-designer'); ?></span>
                                 <input type="file" 

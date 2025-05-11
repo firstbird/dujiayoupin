@@ -47,6 +47,8 @@ class Nbdesigner_Plugin {
             'nbdesigner_design_approve'                 => false,
             'nbdesigner_design_order_email'             => false,
             'nbdesigner_customer_upload'                => true,
+            'nbdesigner_get_customer_files'             => true,
+            'nbdesigner_delete_customer_files'          => true,
             'nbd_upload_design_file'                    => true,
             'nbdesigner_get_font'                       => true,
             'nbdesigner_get_pattern'                    => true,
@@ -94,7 +96,9 @@ class Nbdesigner_Plugin {
             'nbd_upload_pdf_as_bg_image'                => true,
             'nbd_import_images'                         => true,
             'check_flysystem_connected'                 => true,
-            'nbd_get_instagram_token'                   => true
+            'nbd_get_instagram_token'                   => true,
+            'nbdesigner_get_customer_files'              => true,
+            'nbdesigner_clear_customer_album'            => true
         );
         foreach( $ajax_events as $ajax_event => $nopriv ) {
             add_action( 'wp_ajax_' . $ajax_event, array( $this, $ajax_event ) );
@@ -2630,7 +2634,7 @@ class Nbdesigner_Plugin {
             $img_src_height     = 500;
             $img_src_width      = round( $product_width * $ratio );
             $real_top           = round( $old_real_top, 2 );
-            $real_left          = round( $old_real_left - ( $product_height - $product_width) / 2, 2 );
+            $real_left          = round( $old_real_left - ( $product_height - $product_width ) / 2, 2 );
             if( $product_width > $product_height ){
                 $img_src_top        = round( ( $product_width - $product_height ) * $ratio / 2, 2 );
                 $img_src_left       = 0;
@@ -5097,6 +5101,250 @@ class Nbdesigner_Plugin {
         echo json_encode( $result );
         wp_die();
     }
+
+    /**
+     * 清空用户相册
+     */
+    public function nbdesigner_clear_customer_album() {
+        error_log('nbdesigner nbdesigner_clear_customer_album');
+        // 验证 nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'save-design') && NBDESIGNER_ENABLE_NONCE) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Security error', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        // 检查用户是否登录
+        if (!is_user_logged_in()) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Please login to clear album', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        $user_id = get_current_user_id();
+        $upload_dir = wp_upload_dir();
+        $nbd_upload_dir = $upload_dir['basedir'] . '/nbdesigner/';
+        $user_dir = $nbd_upload_dir . $user_id . '/';
+        error_log('nbdesigner nbdesigner_clear_customer_album user_dir: ' . $user_dir);
+        // 检查用户目录是否存在
+        if (!file_exists($user_dir)) {
+            $res['flag'] = 1;
+            $res['mes'] = esc_html__('Album is already empty', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        // 递归删除用户目录下的所有文件
+        $this->delete_directory($user_dir);
+
+        $res['flag'] = 1;
+        $res['mes'] = esc_html__('Album cleared successfully', 'web-to-print-online-designer');
+        echo json_encode($res);
+        wp_die();
+    }
+
+    /**
+     * 递归删除目录
+     */
+    private function delete_directory($dir) {
+        if (!file_exists($dir)) {
+            return true;
+        }
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            if (!$this->delete_directory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+        }
+        return rmdir($dir);
+    }
+    public function nbdesigner_get_customer_files() {
+        error_log('nbdesigner nbdesigner_get_customer_files');
+        // 验证 nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'save-design') && NBDESIGNER_ENABLE_NONCE) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Security error', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+    
+        // 检查用户是否登录
+        if (!is_user_logged_in()) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Please login to view your files', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+    
+        $user_id = get_current_user_id();
+        $upload_dir = wp_upload_dir();
+        $nbd_upload_dir = $upload_dir['basedir'] . '/nbdesigner/';
+        $user_dir = $nbd_upload_dir . $user_id . '/';
+    
+        // 获取用户上传的文件列表
+        $files = array();
+        $allowed_types = array('jpg', 'jpeg', 'png', 'svg');
+        error_log('nbdesigner nbdesigner_get_customer_files user_dir: ' . $user_dir);
+
+        if (file_exists($user_dir)) {
+            // 遍历年份目录
+            $year_dirs = scandir($user_dir);
+            foreach ($year_dirs as $year) {
+                if ($year === '.' || $year === '..' || !is_dir($user_dir . $year)) continue;
+                
+                // 遍历月份目录
+                $month_dirs = scandir($user_dir . $year);
+                foreach ($month_dirs as $month) {
+                    if ($month === '.' || $month === '..' || !is_dir($user_dir . $year . '/' . $month)) continue;
+                    
+                    // 遍历日期目录
+                    $day_dirs = scandir($user_dir . $year . '/' . $month);
+                    foreach ($day_dirs as $day) {
+                        if ($day === '.' || $day === '..' || !is_dir($user_dir . $year . '/' . $month . '/' . $day)) continue;
+                        
+                        // 遍历文件
+                        $file_dir = $user_dir . $year . '/' . $month . '/' . $day . '/';
+                        $dir_files = scandir($file_dir);
+                        foreach ($dir_files as $file) {
+                            if ($file === '.' || $file === '..') continue;
+                            
+                            $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                            if (!in_array($ext, $allowed_types)) continue;
+
+                            $file_path = $file_dir . $file;
+                            $file_url = $upload_dir['baseurl'] . '/nbdesigner/' . $user_id . '/' . $year . '/' . $month . '/' . $day . '/' . $file;
+                            
+                            $file_info = array(
+                                'id' => md5($file),
+                                'name' => $file,
+                                'url' => $file_url,
+                                'path' => $file_path,
+                                'size' => filesize($file_path),
+                                'type' => $ext,
+                                'date' => filemtime($file_path),
+                                'year' => $year,
+                                'month' => $month,
+                                'day' => $day
+                            );
+
+                            // 检查缩略图
+                            $thumb_path = $file_dir . 'thumb_' . $file;
+                            if (file_exists($thumb_path)) {
+                                $file_info['thumb'] = $upload_dir['baseurl'] . '/nbdesigner/' . $user_id . '/' . $year . '/' . $month . '/' . $day . '/thumb_' . $file;
+                            }
+
+                            $files[] = $file_info;
+                        }
+                    }
+                }
+            }
+        }
+    
+        // 按日期排序
+        usort($files, function($a, $b) {
+            return $b['date'] - $a['date'];
+        });
+    
+        $res['flag'] = 1;
+        $res['files'] = $files;
+        
+        echo json_encode($res);
+        wp_die();
+    }
+    public function nbdesigner_delete_customer_files() {
+        error_log('nbdesigner nbdesigner_delete_customer_files');
+        // 验证 nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'save-design') && NBDESIGNER_ENABLE_NONCE) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Security error', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        // 检查用户是否登录
+        if (!is_user_logged_in()) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Please login to delete files', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        // 检查是否提供了文件ID
+        if (!isset($_POST['photo_id']) || empty($_POST['photo_id'])) {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('Photo ID is required', 'web-to-print-online-designer');
+            echo json_encode($res);
+            wp_die();
+        }
+
+        $user_id = get_current_user_id();
+        $upload_dir = wp_upload_dir();
+        $nbd_upload_dir = $upload_dir['basedir'] . '/nbdesigner/';
+        $user_dir = $nbd_upload_dir . $user_id . '/';
+        $photo_id = sanitize_text_field($_POST['photo_id']);
+        error_log('nbdesigner nbdesigner_delete_customer_files photo_id: ' . $photo_id);
+        // 遍历目录查找文件
+        $file_found = false;
+        if (file_exists($user_dir)) {
+            $year_dirs = scandir($user_dir);
+            foreach ($year_dirs as $year) {
+                if ($year === '.' || $year === '..' || !is_dir($user_dir . $year)) continue;
+                
+                $month_dirs = scandir($user_dir . $year);
+                foreach ($month_dirs as $month) {
+                    if ($month === '.' || $month === '..' || !is_dir($user_dir . $year . '/' . $month)) continue;
+                    
+                    $day_dirs = scandir($user_dir . $year . '/' . $month);
+                    foreach ($day_dirs as $day) {
+                        if ($day === '.' || $day === '..' || !is_dir($user_dir . $year . '/' . $month . '/' . $day)) continue;
+                        
+                        $file_dir = $user_dir . $year . '/' . $month . '/' . $day . '/';
+                        $dir_files = scandir($file_dir);
+                        foreach ($dir_files as $file) {
+                            if ($file === '.' || $file === '..') continue;
+                            
+                            // 检查文件ID是否匹配
+                            if (md5($file) === $photo_id) {
+                                $file_path = $file_dir . $file;
+                                $thumb_path = $file_dir . 'thumb_' . $file;
+                                
+                                // 删除原文件
+                                if (file_exists($file_path)) {
+                                    unlink($file_path);
+                                }
+                                
+                                // 删除缩略图（如果存在）
+                                if (file_exists($thumb_path)) {
+                                    unlink($thumb_path);
+                                }
+                                
+                                $file_found = true;
+                                break 4; // 跳出所有循环
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($file_found) {
+            $res['flag'] = 1;
+            $res['mes'] = esc_html__('File deleted successfully', 'web-to-print-online-designer');
+        } else {
+            $res['flag'] = 0;
+            $res['mes'] = esc_html__('File not found', 'web-to-print-online-designer');
+        }
+        
+        echo json_encode($res);
+        wp_die();
+    }
     public function nbdesigner_customer_upload(){
         if ( !wp_verify_nonce( $_POST['nonce'], 'save-design' ) && NBDESIGNER_ENABLE_NONCE ) {
             die('Security error');
@@ -5119,7 +5367,7 @@ class Nbdesigner_Plugin {
         $name               = $_FILES['file']["name"];
         $ext                = $this->nbdesigner_get_extension( $name );
         $new_name           = strtotime( "now" ) . substr( md5( rand( 1111, 9999 ) ), 0, 8 ) . '.' . $ext;
-
+        error_log('nbdesigner nbdesigner_customer_upload new_name: ' . $new_name);
         if( is_available_imagick() || nbdesigner_get_option( 'nbdesigner_enable_pdf2img_cloud2print_api', 'no' ) == 'yes' ){
             $allow_extension    = array( 'jpg', 'jpeg', 'png', 'svg', 'pdf' );
         }
@@ -5148,8 +5396,14 @@ class Nbdesigner_Plugin {
                 $res['ilr'] = 1;
             }
         }
-
-        $path = Nbdesigner_IO::create_file_path( NBDESIGNER_TEMP_DIR, $new_name );
+        $user_id = get_current_user_id();
+        $upload_dir = wp_upload_dir();
+        $nbd_upload_dir = $upload_dir['basedir'] . '/nbdesigner/';
+        $user_dir = $nbd_upload_dir . $user_id . '/';
+        error_log('nbdesigner nbdesigner_customer_upload user_dir: ' . $user_dir);
+        //NBDESIGNER_TEMP_DIR
+        $path = Nbdesigner_IO::create_file_path( $user_dir, $new_name );
+        error_log('nbdesigner nbdesigner_customer_upload path: ' . $path['full_path']);
         if( $result ){
             if( move_uploaded_file( $_FILES['file']["tmp_name"], $path['full_path'] ) ){
                 $res['mes'] = esc_html__( 'Upload success !', 'web-to-print-online-designer' );

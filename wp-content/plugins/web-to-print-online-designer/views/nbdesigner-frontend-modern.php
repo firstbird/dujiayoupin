@@ -68,6 +68,12 @@
                 include NBDESIGNER_PLUGIN_DIR . 'views/editor_components/meta_data_share.php'; 
             }
         ?>
+        <!-- 添加nbd_ajax定义 -->
+        <script type="text/javascript">
+            var nbd_ajax = {
+                ajax_url: '<?php echo admin_url("admin-ajax.php"); ?>'
+            };
+        </script>
         <link type="text/css" href="<?php echo NBDESIGNER_PLUGIN_URL .'assets/css/jquery-ui.min.css'; ?>" rel="stylesheet" media="all" />
         <!-- mzl mod <link href='https://fonts.googleapis.com/css?family=<?php echo( $_default_font ); ?>:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
         <!-- <link href='https://fonts.googleapis.com/css?family=Poppins:400,400i,700,700i' rel='stylesheet' type='text/css'> -->
