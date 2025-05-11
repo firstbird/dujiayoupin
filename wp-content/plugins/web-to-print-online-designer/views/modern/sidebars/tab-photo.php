@@ -119,7 +119,7 @@
                         </div>
                     </div>
                     <?php endif; ?>
-                    <div class="item" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false">
+                    <div class="item select-photo-btn" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-photo-album"></i></div>
                             <div class="item-info">

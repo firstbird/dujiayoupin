@@ -2,6 +2,8 @@
     'use strict';
     
     var PhotoAlbum = {
+        currentTabType: null, // 添加当前 tab 类型记录
+        
         init: function() {
             console.log('PhotoAlbum: 初始化');
             this.bindEvents();
@@ -139,7 +141,16 @@
             $(document).on('click', '[ng-click="openPhotoAlbum()"]', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('PhotoAlbum: 相册按钮被点击');
+                
+                // 通过按钮类名判断当前 tab 类型
+                var $btn = $(this);
+                if ($btn.hasClass('select-bg-btn')) {
+                    self.currentTabType = 'background';
+                } else if ($btn.hasClass('select-photo-btn')) {
+                    self.currentTabType = 'photo';
+                }
+                
+                console.log('PhotoAlbum: 相册按钮被点击，当前 tab 类型:', self.currentTabType);
                 self.openAlbum();
             });
         },
@@ -249,12 +260,20 @@
         },
         
         selectPhoto: function(photoId, photoUrl) {
-            // 触发选择照片事件
-            $(document).trigger('nbd:photoSelected', [photoId, photoUrl]);
             var scope = angular.element(document.getElementById("designer-controller")).scope();
-                    
-            // 遍历所有选中的文件
-            scope.setBackgroundInner(photoUrl);
+            
+            console.log('selectPhoto currentTabType:', this.currentTabType);
+            
+            if (this.currentTabType === 'background') {
+                // 如果是背景 tab，调用设置背景方法
+                scope.setBackgroundInner(photoUrl);
+            } else if (this.currentTabType === 'photo') {
+                // 如果是图片 tab，调用添加图片方法
+                scope.resource.addImageContext = 'manual';
+                scope.addImage(photoUrl, false);
+            }
+            
+            // 关闭相册模态框
             this.closeModal();
         },
 

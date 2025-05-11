@@ -18,13 +18,8 @@
                                     <span class="indicator" ng-style="{'left': 'calc(' + resource.upload.progressBar + '% - 15px)'}">{{resource.upload.progressBar}}</span>
                                 </div>
                             </div>
-                            <div class="item" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false">
-                                <div class="main-item">
-                                    <div class="item-icon"><i class="icon-nbd icon-nbd-photo-album"></i></div>
-                                    <div class="item-info">
-                                        <span class="item-name" title="我的相册"><?php esc_html_e('我的相册','web-to-print-online-designer'); ?></span>
-                                    </div>
-                                </div>
+                            <div class="item select-bg-btn" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false" style="text-align: left;">
+                                <button type="button" class="nbd-select-bg-btn"><?php esc_html_e('选择图片背景','web-to-print-online-designer'); ?></button>
                             </div>
                             <div class="allow-size">
                                 <span><?php esc_html_e('Accept file types','web-to-print-online-designer'); ?>: <strong><?php echo is_available_imagick() ? 'png, jpg, svg, pdf' : 'png, jpg, svg'; ?></strong></span>
@@ -73,3 +68,24 @@
             </div>
     </div>
 </div>
+
+<style>
+.nbd-select-bg-btn {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-left: 12px;
+}
+
+.nbd-select-bg-btn:hover {
+    background: #f8f9fa;
+    border-color: #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+</style>
