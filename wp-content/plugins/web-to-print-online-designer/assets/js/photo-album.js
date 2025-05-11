@@ -249,10 +249,12 @@
         },
         
         selectPhoto: function(photoId, photoUrl) {
-            console.log('PhotoAlbum: 选择照片', photoId, photoUrl);
             // 触发选择照片事件
             $(document).trigger('nbd:photoSelected', [photoId, photoUrl]);
-            // 关闭模态窗口
+            var scope = angular.element(document.getElementById("designer-controller")).scope();
+                    
+            // 遍历所有选中的文件
+            scope.setBackgroundInner(photoUrl);
             this.closeModal();
         },
 

@@ -18,12 +18,13 @@
                                     <span class="indicator" ng-style="{'left': 'calc(' + resource.upload.progressBar + '% - 15px)'}">{{resource.upload.progressBar}}</span>
                                 </div>
                             </div>
-                            <div class="form-upload nbd-dnd-file">
-                                <i class="icon-nbd icon-nbd-cloud-upload"></i>
-                                <span><?php esc_html_e('点击或拖动图片上传','web-to-print-online-designer'); ?></span>
-                                <input type="file" 
-                                    <?php echo is_available_imagick() ? 'accept="image/*, .pdf"' : 'accept="image/*"'; ?> 
-                                    style="display: none;"/>
+                            <div class="item" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false">
+                                <div class="main-item">
+                                    <div class="item-icon"><i class="icon-nbd icon-nbd-photo-album"></i></div>
+                                    <div class="item-info">
+                                        <span class="item-name" title="我的相册"><?php esc_html_e('我的相册','web-to-print-online-designer'); ?></span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="allow-size">
                                 <span><?php esc_html_e('Accept file types','web-to-print-online-designer'); ?>: <strong><?php echo is_available_imagick() ? 'png, jpg, svg, pdf' : 'png, jpg, svg'; ?></strong></span>
