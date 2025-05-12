@@ -378,21 +378,6 @@
     gap: 15px;
 }
 
-.nbd-button {
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #dc3545;
-    transition: color 0.3s ease;
-}
-
-.nbd-button:hover {
-    color: #c82333;
-}
-
 .nbd-modal-close {
     position: static;
     cursor: pointer;
@@ -523,6 +508,11 @@
 }
 
 .error {
+    color: #dc3545;
+}
+
+/* 清空相册按钮悬停样式 */
+#nbd-clear-album:hover {
     color: #dc3545;
 }
 
