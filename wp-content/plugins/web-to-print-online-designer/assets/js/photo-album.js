@@ -90,20 +90,21 @@
             });
             
             // 添加选择照片事件
-            $(document).on('click', '.select-photo', function(e) {
+            $(document).on('click', '.photo-item img.select-photo', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 var photoId = $(this).data('id');
-                var photoUrl = $(this).closest('.photo-item').find('img').attr('src');
+                var photoUrl = $(this).attr('src');
                 console.log('PhotoAlbum: click 选择照片', photoId, photoUrl);
                 self.selectPhoto(photoId, photoUrl);
             });
             
             // 添加删除照片事件
-            $(document).on('click', '.delete-photo', function(e) {
+            $(document).on('click', '.photo-delete', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 var photoId = $(this).data('id');
+                
                 if (confirm('确定要删除这张照片吗？')) {
                     self.deletePhoto(photoId);
                 }
@@ -159,6 +160,10 @@
             console.log('PhotoAlbum: 打开相册');
             var $modal = $('#nbd-photo-album-modal');
             if ($modal.length) {
+                // 根据 tab 类型设置提示文字
+                var tipText = this.currentTabType === 'background' ? '选择加载图片作为背景' : '选择添加图片素材';
+                $('.photo-tip').html(tipText);
+                
                 // 显示模态窗口
                 $modal.addClass('show');
                 
@@ -209,22 +214,10 @@
             }
 
             var html = '';
-            // photos.designs.forEach(function(photo) {
-            //     html += '<div class="photo-item" data-id="' + photo.id + '">';
-            //     html += '<img src="' + photo.url + '" alt="' + photo.title + '">';
-            //     html += '<div class="photo-actions">';
-            //     html += '<button class="select-photo" data-id="' + photo.id + '">选择</button>';
-            //     html += '<button class="delete-photo" data-id="' + photo.id + '">删除</button>';
-            //     html += '</div>';
-            //     html += '</div>';
-            // });
             photos.forEach(function(photo) {
                 html += '<div class="photo-item" data-id="' + photo.id + '">';
-                html += '<img src="' + photo.url + '" alt="' + photo.name + '">';
-                html += '<div class="photo-actions">';
-                html += '<button class="select-photo" data-id="' + photo.id + '">选择</button>';
-                html += '<button class="delete-photo" data-id="' + photo.id + '">删除</button>';
-                html += '</div>';
+                html += '<div class="photo-delete" data-id="' + photo.id + '"><i class="icon-nbd icon-nbd-close"></i></div>';
+                html += '<img src="' + photo.url + '" alt="' + photo.name + '" class="select-photo" data-id="' + photo.id + '">';
                 html += '</div>';
             });
 
@@ -234,7 +227,8 @@
         deletePhoto: function(photoId) {
             var self = this;
             console.log('PhotoAlbum: 删除照片', photoId);
-
+            var scope = angular.element(document.getElementById("designer-controller")).scope();
+            scope.toggleStageLoading();
             $.ajax({
                 url: nbd_ajax.ajax_url,
                 type: 'POST',
@@ -246,6 +240,7 @@
                 success: function(response) {
                     console.log('PhotoAlbum: 删除成功', response);
                     var res = JSON.parse(response);
+                    scope.toggleStageLoading();
                     if (res.flag) {
                         self.loadPhotos();
                     } else {
@@ -254,6 +249,7 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('PhotoAlbum: 删除失败', error);
+                    scope.toggleStageLoading();
                     alert('删除失败：' + error);
                 }
             });
