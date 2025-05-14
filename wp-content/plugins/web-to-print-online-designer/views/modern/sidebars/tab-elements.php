@@ -317,7 +317,7 @@
                                     <i class="icon-nbd icon-nbd-layer-polygon"></i>
                                 </div>
                                 <div class="draw-item" ng-click="addGeometricalObject( 'line' )" title="<?php esc_html_e('Line','web-to-print-online-designer'); ?>">
-                                    <i class="icon-nbd icon-nbd-line"></i>
+                                    <i class="icon-nbd" style="font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.87); width: 50px; height: 6px; background: currentColor;"></i>
                                 </div>
                             </div>
                         </div>
