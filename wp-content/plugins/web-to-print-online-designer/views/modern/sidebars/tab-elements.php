@@ -308,7 +308,10 @@
                                     <i class="icon-nbd icon-nbd-layer-triangle"></i>
                                 </div>
                                 <div class="draw-item" ng-click="addGeometricalObject( 'rect' )" title="<?php esc_html_e('Rectangle','web-to-print-online-designer'); ?>">
-                                    <i class="icon-nbd icon-nbd-layer-rect"></i>
+                                    <i class="icon-nbd icon-nbd-square" style="font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.87);"></i>
+                                </div>
+                                <div class="draw-item" ng-click="addGeometricalObject( 'roundedRect' )" title="<?php esc_html_e('Rounded Rectangle','web-to-print-online-designer'); ?>">
+                                    <i class="icon-nbd icon-nbd-layer-rect" style="border-radius: 8px;"></i>
                                 </div>
                                 <div class="draw-item" ng-click="addGeometricalObject( 'hexagon' )" title="<?php esc_html_e('Hexagon','web-to-print-online-designer'); ?>">
                                     <i class="icon-nbd icon-nbd-layer-polygon"></i>
@@ -499,3 +502,16 @@
         </div>
     </div>
 </div>
+
+<style>
+.icon-nbd-square {
+    display: inline-block;
+    line-height: 1;
+    background: currentColor;
+    position: relative;
+    font-family: 'nbd' !important;
+}
+.draw-item {
+    position: relative;
+}
+</style>
