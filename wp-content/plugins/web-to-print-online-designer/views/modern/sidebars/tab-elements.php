@@ -7,7 +7,7 @@
         <div class="nbd-items-dropdown">
             <div class="main-items">
                 <div class="items">
-                    <div ng-if="!!settings.nbes_enable_settings && ( settings.nbes_enable_settings.background == 1 || settings.nbes_enable_settings.combination == 1 )" class="item item-color" data-type="color" data-api="false" ng-click="onClickTab('color', 'element')">
+                    <div class="item item-color" data-type="color" data-api="false" ng-click="onClickTab('color', 'element'); resource.element.type = 'color';">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-fill-color" ></i></div>
                             <div class="item-info">
@@ -23,7 +23,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="settings['nbdesigner_enable_shapes'] == 'yes'" class="item" data-type="shapes" data-api="false" ng-click="onClickTab('shape', 'element')">
+                    <div class="item" data-type="shapes" data-api="false" ng-click="onClickTab('shape', 'element')">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-shapes"></i></div>
                             <div class="item-info">
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="settings['nbdesigner_enable_icons'] == 'yes'" class="item" data-type="icons" data-api="false" ng-click="onClickTab('icon', 'element')">
+                    <div class="item" data-type="icons" data-api="false" ng-click="onClickTab('icon', 'element')">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-diamond"></i></div>
                             <div class="item-info">
@@ -159,10 +159,11 @@
             </div>
             <div class="result-loaded">
                 <div class="content-items">
-                    <div class="content-item type-color" data-type="color">
+                    <div class="content-item type-color" data-type="color" ng-show="resource.element.type === 'color'" style="display: block;">
                         <div class="main-type">
-                            <div ng-if="!!settings.nbes_enable_settings && settings.nbes_enable_settings.combination == 1">
+                            <div>
                                 <span class="heading-title"><?php esc_html_e('Combination colors','web-to-print-online-designer'); ?></span>
+                                <div style="display: block;">Debug: {{settings.nbes_settings | json}}</div>
                                 <div class="nbes-colors">
                                     <div class="nbes-color" ng-repeat="cbg_code in settings.nbes_settings.combination_colors.bg_codes track by $index">
                                         <div ng-style="{'background-color': cbg_code}" class="bg_color" 
@@ -172,8 +173,11 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" class="circle-color-picker" ng-model="currentColor" ng-change="addColor(currentColor)">
+                                </div>
                             </div>
-                            <div ng-if="!!settings.nbes_enable_settings && settings.nbes_enable_settings.background == 1 && settings.nbes_enable_settings.combination != 1">
+                            <div>
                                 <span class="heading-title"><?php esc_html_e('Background colors','web-to-print-online-designer'); ?></span>
                                 <div class="nbes-colors">
                                     <div class="nbes-color bg-color" ng-repeat="bg_code in settings.nbes_settings.background_colors.codes track by $index">
@@ -513,5 +517,34 @@
 }
 .draw-item {
     position: relative;
+}
+.nbes-colors {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+}
+.nbes-color {
+    width: 32px;
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid #444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.color-picker-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+.circle-color-picker {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 0 4px #888;
+    cursor: pointer;
+    padding: 0;
 }
 </style>

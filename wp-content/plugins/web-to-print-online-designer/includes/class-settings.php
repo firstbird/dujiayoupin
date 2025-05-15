@@ -685,7 +685,7 @@ if( !class_exists( 'NBD_Local_Settings' ) ) {
                 'background_colors'     => array( 'codes' => array(), 'names' => array() ),
                 'foreground_colors'     => array( 'codes' => array(), 'names' => array() ),
                 'force_fg'              => false,
-                'combination_colors'    => array( 'bg_codes' => array(), 'bg_names' => array(), 'fg_codes' => array(), 'fg_names' => array() ),
+                'combination_colors'    => array( 'bg_codes' => array('#FF5733', '#33FF57', '#3357FF'), 'bg_names' => array('Red', 'Green', 'Blue'), 'fg_codes' => array('#FFFFFF', '#000000', '#FFFF00'), 'fg_names' => array('White', 'Black', 'Yellow') ),
                 /* 3D preview */
                 'td_preview'            => 0,
                 'td_folder_name'        => '',

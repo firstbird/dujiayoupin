@@ -13,6 +13,34 @@ class Nbdesigner_Plugin {
         $this->plugin_id    = 'nbdesigner';
         $this->activedomain = 'activedomain/netbase/';
         $this->removedomain = 'removedomain/netbase/';
+        $this->init_settings();
+    }
+    private function init_settings() {
+        // 初始化颜色设置
+        $color_settings = get_option('nbdesigner_color_settings', array());
+        error_log('nbdesigner_color_settings init: ' . print_r($color_settings, true));
+        if (empty($color_settings)) {
+            $color_settings = array(
+                'combination_colors' => array(
+                    'bg_codes' => array('#FF5733', '#33FF57', '#3357FF', '#FF33F6', '#33FFF6', '#F6FF33'),
+                    'bg_names' => array('Red', 'Green', 'Blue', 'Pink', 'Cyan', 'Yellow'),
+                    'fg_codes' => array('#FFFFFF', '#000000', '#FFFFFF', '#000000', '#000000', '#000000'),
+                    'fg_names' => array('White', 'Black', 'White', 'Black', 'Black', 'Black')
+                ),
+                'background_colors' => array(
+                    'codes' => array('#FFFFFF', '#000000', '#FF5733', '#33FF57', '#3357FF'),
+                    'names' => array('White', 'Black', 'Red', 'Green', 'Blue')
+                )
+            );
+            error_log('nbdesigner_color_settings: ' . print_r($color_settings, true));
+        }
+        update_option('nbdesigner_color_settings', $color_settings);
+
+        // 将颜色设置添加到前端配置
+        add_filter('nbdesigner_frontend_settings', function($settings) use ($color_settings) {
+            $settings['nbes_settings'] = $color_settings;
+            return $settings;
+        });
     }
     public function init(){
         $this->hook();
@@ -1247,6 +1275,34 @@ class Nbdesigner_Plugin {
         ) );
         wp_localize_script( 'nbdesigner', 'nbds_frontend', $args );
         wp_enqueue_script( 'nbdesigner' );
+
+        // 获取颜色设置
+        $color_settings = get_option('nbdesigner_color_settings', array());
+        if (empty($color_settings)) {
+            $color_settings = array(
+                'combination_colors' => array(
+                    'bg_codes' => array('#FF5733', '#33FF57', '#3357FF', '#FF33F6', '#33FFF6', '#F6FF33'),
+                    'bg_names' => array('Red', 'Green', 'Blue', 'Pink', 'Cyan', 'Yellow'),
+                    'fg_codes' => array('#FFFFFF', '#000000', '#FFFFFF', '#000000', '#000000', '#000000'),
+                    'fg_names' => array('White', 'Black', 'White', 'Black', 'Black', 'Black')
+                ),
+                'background_colors' => array(
+                    'codes' => array('#FFFFFF', '#000000', '#FF5733', '#33FF57', '#3357FF'),
+                    'names' => array('White', 'Black', 'Red', 'Green', 'Blue')
+                )
+            );
+            update_option('nbdesigner_color_settings', $color_settings);
+        }
+
+        // 将颜色设置添加到前端配置
+        // $settings = array(
+        //     'nbes_settings' => $color_settings
+        // );
+
+        // 添加调试信息
+        error_log('Frontend settings: ' . print_r($settings, true));
+
+        wp_localize_script('nbd-script', 'NBDESIGNCONFIG', $settings);
     }
     public static function plugin_activation( $network_wide ) {
         if ( is_multisite() && $network_wide ) {
@@ -4906,7 +4962,7 @@ class Nbdesigner_Plugin {
                     $files      = nbd_export_pdfs( $nbd_item_key, $watermark, $force, $showBleed );
                     foreach( $files as $key => $file ){
                         $zip_files[] = $file;
-                    };
+                    }
                     $has_design = true;
                 }
             }
