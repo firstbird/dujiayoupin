@@ -36,8 +36,23 @@
                             </div>
                              -->
                         </div>
+                        <div>
+                            <span class="heading-title"><?php esc_html_e('Background colors','web-to-print-online-designer'); ?></span>
+                            <div class="nbes-colors">
+                                <div class="nbes-color bg-color" ng-repeat="bg_code in settings.nbes_settings.background_colors.codes track by $index">
+                                    <div ng-style="{'background-color': bg_code}" class="bg_color" 
+                                            ng-click="_changeBackgroundCanvas($index)"
+                                            title="{{settings.nbes_settings.background_colors.names[$index]}}">
+                                        <span ng-style="{'color': bg_code}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
+                    <div class="color-picker-wrapper">
+                        <div class="color-picker-label">选择颜色背景</div>
+                        <input type="color" class="color-bar" ng-model="currentColor" ng-change="changeBackgroundCanvas(currentColor)">
+                    </div>
                     <?php do_action('nbd_modern_sidebar_photo_images'); ?>
                 </div>
                 <!--
@@ -79,4 +94,80 @@
     border-color: #ccc;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
+
+.heading-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 15px;
+    display: block;
+}
+.nbes-colors {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    justify-content: space-between;
+    margin-left: 12px;
+    padding-left: 0;
+}
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 20px 12px;
+}
+.color-picker-label {
+    font-size: 14px;
+    color: #333;
+    margin-right: 12px;
+    white-space: nowrap;
+}
+.color-bar {
+    width: 200px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+.color-bar:hover {
+    border-color: #999;
+}
 </style>
+
+<script>
+angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$document', function($scope, $document) {
+    $document.on('click', function(event) {
+        if (!angular.element(event.target).closest('.color-picker-wrapper').length) {
+            $scope.$apply(function() {
+                $scope.showColorPicker = false;
+            });
+        }
+    });
+    
+    $scope.closeColorPicker = function() {
+        $scope.showColorPicker = false;
+    };
+
+    $scope.$on('$locationChangeStart', function() {
+        $scope.showColorPicker = false;
+    });
+    
+    function closeColorPicker(event) {
+        var colorPicker = angular.element(event.target).closest('.nbd-text-color-picker');
+        var colorBar = angular.element(event.target).closest('.color-bar');
+        if (!colorPicker.length && !colorBar.length) {
+            $scope.$apply(function() {
+                $scope.showColorPicker = false;
+            });
+        }
+    }
+    
+    $scope.$watch('showColorPicker', function(newVal) {
+        if (newVal) {
+            $document.on('click', closeColorPicker);
+        } else {
+            $document.off('click', closeColorPicker);
+        }
+    });
+}]);
+</script>

@@ -7,7 +7,7 @@
         <div class="nbd-items-dropdown">
             <div class="main-items">
                 <div class="items">
-                    <div class="item item-color" data-type="color" data-api="false" ng-click="onClickTab('color', 'element'); resource.element.type = 'color';">
+                    <div ng-if="false" class="item item-color" data-type="color" data-api="false" ng-click="onClickTab('color', 'element'); resource.element.type = 'color';">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-fill-color" ></i></div>
                             <div class="item-info">
@@ -159,11 +159,11 @@
             </div>
             <div class="result-loaded">
                 <div class="content-items">
-                    <div class="content-item type-color" data-type="color" ng-show="resource.element.type === 'color'" style="display: block;">
+                    <div ng-if="false" class="content-item type-color" data-type="color" ng-show="resource.element.type === 'color'" style="display: block;">
                         <div class="main-type">
                             <div>
                                 <span class="heading-title"><?php esc_html_e('Combination colors','web-to-print-online-designer'); ?></span>
-                                <div style="display: block;">Debug: {{settings.nbes_settings | json}}</div>
+                                <!-- <div style="display: block;">Debug: {{settings.nbes_settings | json}}</div> -->
                                 <div class="nbes-colors">
                                     <div class="nbes-color" ng-repeat="cbg_code in settings.nbes_settings.combination_colors.bg_codes track by $index">
                                         <div ng-style="{'background-color': cbg_code}" class="bg_color" 
@@ -520,31 +520,17 @@
 }
 .nbes-colors {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 2px;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    justify-content: space-between;
 }
 .nbes-color {
     width: 32px;
     height: 32px;
     box-sizing: border-box;
-    border: 1px solid #444;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.color-picker-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 12px;
-}
-.circle-color-picker {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: none;
-    box-shadow: 0 0 4px #888;
-    cursor: pointer;
-    padding: 0;
 }
 </style>
