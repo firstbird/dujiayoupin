@@ -105,8 +105,8 @@ class NBDesigner_Artwork_Actions {
     }
     public function maybe_hide_cart_item_design_section( $_show_design, $cart_item ){
         if( isset( $cart_item['nbo_meta'] ) ){
-            $options                = $cart_item['nbo_meta']['options'];
-            if( nbd_is_base64_string( $options['fields'] ) ){
+            $options                = isset($cart_item['nbo_meta']['options']) ? $cart_item['nbo_meta']['options'] : array();
+            if( isset($options['fields']) && nbd_is_base64_string( $options['fields'] ) ){
                 $options['fields']  = base64_decode( $options['fields'] );
             }
             $option_fields          = unserialize( $options['fields'] );
@@ -136,8 +136,8 @@ class NBDesigner_Artwork_Actions {
     }
     public function add_request_design_action( $cart_item, $cart_item_key ){
         if( isset( $cart_item['nbo_meta'] ) ){
-            $options                = $cart_item['nbo_meta']['options'];
-            if( nbd_is_base64_string( $options['fields'] ) ){
+            $options                = isset($cart_item['nbo_meta']['options']) ? $cart_item['nbo_meta']['options'] : array();
+            if( isset($options['fields']) && nbd_is_base64_string( $options['fields'] ) ){
                 $options['fields']  = base64_decode( $options['fields'] );
             }
             $option_fields          = unserialize( $options['fields'] );

@@ -19,73 +19,27 @@ class Nbdesigner_IO {
      * @return array Array path images in folder
      */
     public static function get_list_images($path, $level = 100) {
-        error_log('Getting image list from path: ' . $path);
-        
-        $list = array();
-        $image_extensions = array('jpg', 'jpeg', 'png', 'gif');
-        
-        // 检查路径是否存在且可读
-        if (!is_dir($path)) {
-            error_log('Directory does not exist: ' . $path);
-            return $list;
+        // error_log('Getting image list from path: ' . $path);
+        $files = array();
+        if (is_dir($path)) {
+            $files = self::get_list_files_by_type($path, $level, 'image');
         }
-        
-        // 使用 opendir 并添加错误检查
-        $dir_handle = @opendir($path);
-        if ($dir_handle === false) {
-            error_log('Cannot open directory: ' . $path);
-            return $list;
-        }
-        
-        try {
-            while (false !== ($file = readdir($dir_handle))) {
-                if ($file != '.' && $file != '..') {
-                    $full_path = rtrim($path, '/') . '/' . $file;
-                    
-                    if (is_file($full_path)) {
-                        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                        if (in_array($ext, $image_extensions)) {
-                            // 添加完整路径到列表
-                            $list[] = $full_path;
-                        }
-                    } elseif (is_dir($full_path) && $level > 0) {
-                        // 递归搜索子目录
-                        $sub_images = self::get_list_images($full_path, $level - 1);
-                        $list = array_merge($list, $sub_images);
-                    }
-                }
-            }
-            
-            // 只在目录句柄有效时关闭
-            if (is_resource($dir_handle)) {
-                closedir($dir_handle);
-            }
-            
-        } catch (Exception $e) {
-            error_log('Error reading directory: ' . $e->getMessage());
-            if (is_resource($dir_handle)) {
-                closedir($dir_handle);
-            }
-        }
-        
-        error_log('Found image files: ' . print_r($list, true));
-        return $list;
+        // error_log('Found image files: ' . print_r($files, true));
+        return $files;
     }
-    // public static function get_list_images( $path, $level = 100 ){
-    //     $list       = array();
-    //     $_list      = self::get_list_files($path, $level);
-    //     $list       = preg_grep('/\.(jpg|jpeg|png|gif)(?:[\?\#].*)?$/i', $_list);
-    //     return $list;
-    // }
-    public static function get_list_files_by_type($path, $level = 100, $type){
-        $list       = array();
-        $_list      = self::get_list_files($path, $level);
-        $list       = preg_grep('/\.(' . $type . ')(?:[\?\#].*)?$/i', $_list);
-        return $list;
+    public static function get_list_files_by_type($path, $type, $level = 100){
+        $files = array();
+        if(is_dir($path)){
+            $files = self::get_list_files($path, $level);
+            $files = array_filter($files, function($file) use ($type) {
+                return strpos($file, $type) !== false;
+            });
+        }
+        return $files;
     }
     public static function get_list_files( $folder = '', $levels = 100 ) {
         // 添加错误处理和日志
-        error_log('Getting list files from path: ' . $folder);
+        // error_log('Getting list files from path: ' . $folder);
         
         $list = array();
         
@@ -129,7 +83,7 @@ class Nbdesigner_IO {
             }
         }
         
-        error_log('Found files: ' . print_r($list, true));
+        // error_log('Found files: ' . print_r($list, true));
         return $list;
     }
     public static function get_list_folder( $folder = '', $levels = 100 ){
@@ -239,7 +193,7 @@ class Nbdesigner_IO {
         $basedir    = $upload_dir['basedir'];
         $arr        = explode('/', $basedir);
         $upload     = $arr[count($arr) - 1];
-        error_log('nbdesigner convert_path_to_url ------$upload ' . $upload . ' ' . $basedir . 'upload_dir ' . $upload_dir);
+        // error_log('nbdesigner convert_path_to_url ------$upload ' . $upload . ' ' . $basedir . 'upload_dir ' . $upload_dir);
         if( is_multisite() && !is_main_site() ) $upload = $arr[count($arr) - 3].'/'.$arr[count($arr) - 2].'/'.$arr[count($arr) - 1];
         return content_url( substr( $path, strrpos( $path, '/' . $upload . '/nbdesigner' ) ) );
     }
@@ -1801,7 +1755,7 @@ function nbd_get_template_by_folder( $folder ){
     $data['config'] = nbd_get_data_from_json( $path . '/config.json' );
     return $data;
 }
-function nbd_get_product_info( $product_id, $variation_id, $nbd_item_key = '', $task, $task2 = '', $reference = '', $need_templates = false, $cart_item_key = '' ){
+function nbd_get_product_info( $product_id, $variation_id, $task, $nbd_item_key = '', $task2 = '', $reference = '', $need_templates = false, $cart_item_key = '' ){
     error_log('[nbdesigner-class-util] nbd_get_product_info product_id: ' . $product_id . ' variation_id: ' . $variation_id . ' nbd_item_key: ' . $nbd_item_key . ' task: ' . $task);
     $data = array();
     if($variation_id > 0){
@@ -1812,7 +1766,6 @@ function nbd_get_product_info( $product_id, $variation_id, $nbd_item_key = '', $
     $cart_design_ids = array();
     foreach(WC()->cart->cart_contents as $cart_item_key => $cart_item) {
         if(isset($cart_item['nbd_design_id'])) {
-            // error_log('nbd_get_user_designs cart_design_id: ' . $cart_item['nbd_design_id']);
             $cart_design_ids[] = $cart_item['nbd_design_id'];
         }
     }
@@ -1823,9 +1776,6 @@ function nbd_get_product_info( $product_id, $variation_id, $nbd_item_key = '', $
     }
     error_log('[nbdesigner-class-util] nbd_get_product_info $_nbd_item_key: ' . $_nbd_item_key);
     if( $_nbd_item_key && $task2 == '' && $nbd_item_key == '' && $task != 'create' ) $nbd_item_key = $_nbd_item_key;
-//    if( $cart_item_key != '' && WC()->session->get($cart_item_key . '_nbd') ) {
-//        $nbd_item_key = WC()->session->get($cart_item_key . '_nbd');
-//    }
     $lazy_load_default_template = nbdesigner_get_option( 'nbdesigner_lazy_load_template' );
     $path = NBDESIGNER_CUSTOMER_DIR . '/' . $nbd_item_key;
     /* Path not exist in case add to cart before design, session has been init */  

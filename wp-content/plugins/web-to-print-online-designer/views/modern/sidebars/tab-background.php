@@ -16,6 +16,14 @@
                             <div class="item select-bg-btn" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false" style="text-align: left;">
                                 <button type="button" class="nbd-select-bg-btn"><?php esc_html_e('选择图片背景','web-to-print-online-designer'); ?></button>
                             </div>
+                            <div class="recent-images">
+                                <h3 class="color-palette-label"><?php esc_html_e('最近选择','web-to-print-online-designer'); ?></h3>
+                                <div class="recent-images-grid">
+                                    <div class="recent-image-item" ng-repeat="img in recentImages" ng-click="setBackgroundUrl(img.url)">
+                                        <img ng-src="{{img.url}}" alt="最近选择的图片">
+                                    </div>
+                                </div>
+                            </div>
                             <!-- 
                             <div class="clear-local-images-wrap" style="margin-left: 12px;">
                                 <button type="button" class="nbd-clear-btn" ng-click="clearBackgroundFiles()">
@@ -36,21 +44,22 @@
                             </div>
                              -->
                         </div>
-                        <div>
-                            <span class="heading-title"><?php esc_html_e('Background colors','web-to-print-online-designer'); ?></span>
-                            <div class="nbes-colors">
-                                <div class="nbes-color bg-color" ng-repeat="bg_code in settings.nbes_settings.background_colors.codes track by $index">
-                                    <div ng-style="{'background-color': bg_code}" class="bg_color" 
-                                            ng-click="_changeBackgroundCanvas($index)"
-                                            title="{{settings.nbes_settings.background_colors.names[$index]}}">
-                                        <span ng-style="{'color': bg_code}"></span>
-                                    </div>
+                    </div>
+                    <div class="divider"></div>
+                    <h3 class="color-palette-label"><?php esc_html_e('颜色背景','web-to-print-online-designer'); ?></h3>
+                    <div>
+                        <div class="nbes-colors">
+                            <div class="nbes-color bg-color" ng-repeat="bg_code in settings.nbes_settings.background_colors.codes track by $index">
+                                <div ng-style="{'background-color': bg_code}" class="bg_color" 
+                                        ng-click="_changeBackgroundCanvas($index)"
+                                        title="{{settings.nbes_settings.background_colors.names[$index]}}">
+                                    <span ng-style="{'color': bg_code}"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <h3 class="color-palette-label"><?php esc_html_e('调色板','web-to-print-online-designer'); ?></h3>
                     <div class="color-picker-wrapper">
-                        <div class="color-picker-label">选择颜色背景</div>
                         <input type="color" class="color-bar" ng-model="currentColor" ng-change="changeBackgroundCanvas(currentColor)">
                     </div>
                     <?php do_action('nbd_modern_sidebar_photo_images'); ?>
@@ -96,10 +105,12 @@
 }
 
 .heading-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 20px 0 15px;
+    font-size: 14px;
+    font-weight: 450;
+    color: #333;
+    margin: 12px 12px 8px;
     display: block;
+    text-align: left;
 }
 .nbes-colors {
     display: grid;
@@ -109,13 +120,21 @@
     margin-left: 12px;
     padding-left: 0;
 }
+.color-palette-label {
+    font-size: 14px;
+    font-weight: 450;
+    color: #333;
+    margin: 12px 12px 8px;
+    text-align: left;
+}
 .color-picker-wrapper {
     display: flex;
     align-items: center;
-    margin: 20px 12px;
+    margin: 0 12px 12px;
 }
 .color-picker-label {
     font-size: 14px;
+    font-weight: 450;
     color: #333;
     margin-right: 12px;
     white-space: nowrap;
@@ -131,6 +150,37 @@
 }
 .color-bar:hover {
     border-color: #999;
+}
+.divider {
+    height: 1px;
+    background-color: #fff;
+    margin: 12px 12px;
+}
+.recent-images {
+    margin: 12px 12px;
+}
+.recent-images-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+.recent-image-item {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+.recent-image-item:hover {
+    border-color: #999;
+    transform: scale(1.02);
+}
+.recent-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>
 

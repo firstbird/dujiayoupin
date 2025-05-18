@@ -1,5 +1,8 @@
 <?php if (!defined('ABSPATH')) exit; // Exit if accessed directly   ?>
 <?php
+// 设置错误报告级别，抑制Deprecated警告
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 require_once(NBDESIGNER_PLUGIN_DIR . 'includes/launcher/class.designer.php');
 class My_Design_Endpoint {
 
@@ -9,6 +12,8 @@ class My_Design_Endpoint {
      * @var string
      */
     public static $endpoint = 'my-designs';
+    protected $query_vars = array();
+
     /**
      * Plugin actions.
      */
@@ -19,6 +24,43 @@ class My_Design_Endpoint {
             'view_design'   => 'view-design',
             'artist_info'   => 'artist-info'
         );
+        add_action('init', array($this, 'add_endpoints'));
+        add_filter('query_vars', array($this, 'add_query_vars'));
+        add_action('parse_request', array($this, 'parse_request'));
+
+        // Change the My Accout page title.
+        add_filter('the_title', array($this, 'endpoint_title'));
+
+        // Inserting your new tab/page into the My Account page.
+        add_filter('woocommerce_account_menu_items', array($this, 'new_menu_items'));
+        foreach ( $this->query_vars as $key => $var ){
+            add_action('woocommerce_account_' . $var . '_endpoint', array($this, 'endpoint_content_'.$key), 10, 1);
+        }
+        
+        //Inserting user info
+        add_action( 'show_user_profile', array( $this, 'user_profile' ) );
+        add_action( 'edit_user_profile', array( $this, 'user_profile' ) );  
+
+        //Update user info
+        add_action( 'personal_options_update', array( $this, 'process_user_option_update' ) );
+        add_action( 'edit_user_profile_update', array( $this, 'process_user_option_update' ) );  
+        
+        //Design page breadcrumbs
+        add_filter( 'woocommerce_get_breadcrumb', array( $this, 'design_page_breadcrumb'), 10 ,1  );
+        add_filter( 'body_class', array($this, 'add_body_class'), 10, 1 );
+        
+        //Load assets
+        add_action( 'wp_enqueue_scripts', array($this, 'nbd_gallery_enqueue_scripts') );
+        
+        //User update artist name
+        $this->ajax();
+        
+        //Gallery
+        add_shortcode( 'nbdesigner_gallery', array($this,'nbd_gallery_func') );
+        //add_action( 'wp_head', array( &$this, 'set_open_graph_image' ), 1000 );
+        add_action( 'delete_post', array($this,'delete_categories_transient') );
+        add_action( 'save_post', array($this,'delete_categories_transient') );
+        add_action( 'deleted_user', array($this,'delete_designs_transient') );
     }
     public function init(){
         // Actions used to insert a new endpoint in the WordPress.
@@ -1295,5 +1337,17 @@ class My_Design_Endpoint {
         }
         
         return $results;
+    }
+
+    /**
+     * Parse request to handle custom endpoints
+     */
+    public function parse_request() {
+        global $wp;
+        foreach ($this->query_vars as $key => $var) {
+            if (isset($wp->query_vars[$var])) {
+                $wp->query_vars[$key] = $wp->query_vars[$var];
+            }
+        }
     }
 }

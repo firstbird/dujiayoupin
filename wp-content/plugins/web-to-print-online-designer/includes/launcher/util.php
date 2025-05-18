@@ -1,9 +1,9 @@
+<?php if (!defined('ABSPATH')) exit; // Exit if accessed directly   ?>
 <?php
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
-}
+// 设置错误报告级别，抑制Deprecated警告
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
-function nbdl_get_designers( $args, $get_info = true ){
+function nbdl_get_designers($args, $get_info = true){
     $designers  = array();
     $defaults   = array(
         'role__in'   => array( 'designer', 'administrator', 'shop_manager' ),
@@ -243,7 +243,7 @@ function nbdl_get_withdraw_status_count( $user_id = '' ) {
     return $counts;
 }
 
-function nbdl_get_designs( $status = '', $limit = 10, $offset = 0, $user_id = '', $product_id = '' ){
+function nbdl_get_designs($status, $limit = 10, $offset = 0, $user_id = '', $product_id = ''){
     global $wpdb;
 
     if( $status === '' ){
@@ -805,4 +805,17 @@ function nbdl_generate_color_product_design( $approved ){
         $nbdl_processor->push_to_queue( $design_id );
     }
     $nbdl_processor->save()->dispatch();
+}
+
+function get_product_option($product_id, $variation_id = 0, $task, $nbd_item_key = '', $task2 = '', $reference = '', $need_templates = false, $cart_item_key = ''){
+    $enable = is_nbdesigner_product($product_id);
+    if(!$enable) return false;
+    
+    $product = wc_get_product($product_id);
+    if(!$product) return false;
+    
+    $product_option = get_post_meta($product_id, '_nbdesigner_option', true);
+    if(!$product_option) return false;
+    
+    return $product_option;
 }

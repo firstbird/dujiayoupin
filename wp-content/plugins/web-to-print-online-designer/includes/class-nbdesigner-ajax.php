@@ -18,6 +18,14 @@ class Nbdesigner_Ajax {
         add_action('wp_ajax_nopriv_nbdesigner_get_user_photos', array($this, 'nbdesigner_get_user_photos'));
         add_action('wp_ajax_nopriv_nbdesigner_upload_user_photo', array($this, 'nbdesigner_upload_user_photo'));
         add_action('wp_ajax_nopriv_nbdesigner_delete_user_photo', array($this, 'nbdesigner_delete_user_photo'));
+
+        // 添加保存最近图片的AJAX处理
+        add_action('wp_ajax_nbdesigner_save_recent_image', array($this, 'save_recent_image'));
+        add_action('wp_ajax_nopriv_nbdesigner_save_recent_image', array($this, 'save_recent_image'));
+
+        // 添加前端日志处理
+        add_action('wp_ajax_nbdesigner_log_frontend', array($this, 'log_frontend'));
+        add_action('wp_ajax_nopriv_nbdesigner_log_frontend', array($this, 'log_frontend'));
     }
 
     public function nbdesigner_get_nonce() {
@@ -215,6 +223,71 @@ class Nbdesigner_Ajax {
                 'success' => false,
                 'message' => '删除失败：' . $e->getMessage()
             ));
+        }
+    }
+
+    public function save_recent_image() {
+        check_ajax_referer('nbdesigner_ajax_nonce', 'nonce');
+        $image_url = sanitize_text_field($_POST['image_url']);
+        if(!empty($image_url)) {
+            $frontend = new NBDesignerFrontend();
+            $frontend->save_recent_image($image_url);
+            wp_send_json_success();
+        }
+        wp_send_json_error();
+    }
+
+    public function log_frontend() {
+        try {
+            // 检查日志文件权限
+            $log_file = WP_CONTENT_DIR . '/debug.log';
+            if (!is_writable($log_file)) {
+                error_log('日志文件不可写: ' . $log_file);
+                wp_send_json_error('日志文件不可写');
+                return;
+            }
+
+            error_log('开始处理前端日志请求 - ' . date('Y-m-d H:i:s'));
+            error_log('POST数据: ' . print_r($_POST, true));
+            
+            if (!check_ajax_referer('nbdesigner_ajax_nonce', 'nonce', false)) {
+                error_log('nonce验证失败 - 期望: ' . wp_create_nonce('nbdesigner_ajax_nonce') . ', 收到: ' . $_POST['nonce']);
+                wp_send_json_error('nonce验证失败');
+                return;
+            }
+            
+            $message = isset($_POST['message']) ? sanitize_text_field($_POST['message']) : '';
+            $data = isset($_POST['data']) ? $_POST['data'] : array();
+            
+            if (!empty($message)) {
+                $log_message = sprintf(
+                    "[前端日志] %s - 用户: %s - 时间: %s - 数据: %s",
+                    $message,
+                    is_user_logged_in() ? get_current_user_id() : '游客',
+                    date('Y-m-d H:i:s'),
+                    json_encode($data, JSON_UNESCAPED_UNICODE)
+                );
+                
+                // 尝试直接写入文件
+                $result = file_put_contents($log_file, $log_message . "\n", FILE_APPEND);
+                if ($result === false) {
+                    error_log('直接写入日志文件失败');
+                    // 尝试使用error_log
+                    if (!error_log($log_message)) {
+                        error_log('error_log写入失败');
+                        wp_send_json_error('日志写入失败');
+                        return;
+                    }
+                }
+                
+                wp_send_json_success(array('message' => '日志写入成功'));
+            } else {
+                error_log('日志消息为空');
+                wp_send_json_error('日志消息为空');
+            }
+        } catch (Exception $e) {
+            error_log('日志处理异常: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            wp_send_json_error('日志处理异常: ' . $e->getMessage());
         }
     }
 }

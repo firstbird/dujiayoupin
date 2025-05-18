@@ -3,6 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 if( !class_exists('NBD_Updates') ) {
     class NBD_Updates{
         protected static $instance;
+        protected $remote_url;
         private $_remote_url        = 'https://cmsmart.net/index.php?option=com_cmsmart&controller=product_api&task=info';
         private $product_id         = 1074;
         private $tested             = "5.4.2";
@@ -18,7 +19,7 @@ if( !class_exists('NBD_Updates') ) {
         private $author_homepage    = "http://netbaseteam.com/";
         private $first              = null;
         public function __construct() {
-            //todo
+            $this->remote_url = '';
         }
         public function init(){
             $license = $this->get_license();

@@ -18,7 +18,7 @@ class Nbdesigner_Plugin {
     private function init_settings() {
         // 初始化颜色设置
         $color_settings = get_option('nbdesigner_color_settings', array());
-        error_log('nbdesigner_color_settings init: ' . print_r($color_settings, true));
+        // error_log('nbdesigner_color_settings init: ' . print_r($color_settings, true));
         if (empty($color_settings)) {
             $color_settings = array(
                 'combination_colors' => array(
@@ -136,23 +136,23 @@ class Nbdesigner_Plugin {
         }
     }
     public function nbd_get_user_designs(){
-        error_log('nbd_get_user_designs begin');
+        // error_log('nbd_get_user_designs begin');
         $user_id = wp_get_current_user()->ID;
         $result = array(
             'flag'   =>  1
         );
         if( $user_id ){
             if( !isset($_POST['did']) ){
-                error_log('nbd_get_user_designs $_POST not did');
+                // error_log('nbd_get_user_designs $_POST not did');
                 global $wpdb;
                 $table_name =  $wpdb->prefix . 'nbdesigner_mydesigns';
                 if( isset($_POST['product_id']) ){
                     $product_id     = absint( $_POST['product_id'] );
                     $variation_id   = absint( $_POST['variation_id'] );
-                    error_log('nbd_get_user_designs product_id: ' . $product_id . ' variation_id: ' . $variation_id);
+                    // error_log('nbd_get_user_designs product_id: ' . $product_id . ' variation_id: ' . $variation_id);
                     $designs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = {$user_id} AND product_id = {$product_id} AND variation_id = {$variation_id} ORDER BY created_date DESC" );
                 }else{
-                    error_log('nbd_get_user_designs no product_id: . variation_id: ' . $variation_id);
+                    // error_log('nbd_get_user_designs no product_id: . variation_id: ' . $variation_id);
                     $designs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = {$user_id} ORDER BY created_date DESC" );
                 }
                 $cart_design_ids = array();
@@ -162,13 +162,12 @@ class Nbdesigner_Plugin {
                         $cart_design_ids[] = $cart_item['nbd_design_id'];
                     }
                 }
-                                        //     $cart_design_ids[] = $cart_item['nbd_item_meta_ds']['nbd'];
-                error_log('nbd_get_user_designs cart_design_ids: ' . print_r($cart_design_ids, true));
+                // error_log('nbd_get_user_designs cart_design_ids: ' . print_r($cart_design_ids, true));
                 foreach( $designs as $design ){
                     $path_preview   = NBDESIGNER_CUSTOMER_DIR .'/'.$design->folder. '/preview';
                     $listThumb      = Nbdesigner_IO::get_list_images( $path_preview );
                     $image          = '';
-                    error_log('nbd_get_user_designs $design->folder: ' . $design->folder);
+                    // error_log('nbd_get_user_designs $design->folder: ' . $design->folder);
                     if( !in_array($design->folder, $cart_design_ids) ){
                         if( count( $listThumb ) ){
                             asort($listThumb);
@@ -188,11 +187,10 @@ class Nbdesigner_Plugin {
             }  
         } else {
             $result['flag'] = 0;
-            error_log('nbd_get_user_designs error');
+            // error_log('nbd_get_user_designs error');
         }
-        error_log('nbd_get_user_designs end');
+        // error_log('nbd_get_user_designs end');
         wp_send_json_success($result);
-        // echo json_encode( $result );
         wp_die();
     }
 
@@ -431,7 +429,7 @@ class Nbdesigner_Plugin {
         
         if (isset($values['nbd_design_id'])) {
             $cart_item['nbd_design_id'] = $values['nbd_design_id'];
-            error_log('nbdesigner get_cart_item_from_session nbd_design_id: ' . $cart_item['nbd_design_id']);
+            // error_log('nbdesigner get_cart_item_from_session nbd_design_id: ' . $cart_item['nbd_design_id']);
         }
 
         if (isset($values['nbd_design_key'])) {
@@ -916,7 +914,7 @@ class Nbdesigner_Plugin {
         }
     }
     public function nbdesigner_add_to_cart_shop_link( $handler, $product ){
-        error_log('nbdesigner_add_to_cart_shop_link check');
+        // error_log('nbdesigner_add_to_cart_shop_link check');
         if( is_nbdesigner_product( $product->get_id() ) ){
             $label = esc_html__( 'Start Design', 'web-to-print-online-designer' );
             ob_start();
@@ -1295,14 +1293,18 @@ class Nbdesigner_Plugin {
         }
 
         // 将颜色设置添加到前端配置
-        // $settings = array(
-        //     'nbes_settings' => $color_settings
-        // );
+        $settings = array(
+            'nbes_settings' => $color_settings
+        );
 
         // 添加调试信息
-        error_log('Frontend settings: ' . print_r($settings, true));
+        // error_log('Frontend settings: ' . print_r($settings, true));
 
-        wp_localize_script('nbd-script', 'NBDESIGNCONFIG', $settings);
+        wp_localize_script('nbdesigner', 'nbdesigner_settings', array(
+            'settings' => $settings,
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('nbdesigner-nonce')
+        ));
     }
     public static function plugin_activation( $network_wide ) {
         if ( is_multisite() && $network_wide ) {
@@ -3128,7 +3130,7 @@ class Nbdesigner_Plugin {
                 $site_url = home_url();
             }
             // mzl 没有走这个分支
-            error_log('[class.nbdesigner.php] nbdesigner_button click ----');
+            // error_log('[class.nbdesigner.php] nbdesigner_button click ----');
             $src = add_query_arg( array( 'action' => 'nbdesigner_editor_html', 'product_id' => $pid ), $site_url . '/' );
             if( isset( $_POST['variation_id'] ) &&  $_POST['variation_id'] != '' ){
                 $src .= '&variation_id='. absint( $_POST['variation_id'] );
@@ -4403,7 +4405,7 @@ class Nbdesigner_Plugin {
         return array_merge( $columns, array( 'design' => esc_html__( 'Design', 'web-to-print-online-designer' ) ) );
     }
     public function render_cart( $title = null, $cart_item = null, $cart_item_key = null ) {
-        error_log('nbdesigner render_cart ------$cart_item_key ' . $cart_item_key . ' is_cart() ' . is_cart() . ' is_checkout() ' . is_checkout());
+        // error_log('nbdesigner render_cart ------$cart_item_key ' . $cart_item_key . ' is_cart() ' . is_cart() . ' is_checkout() ' . is_checkout());
         // && ( is_cart() || is_checkout() ) mzl note 检查是购物车还是结账页面 ，不需要
         if ($cart_item_key) {
             $nbd_session = WC()->session->get($cart_item_key . '_nbd');
@@ -4412,7 +4414,7 @@ class Nbdesigner_Plugin {
                 if( isset($cart_item['nbd_item_meta_ds']['nbd']) ) $nbd_session = $cart_item['nbd_item_meta_ds']['nbd'];
                 if( isset($cart_item['nbd_item_meta_ds']['nbu']) ) $nbu_session = $cart_item['nbd_item_meta_ds']['nbu'];
             }
-            error_log('nbdesigner render_cart ------$nbd_session ' . $nbd_session . ' $nbu_session ' . $nbu_session);
+            // error_log('nbdesigner render_cart ------$nbd_session ' . $nbd_session . ' $nbu_session ' . $nbu_session);
             $_show_design                   = nbdesigner_get_option('nbdesigner_show_in_cart', 'yes');
             $_show_design                   = apply_filters( 'nbd_show_design_section_in_cart', $_show_design, $cart_item );
             $enable_edit_design             = nbdesigner_get_option('nbdesigner_show_button_edit_design_in_cart', 'yes') == 'yes' ? true : false;
@@ -4425,9 +4427,9 @@ class Nbdesigner_Plugin {
             $_enable_upload_without_design  = get_post_meta($product_id, '_nbdesigner_enable_upload_without_design', true);
             $_product                       = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
             $product_permalink              = apply_filters( 'woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key );            
-            error_log('nbdesigner render_cart ------$is_nbdesign ' . $is_nbdesign . ' $_show_design ' . $_show_design . ' $show_edit_link ' . $show_edit_link . ' $enable_edit_design ' . $enable_edit_design);
+            // error_log('nbdesigner render_cart ------$is_nbdesign ' . $is_nbdesign . ' $_show_design ' . $_show_design . ' $show_edit_link ' . $show_edit_link . ' $enable_edit_design ' . $enable_edit_design);
             if ( $is_nbdesign && $_show_design == 'yes' ) {
-                error_log('nbdesigner render_cart ------$nbd_session ' . $nbd_session . ' $nbu_session ' . $nbu_session);
+                // error_log('nbdesigner render_cart ------$nbd_session ' . $nbd_session . ' $nbu_session ' . $nbu_session);
                 if($nbd_session || $nbu_session){
                     $html = is_checkout() ? $title . ' &times; <strong>' . $cart_item['quantity'] .'</strong>' : $title;
                 }else{
@@ -4444,10 +4446,10 @@ class Nbdesigner_Plugin {
                     $list           = Nbdesigner_IO::get_list_images( NBDESIGNER_CUSTOMER_DIR . '/' . $nbd_session . '/preview' );
                     $list           = nbd_sort_file_by_side( $list );
                     foreach ( $list as $img ) {
-                        error_log('nbdesigner render_cart ------$img ' . $img);
+                        // error_log('nbdesigner render_cart ------$img ' . $img);
                         $src    = Nbdesigner_IO::convert_path_to_url( $img ) . '?&t=' . round( microtime( true ) * 1000 );
                         $html  .= '<img class="nbd_cart_item_design_preview" src="' . $src . '"/>';
-                        error_log('nbdesigner render_cart ------$src ' . $src);
+                        // error_log('nbdesigner render_cart ------$src ' . $src);
                     }
                     if (!empty($list)) {
                         // 获取第一张预览图的路径
@@ -5867,20 +5869,20 @@ class Nbdesigner_Plugin {
         wp_die();
     }
     public function nbdesigner_editor_html(){
-        error_log('[class.nbdesigner.php] nbdesigner_editor_html ------');
-        $stack = debug_backtrace();
-        foreach ($stack as $index => $trace) {
-            error_log(sprintf(
-                "#%d %s:%d - %s%s%s()",
-                $index,
-                isset($trace['file']) ? $trace['file'] : 'unknown file',
-                isset($trace['line']) ? $trace['line'] : 0,
-                isset($trace['class']) ? $trace['class'] : '',
-                isset($trace['type']) ? $trace['type'] : '',
-                $trace['function']
-            ));
-        }
-        error_log('=== End Call Stack ===');
+        // error_log('[class.nbdesigner.php] nbdesigner_editor_html ------');
+        // $stack = debug_backtrace();
+        // foreach ($stack as $index => $trace) {
+        //     error_log(sprintf(
+        //         "#%d %s:%d - %s%s%s()",
+        //         $index,
+        //         isset($trace['file']) ? $trace['file'] : 'unknown file',
+        //         isset($trace['line']) ? $trace['line'] : 0,
+        //         isset($trace['class']) ? $trace['class'] : '',
+        //         isset($trace['type']) ? $trace['type'] : '',
+        //         $trace['function']
+        //     ));
+        // }
+        // error_log('=== End Call Stack ===');
         if( isset( $_GET['nbd-route'] ) && $_REQUEST['nbd-route'] == 'nbd-3d-preview' ){
             $path = NBDESIGNER_PLUGIN_DIR . 'views/3d-preview.php';
             include( $path ); exit();
