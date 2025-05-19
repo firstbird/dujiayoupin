@@ -183,7 +183,7 @@ jQuery(document).ready(function () {
                     // 等待iframe内容完全加载
                     var checkIframeReady = setInterval(function(){
                         if(frame.contentWindow.document.readyState === 'complete'){
-                            console.log('iframe content loaded');
+                            // console.log('iframe content loaded');
                             // 隐藏loading
                             // if(document.getElementById('nbd_processing')){
                             //     document.getElementById('nbd_processing').style.display = 'none';

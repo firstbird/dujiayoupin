@@ -1,4 +1,5 @@
 <?php
+require_once NBDESIGNER_PLUGIN_DIR . 'includes/class-nbdesigner-logger.php';
 
 class NBDesignerFrontend {
 
@@ -33,6 +34,12 @@ class NBDesignerFrontend {
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('nbdesigner_ajax_nonce'),
             'debug' => WP_DEBUG
+        ));
+
+        // 添加日志相关的 JavaScript 变量
+        wp_localize_script('nbdesigner', 'nbd_window', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nbdesigner_log_nonce' => wp_create_nonce('nbdesigner_log_nonce'),
         ));
     }
 
