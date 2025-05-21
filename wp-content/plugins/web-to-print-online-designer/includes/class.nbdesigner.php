@@ -1275,7 +1275,7 @@ class Nbdesigner_Plugin {
         ) );
         wp_localize_script( 'nbdesigner', 'nbds_frontend', $args );
         wp_enqueue_script( 'nbdesigner' );
-        wp_enqueue_script( 'custom-console-log', NBDESIGNER_JS_URL . 'custom-console-log.js' , array( 'jquery' ) );
+        //wp_enqueue_script( 'custom-console-log', NBDESIGNER_JS_URL . 'custom-console-log.js' , array( 'jquery' ) );
 
 
         // 获取颜色设置

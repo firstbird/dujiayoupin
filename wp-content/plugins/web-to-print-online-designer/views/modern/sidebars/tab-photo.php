@@ -16,7 +16,22 @@
                                 <button type="button" class="nbd-select-photo-btn"><?php esc_html_e('上传或加载图片','web-to-print-online-designer'); ?></button>
                             </div>    
                         </div>
-                    </div>                    
+                    </div>
+                    
+                    <!-- 最近加载的图片 -->
+                    <div class="recent-photos-section" ng-if="recentPhotos && recentPhotos.length > 0">
+                        <h3 class="section-title">最近加载的图片</h3>
+                        <div class="recent-photos-grid">
+                            <div ng-repeat="photo in recentPhotos | limitTo:10" class="recent-photo-item">
+                                <img ng-src="{{photo.url}}" alt="{{photo.name}}" ng-click="addImage(photo.url, false)">
+                                <div class="photo-info">
+                                    <span class="photo-name">{{photo.name}}</span>
+                                    <span class="photo-date">{{photo.date}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <?php do_action('nbd_modern_sidebar_photo_images'); ?>
                 </div>                
             </div>
@@ -356,4 +371,137 @@
     padding: 5px 0;
     border-bottom: 1px solid #eee;
 }
+
+/* 最近加载图片样式 */
+.recent-photos-section {
+    margin: 20px 12px;
+    padding: 0;
+    position: relative;
+}
+
+.section-title {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.recent-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    padding: 0;
+    position: relative;
+}
+
+.recent-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.recent-photo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.recent-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.recent-photo-item:hover img {
+    transform: scale(1.05);
+}
+
+.photo-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #fff;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.recent-photo-item:hover .photo-info {
+    opacity: 1;
+}
+
+.photo-name {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.photo-date {
+    display: block;
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* 禁用外层容器滚动 */
+.tab-main.tab-scroll {
+    overflow: hidden !important;
+}
+
+/* 禁用nbd-scroll指令的滚动 */
+.tab[data-container="#tab-photo"] {
+    overflow: hidden !important;
+}
+
+.ps__scrollbar-y-rail {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.ps__rail-y {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
 </style>
+
+<script>
+// 禁用Perfect Scrollbar
+if (typeof Ps !== 'undefined') {
+    var $tabMain = $('.tab-main.tab-scroll');
+    if ($tabMain.length) {
+        // 销毁现有的Perfect Scrollbar实例
+        Ps.destroy($tabMain[0]);
+        
+        // 重新初始化，但禁用滚动
+        Ps.initialize($tabMain[0], {
+            wheelSpeed: 0,
+            wheelPropagation: false,
+            swipeEasing: false,
+            minScrollbarLength: 0,
+            maxScrollbarLength: 0,
+            suppressScrollX: true,
+            suppressScrollY: true
+        });
+    }
+}
+
+// 确保滚动条被禁用
+$('.ps__scrollbar-y-rail, .ps__rail-y').css({
+    'display': 'none',
+    'pointer-events': 'none',
+    'opacity': '0',
+    'visibility': 'hidden'
+});
+</script>

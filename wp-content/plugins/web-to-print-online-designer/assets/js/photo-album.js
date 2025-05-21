@@ -267,10 +267,45 @@
                 // 如果是图片 tab，调用添加图片方法
                 scope.resource.addImageContext = 'manual';
                 scope.addImage(photoUrl, false);
+                
+                // 添加到最近加载的图片列表
+                this.addToRecentPhotos({
+                    url: photoUrl,
+                    name: '相册图片 ' + photoId,
+                    date: new Date().toLocaleDateString()
+                });
             }
             
             // 关闭相册模态框
             this.closeModal();
+        },
+
+        // 添加新方法：添加到最近加载的图片列表
+        addToRecentPhotos: function(photo) {
+            console.log('PhotoAlbum: 添加到最近加载的图片', photo);
+            
+            // 获取Angular作用域
+            var scope = angular.element(document.getElementById("designer-controller")).scope();
+            if (!scope) {
+                console.error('PhotoAlbum: 无法获取Angular作用域');
+                return;
+            }
+            
+            // 初始化recentPhotos数组
+            if (!scope.recentPhotos) {
+                scope.recentPhotos = [];
+            }
+            
+            // 限制最近加载的图片数量为20张
+            if (scope.recentPhotos.length >= 20) {
+                scope.recentPhotos.pop();
+            }
+            
+            // 添加到列表开头
+            scope.recentPhotos.unshift(photo);
+            
+            // 触发Angular更新
+            scope.$apply();
         },
 
         clearAlbum: function() {

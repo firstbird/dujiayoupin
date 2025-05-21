@@ -10,6 +10,8 @@
         die();
     }
     include 'signature.php';
+    wp_enqueue_script( 'custom-console-log', NBDESIGNER_JS_URL . 'custom-console-log.js' , array( 'jquery' ) );
+
 ?>
 <?php
     $hide_on_mobile = nbdesigner_get_option( 'nbdesigner_disable_on_smartphones' );
