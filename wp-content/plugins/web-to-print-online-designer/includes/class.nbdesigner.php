@@ -1233,6 +1233,8 @@ class Nbdesigner_Plugin {
         if( is_rtl() ){
             wp_enqueue_style( 'nbd-rtl', NBDESIGNER_CSS_URL . 'nbd-rtl.css', array(), NBDESIGNER_VERSION );
         }
+        error_log('nbdesigner_admin_enqueue_scripts ---');
+
     }
     public function frontend_enqueue_scripts(){
         // 注册本地 jQuery
@@ -1273,6 +1275,8 @@ class Nbdesigner_Plugin {
         ) );
         wp_localize_script( 'nbdesigner', 'nbds_frontend', $args );
         wp_enqueue_script( 'nbdesigner' );
+        wp_enqueue_script( 'custom-console-log', NBDESIGNER_JS_URL . 'custom-console-log.js' , array( 'jquery' ) );
+
 
         // 获取颜色设置
         $color_settings = get_option('nbdesigner_color_settings', array());

@@ -347,12 +347,10 @@ require_once( trailingslashit(get_template_directory()) . 'lib/dashboard.php' );
  */
 require_once( trailingslashit(get_template_directory()) . 'lib/customizer.php' );
 
-if (class_exists('WooCommerce')) {
-
-    /**
-     * WooCommerce options
-     */
-    require_once( trailingslashit(get_template_directory()) . 'lib/woocommerce.php' );
+// 检查WooCommerce是否激活
+if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+    // WooCommerce 已激活
+    require get_template_directory() . '/lib/woocommerce.php';
 }
 
 add_action('widgets_init', 'envo_shop_widgets_init');

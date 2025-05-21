@@ -1,4 +1,14 @@
 <?php
+// 检查WooCommerce是否激活
+if (!function_exists('is_woocommerce')) {
+    return;
+}
+
+// 确保WooCommerce已加载
+if (!class_exists('WooCommerce')) {
+    return;
+}
+
 if (!function_exists('envo_shop_cart_link')) {
 
     function envo_shop_cart_link() {
@@ -166,3 +176,20 @@ if (!function_exists('envo_shop_compare_wishlist_buttons')) {
 // Load cart widget in header
 function envo_shop_wc_cart_fragments() { wp_enqueue_script( 'wc-cart-fragments' ); }
 add_action( 'wp_enqueue_scripts', 'envo_shop_wc_cart_fragments' );
+
+// 获取购物车内容数量
+function get_cart_contents_count() {
+    if (function_exists('WC') && WC()->cart) {
+        return WC()->cart->get_cart_contents_count();
+    }
+    return 0;
+}
+
+// 其他WooCommerce相关函数
+function envo_shop_woocommerce_setup() {
+    add_theme_support('woocommerce');
+    add_theme_support('wc-product-gallery-zoom');
+    add_theme_support('wc-product-gallery-lightbox');
+    add_theme_support('wc-product-gallery-slider');
+}
+add_action('after_setup_theme', 'envo_shop_woocommerce_setup');
