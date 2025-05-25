@@ -82,7 +82,7 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="settings['nbdesigner_enable_qrcode'] == 'yes'" class="item" data-type="qr-code" data-api="false" ng-click="onClickTab('qrcode', 'element')">
+                    <div ng-if="false" class="item" data-type="qr-code" data-api="false" ng-click="onClickTab('qrcode', 'element')">
                         <div class="main-item">
                             <div class="item-icon"><i class="icon-nbd icon-nbd-qrcode"></i></div>
                             <div class="item-info">

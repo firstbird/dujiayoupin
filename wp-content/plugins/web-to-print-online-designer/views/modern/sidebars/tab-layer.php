@@ -1,7 +1,11 @@
 <div class="<?php if( $active_layers ) echo 'active'; ?> tab tab-last" id="tab-layer">
     <div class="tab-main tab-scroll">
         <div class="inner-tab-layer">
-            <ul class="menu-layer" nbd-layer="sortLayer(srcIndex, dstIndex)">
+            <div class="empty-layer-tip" ng-if="!stages[currentStage].layers || stages[currentStage].layers.length === 0">
+                <i class="icon-nbd icon-nbd-layers"></i>
+                <p>当前设计未包含任何元素 todo picture</p>
+            </div>
+            <ul class="menu-layer" nbd-layer="sortLayer(srcIndex, dstIndex)" ng-if="stages[currentStage].layers && stages[currentStage].layers.length > 0">
                 <li class="menu-item item-layer-text" data-index="{{layer.index}}" ng-click="activeLayer(layer.index)" 
                     ng-class="[{'lock-active': !layer.selectable, 'nbd-disable-event': !isTemplateMode && layer.forceLock, 'active' : stages[currentStage].states.isLayer && stages[currentStage].states.itemId == layer.itemId}, layer.type]" 
                     data-id="{{layer.itemId}}" ng-repeat="layer in stages[currentStage].layers | reverse">
@@ -44,3 +48,27 @@
         </div>
     </div>
 </div>
+
+<style>
+.empty-layer-tip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.empty-layer-tip .icon-nbd {
+    font-size: 32px;
+    margin-bottom: 12px;
+    color: #ccc;
+}
+
+.empty-layer-tip p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+</style>

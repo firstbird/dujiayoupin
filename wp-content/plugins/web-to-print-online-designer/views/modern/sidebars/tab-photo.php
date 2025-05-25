@@ -19,9 +19,13 @@
                     </div>
                     
                     <!-- 最近加载的图片 -->
-                    <div class="recent-photos-section" ng-if="recentPhotos && recentPhotos.length > 0">
+                    <div class="recent-photos-section">
                         <h3 class="section-title">最近加载的图片</h3>
-                        <div class="recent-photos-grid">
+                        <div class="empty-photos-tip" ng-if="!recentPhotos || recentPhotos.length === 0">
+                            <i class="icon-nbd icon-nbd-fomat-info-outline"></i>
+                            <p>未加载任何图片 todo picture</p>
+                        </div>
+                        <div class="recent-photos-grid" ng-if="recentPhotos && recentPhotos.length > 0">
                             <div ng-repeat="photo in recentPhotos" class="recent-photo-item">
                                 <img ng-src="{{photo.url}}" alt="{{photo.name}}" ng-click="addImage(photo.url, false)">
                                 <div class="photo-info">
@@ -498,6 +502,30 @@
     pointer-events: auto !important;
     opacity: 1 !important;
     visibility: visible !important;
+}
+
+/* 空状态提示样式 */
+.empty-photos-tip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    margin: 10px 0;
+}
+
+.empty-photos-tip .icon-nbd {
+    font-size: 32px;
+    margin-bottom: 12px;
+    color: #ccc;
+}
+
+.empty-photos-tip p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
 }
 </style>
 
