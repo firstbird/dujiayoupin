@@ -22,7 +22,7 @@
                     <div class="recent-photos-section" ng-if="recentPhotos && recentPhotos.length > 0">
                         <h3 class="section-title">最近加载的图片</h3>
                         <div class="recent-photos-grid">
-                            <div ng-repeat="photo in recentPhotos | limitTo:10" class="recent-photo-item">
+                            <div ng-repeat="photo in recentPhotos" class="recent-photo-item">
                                 <img ng-src="{{photo.url}}" alt="{{photo.name}}" ng-click="addImage(photo.url, false)">
                                 <div class="photo-info">
                                     <span class="photo-name">{{photo.name}}</span>
@@ -377,6 +377,7 @@
     margin: 20px 12px;
     padding: 0;
     position: relative;
+    background: transparent;
 }
 
 .section-title {
@@ -385,14 +386,38 @@
     margin: 0 0 10px 0;
     padding-bottom: 8px;
     border-bottom: 1px solid #eee;
+    position: relative;
+    background: transparent;
+    z-index: 1;
 }
 
 .recent-photos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 0;
     position: relative;
+    background: transparent;
+    max-height: calc(100vh * 0.66);
+    overflow-y: auto;
+}
+
+.recent-photos-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.recent-photos-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.recent-photos-grid::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.recent-photos-grid::-webkit-scrollbar-thumb:hover {
+    background: #999;
 }
 
 .recent-photo-item {
@@ -403,6 +428,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     cursor: pointer;
+    width: 100%;
 }
 
 .recent-photo-item:hover {
@@ -451,57 +477,36 @@
     opacity: 0.8;
 }
 
-/* 禁用外层容器滚动 */
+/* 移除之前的滚动禁用样式 */
 .tab-main.tab-scroll {
-    overflow: hidden !important;
+    overflow: auto !important;
 }
 
-/* 禁用nbd-scroll指令的滚动 */
 .tab[data-container="#tab-photo"] {
-    overflow: hidden !important;
+    overflow: auto !important;
 }
 
 .ps__scrollbar-y-rail {
-    display: none !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
+    display: block !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .ps__rail-y {
-    display: none !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
+    display: block !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 </style>
 
 <script>
-// 禁用Perfect Scrollbar
+// 移除Perfect Scrollbar禁用代码
 if (typeof Ps !== 'undefined') {
     var $tabMain = $('.tab-main.tab-scroll');
     if ($tabMain.length) {
-        // 销毁现有的Perfect Scrollbar实例
-        Ps.destroy($tabMain[0]);
-        
-        // 重新初始化，但禁用滚动
-        Ps.initialize($tabMain[0], {
-            wheelSpeed: 0,
-            wheelPropagation: false,
-            swipeEasing: false,
-            minScrollbarLength: 0,
-            maxScrollbarLength: 0,
-            suppressScrollX: true,
-            suppressScrollY: true
-        });
+        Ps.initialize($tabMain[0]);
     }
 }
-
-// 确保滚动条被禁用
-$('.ps__scrollbar-y-rail, .ps__rail-y').css({
-    'display': 'none',
-    'pointer-events': 'none',
-    'opacity': '0',
-    'visibility': 'hidden'
-});
 </script>

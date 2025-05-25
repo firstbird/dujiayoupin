@@ -16,33 +16,61 @@
                             <div class="item select-bg-btn" ng-click="openPhotoAlbum()" data-type="photo-album" data-api="false" style="text-align: left;">
                                 <button type="button" class="nbd-select-bg-btn"><?php esc_html_e('选择图片背景','web-to-print-online-designer'); ?></button>
                             </div>
-                            <div class="recent-images">
-                                <h3 class="color-palette-label"><?php esc_html_e('最近选择','web-to-print-online-designer'); ?></h3>
-                                <div class="recent-images-grid">
-                                    <div class="recent-image-item" ng-repeat="img in recentImages" ng-click="setBackgroundUrl(img.url)">
-                                        <img ng-src="{{img.url}}" alt="最近选择的图片">
+                            
+                            <!-- 当前背景图片 -->
+                            <div class="recent-photos-section">
+                                <h3 class="section-title">
+                                    当前背景
+                                    <div class="background-tip" ng-click="showBackgroundTip()">
+                                        <i class="icon-nbd icon-nbd-info-circle"></i>
+                                    </div>
+                                </h3>
+                                <div id="background-tip-text" class="nbd-tooltip-content" style="display: none;">
+                                    <div class="tooltip-content">
+                                        <div class="tooltip-header">
+                                            <h4>背景说明</h4>
+                                            <i class="icon-nbd icon-nbd-clear" ng-click="hideBackgroundTip()"></i>
+                                        </div>
+                                        <div class="tooltip-body">
+                                            图片背景覆盖在颜色背景之上，包含透明区域的图片才能和颜色背景同时显示
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="recent-photos-grid">
+                                    <div class="recent-photo-item" ng-if="stages[currentStage].canvas.backgroundImage">
+                                        <img ng-src="{{stages[currentStage].canvas.backgroundImage._element.src}}" alt="当前背景">
+                                        <div class="photo-info">
+                                            <span class="photo-name">清除背景图片</span>
+                                        </div>
+                                        <div class="photo-action" ng-click="setBackgroundInner('')">
+                                            <i class="icon-nbd icon-nbd-delete"></i>
+                                        </div>
+                                    </div>
+                                    <div class="recent-photo-item no-image" ng-if="!stages[currentStage].canvas.backgroundImage">
+                                        <div class="no-image-icon">
+                                            <i class="icon-nbd icon-nbd-image"></i>
+                                            <span>暂无背景图片</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 当前颜色背景 -->
+                                    <div class="recent-photo-item" ng-if="stages[currentStage].canvas.backgroundColor">
+                                        <div class="color-bg" ng-style="{'background-color': stages[currentStage].canvas.backgroundColor}"></div>
+                                        <div class="photo-info">
+                                            <span class="photo-name">清除颜色背景</span>
+                                        </div>
+                                        <div class="photo-action" ng-click="changeBackgroundCanvas('')">
+                                            <i class="icon-nbd icon-nbd-delete"></i>
+                                        </div>
+                                    </div>
+                                    <div class="recent-photo-item no-image" ng-if="!stages[currentStage].canvas.backgroundColor">
+                                        <div class="no-image-icon">
+                                            <i class="icon-nbd icon-nbd-color"></i>
+                                            <span>暂无颜色背景</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- 
-                            <div class="clear-local-images-wrap" style="margin-left: 12px;">
-                                <button type="button" class="nbd-clear-btn" ng-click="clearBackgroundFiles()">
-                                    <?php //esc_html_e('清除所有图片','web-to-print-online-designer'); ?>
-                                </button>
-                            </div>
-                            <div class="nbd-term" ng-if="settings['nbdesigner_upload_show_term'] == 'yes'">
-                                <div class="nbd-checkbox">
-                                    <input id="accept-term" type="checkbox">
-                                    <label for="accept-term">&nbsp;</label>
-                                </div>
-                                <span class="term-read"><?php //esc_html_e('I accept the terms','web-to-print-online-designer'); ?></span>
-                            </div>
-                            <div id="nbd-background-wrap" ng-show="resource.background.data.length > 0">
-                                <div class="mansory-wrap">
-                                    <div nbd-drag="img.url" nbd-img="img" extenal="false" type="image" class="mansory-item" ng-click="resource.addImageContext = 'manual'; setBackgroundUrl(img.url);" ng-repeat="img in resource.background.data track by $index" repeat-end="onEndRepeat('background')"><img ng-src="{{img.url}}"></div>
-                                </div>
-                            </div>
-                             -->
                         </div>
                     </div>
                     <div class="divider"></div>
@@ -182,17 +210,313 @@
     height: 100%;
     object-fit: cover;
 }
+
+/* 当前背景图片样式 */
+.recent-photos-section {
+    margin: 20px 12px;
+    padding: 0;
+    position: relative;
+    background: transparent;
+}
+
+.section-title {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    background: transparent;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+}
+
+.recent-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0;
+    position: relative;
+    background: transparent;
+}
+
+.recent-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.recent-photo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.recent-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.recent-photo-item:hover img {
+    transform: scale(1.05);
+}
+
+.photo-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: #fff;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
+}
+
+.recent-photo-item:hover .photo-info {
+    opacity: 1;
+}
+
+.photo-name {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.photo-action {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.photo-action i {
+    color: #fff;
+    font-size: 20px;
+}
+
+.recent-photo-item:hover .photo-action {
+    opacity: 1;
+}
+
+.photo-action:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* 无图片状态样式 */
+.recent-photo-item.no-image {
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #ddd;
+}
+
+.no-image-icon {
+    text-align: center;
+    color: #999;
+}
+
+.no-image-icon i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.no-image-icon span {
+    font-size: 12px;
+    display: block;
+}
+
+/* 颜色背景样式 */
+.color-bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.recent-photo-item .icon-nbd-color {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+    color: #999;
+}
+
+/* 帮助图标样式 */
+.icon-nbd-info-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    color: #666;
+    font-size: 16px;
+    margin-left: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+.icon-nbd-info-circle:hover {
+    color: #333;
+}
+
+.nbd-hover-shadow:hover {
+    text-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+/* Tooltipster 样式覆盖 */
+.tooltipster-sidetip.tooltipster-borderless .tooltipster-box {
+    border: none;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.tooltipster-sidetip.tooltipster-borderless .tooltipster-content {
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 12px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless .tooltipster-arrow {
+    height: 6px;
+    margin-left: -4px;
+    width: 12px;
+}
+
+.tooltipster-sidetip.tooltipster-borderless .tooltipster-arrow-border {
+    border: 6px solid transparent;
+}
+
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-right .tooltipster-arrow-border {
+    border-right-color: rgba(0, 0, 0, 0.8);
+}
+
+.tooltipster-sidetip.tooltipster-borderless .tooltipster-arrow-background {
+    display: none;
+}
+
+/* 提示框样式 */
+.background-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.background-tip .icon-nbd-info-circle {
+    font-size: 16px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.background-tip:hover .icon-nbd-info-circle {
+    color: #333;
+    text-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+.nbd-tooltip-content {
+    position: fixed;
+    z-index: 9999;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    min-width: 280px;
+    max-width: 320px;
+    display: block !important;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.tooltip-content {
+    padding: 12px;
+}
+
+.tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.tooltip-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.tooltip-header .icon-nbd-clear {
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tooltip-header .icon-nbd-clear:hover {
+    color: #333;
+}
+
+.tooltip-body {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #666;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+}
+
+.nbd-tooltip-content.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
 </style>
 
 <script>
-angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$document', function($scope, $document) {
-    $document.on('click', function(event) {
-        if (!angular.element(event.target).closest('.color-picker-wrapper').length) {
-            $scope.$apply(function() {
-                $scope.showColorPicker = false;
-            });
-        }
-    });
+angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$document', '$timeout', function($scope, $document, $timeout) {
+    // $document.on('click', function(event) {
+    //     console.log('document click');
+    //     if (!angular.element(event.target).closest('.color-picker-wrapper').length) {
+    //         $scope.$apply(function() {
+    //             $scope.showColorPicker = false;
+    //         });
+    //     }
+    // });
     
     $scope.closeColorPicker = function() {
         $scope.showColorPicker = false;
@@ -212,12 +536,31 @@ angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$doc
         }
     }
     
-    $scope.$watch('showColorPicker', function(newVal) {
-        if (newVal) {
-            $document.on('click', closeColorPicker);
-        } else {
-            $document.off('click', closeColorPicker);
-        }
+    // $scope.$watch('showColorPicker', function(newVal) {
+    //     if (newVal) {
+    //         $document.on('click', closeColorPicker);
+    //     } else {
+    //         $document.off('click', closeColorPicker);
+    //     }
+    // });
+
+    // 初始化tooltip
+    $timeout(function() {
+        console.log('开始初始化tooltip');
+        jQuery('.nbd-tooltip-hover').tooltipster({
+            theme: 'tooltipster-borderless',
+            side: 'right',
+            animation: 'fade',
+            delay: 200,
+            distance: 10,
+            contentAsHTML: true,
+            interactive: true,
+            trigger: 'hover',
+            maxWidth: 300
+        });
     });
+
+    
+
 }]);
 </script>
