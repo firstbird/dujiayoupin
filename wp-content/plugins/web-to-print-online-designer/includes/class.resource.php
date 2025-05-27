@@ -31,10 +31,13 @@ if(!class_exists('NBD_RESOURCE')){
         public function nbd_get_resource(){
             $flag = 1;
             $data = array();
+            error_log('nbd_get_resource begin ---');
             if (!wp_verify_nonce($_REQUEST['nonce'], 'nbdesigner-get-data') && NBDESIGNER_ENABLE_NONCE) {
                 //todo something
+                error_log('nbd_get_resource --- wp_verify_nonce failed');
             }else{     
                 $rq_type = wc_clean( $_REQUEST['type'] );
+                error_log('nbd_get_resource --- $rq_type:' . $rq_type);
                 switch ($rq_type) {
                     case 'typography':
                         $path = $_REQUEST['task'] == 'typography' ? NBDESIGNER_PLUGIN_DIR . '/data/typography/typography.json' : NBDESIGNER_PLUGIN_DIR . '/data/typography/typo.json';
@@ -42,7 +45,7 @@ if(!class_exists('NBD_RESOURCE')){
                         break;  
                     case 'get_typo':
                         $path = NBDESIGNER_PLUGIN_DIR . '/data/typography/store/'.$_REQUEST['folder'];
-                        $data['font'] = json_decode( file_get_contents($path.'/used_font.json') );
+                        $data['font'] = json_depcode( file_get_contents($path.'/used_font.json') );
                         $data['design'] = json_decode( file_get_contents($path.'/design.json') );
                         break;
                     case 'clipart':
@@ -262,6 +265,43 @@ if(!class_exists('NBD_RESOURCE')){
                             $flag = 1;
                             $data = $flaticon_token;
                         }
+                        break;
+                    case 'background':
+                        error_log('nbd_get_resource --- get_background');
+                        $response = array(
+                            'status' => 'success',
+                            'message' => '获取背景图片成功',
+                            'data' => array()
+                        );
+                        
+                        // 从Bing API获取图片
+                        $images = array();
+                        for($i = 0; $i < 20; $i++) {
+                            $url = "https://bingw.jasonzeng.dev?resolution=UHD&index=" . $i;
+                            $image_data = array(
+                                'id' => $i + 1,
+                                'name' => 'Bing Image ' . ($i + 1),
+                                'url' => $url,
+                                'thumbnail' => $url,
+                                'type' => 'image',
+                                'category' => 'background',
+                                'tags' => array('background', 'bing'),
+                                'width' => 1920,
+                                'height' => 1080
+                            );
+                            $images[] = $image_data;
+                        }
+                        
+                        $response['data'] = array(
+                            'arts' => $images,
+                            'length' => count($images),
+                            // 'total' => 100,
+                            // 'currentPage' => 1,
+                            // 'perPage' => 20,
+                            // 'totalPage' => 1
+                        );
+                        
+                        wp_send_json($response);
                         break;
                 }
             }

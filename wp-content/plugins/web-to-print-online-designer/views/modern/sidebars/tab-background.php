@@ -93,18 +93,23 @@
                     <?php do_action('nbd_modern_sidebar_photo_images'); ?>
                 </div>
                 <div class="divider"></div>
-                <div class="background-wrap">
-                    <div class="background-item" nbd-drag="art.url" extenal="false" type="svg"  ng-repeat="art in resource.background" repeat-end="onEndRepeat('background')">
-                        <img  ng-src="{{art.url}}" ng-click="addArt(art, true, true)" alt="{{art.name}}">
+            </div>
+            <h3 class="color-palette-label"><?php esc_html_e('免费背景图片todo','web-to-print-online-designer'); ?></h3>
+            <div class="nbd-items-dropdown" >
+                <div>
+                    <div class="background-wrap">
+                        <div class="background-item" nbd-drag="art.url" extenal="false" type="svg"  ng-repeat="art in resource.background.filteredArts" repeat-end="onEndRepeat('background')">
+                            <img  ng-src="{{art.url}}" ng-click="addArt(art, true, true)" alt="{{art.name}}">
+                        </div>
                     </div>
-                </div>
-                <div class="loading-photo" >
-                    <svg class="circular" viewBox="25 25 50 50">
-                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                    </svg>
-                </div>
-                <div class="tab-load-more" style="display: none;" ng-show="!resource.background.onload && resource.background.filteredArts.length && resource.background.filter.currentPage * resource.background.filter.perPage < resource.background.filter.total">
-                    <a class="nbd-button" ng-click="scrollLoadMore('#tab-background', 'background')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
+                    <div class="loading-photo" >
+                        <svg class="circular" viewBox="25 25 50 50">
+                            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                        </svg>
+                    </div>
+                    <div class="tab-load-more" style="display: none;" ng-show="!resource.background.onload && resource.background.filteredArts.length && resource.background.filter.currentPage * resource.background.filter.perPage < resource.background.filter.total">
+                        <a class="nbd-button" ng-click="scrollLoadMore('#tab-svg', 'background')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
+                    </div>
                 </div>
             </div>
     </div>
@@ -502,6 +507,43 @@
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+}
+
+/* 背景图片网格布局 */
+.background-wrap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px;
+    position: relative;
+    background: transparent;
+}
+
+.background-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.background-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.background-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.background-item:hover img {
+    transform: scale(1.05);
 }
 </style>
 

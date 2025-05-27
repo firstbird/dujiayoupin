@@ -2,51 +2,51 @@ $scope.recentImages = nbdesigner.recentImages || [];
 
 // 添加日志记录函数
 $scope.logToServer = function(message, data) {
-    if (!nbdesigner.debug) {
-        console.log('调试模式未启用');
-        return;
-    }
+    // if (!nbdesigner.debug) {
+    //     console.log('调试模式未启用');
+    //     return;
+    // }
     
-    console.log('发送日志:', message, data);
+    // console.log('发送日志:', message, data);
     
-    if (!nbdesigner.ajax_url) {
-        console.error('ajax_url未定义');
-        return;
-    }
+    // if (!nbdesigner.ajax_url) {
+    //     console.error('ajax_url未定义');
+    //     return;
+    // }
     
-    if (!nbdesigner.nonce) {
-        console.error('nonce未定义');
-        return;
-    }
+    // if (!nbdesigner.nonce) {
+    //     console.error('nonce未定义');
+    //     return;
+    // }
     
-    $http.post(nbdesigner.ajax_url, {
-        action: 'nbdesigner_log_frontend',
-        message: message,
-        data: data,
-        nonce: nbdesigner.nonce
-    }).then(function(response) {
-        console.log('日志发送成功:', response);
-        if (!response.data.success) {
-            console.error('日志发送失败:', response.data);
-        }
-    }).catch(function(error) {
-        console.error('日志发送失败:', error);
-        // 尝试使用备用方法记录错误
-        if (window.localStorage) {
-            try {
-                var logs = JSON.parse(localStorage.getItem('nbdesigner_logs') || '[]');
-                logs.push({
-                    time: new Date().toISOString(),
-                    message: message,
-                    data: data,
-                    error: error.toString()
-                });
-                localStorage.setItem('nbdesigner_logs', JSON.stringify(logs.slice(-100))); // 只保留最近100条
-            } catch (e) {
-                console.error('保存日志到localStorage失败:', e);
-            }
-        }
-    });
+    // $http.post(nbdesigner.ajax_url, {
+    //     action: 'nbdesigner_log_frontend',
+    //     message: message,
+    //     data: data,
+    //     nonce: nbdesigner.nonce
+    // }).then(function(response) {
+    //     console.log('日志发送成功:', response);
+    //     if (!response.data.success) {
+    //         console.error('日志发送失败:', response.data);
+    //     }
+    // }).catch(function(error) {
+    //     console.error('日志发送失败:', error);
+    //     // 尝试使用备用方法记录错误
+    //     if (window.localStorage) {
+    //         try {
+    //             var logs = JSON.parse(localStorage.getItem('nbdesigner_logs') || '[]');
+    //             logs.push({
+    //                 time: new Date().toISOString(),
+    //                 message: message,
+    //                 data: data,
+    //                 error: error.toString()
+    //             });
+    //             localStorage.setItem('nbdesigner_logs', JSON.stringify(logs.slice(-100))); // 只保留最近100条
+    //         } catch (e) {
+    //             console.error('保存日志到localStorage失败:', e);
+    //         }
+    //     }
+    // });
 };
 
 // 添加全局错误处理
