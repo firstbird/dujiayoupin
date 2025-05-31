@@ -3,6 +3,7 @@
     
     var PhotoAlbum = {
         currentTabType: null, // 添加当前 tab 类型记录
+        ossNextToken: null, // 添加OSS分页标记
         
         init: function() {
             console.log('PhotoAlbum: 初始化');
@@ -183,6 +184,7 @@
             var self = this;
             console.log('PhotoAlbum: 加载照片');
             
+            // 原有的相册加载逻辑
             $.ajax({
                 url: nbd_ajax.ajax_url,
                 type: 'POST',
@@ -271,7 +273,7 @@
                 // 添加到最近加载的图片列表
                 this.addToRecentPhotos({
                     url: photoUrl,
-                    name: '相册图片 ' + photoId,
+                    name: photoUrl.split('/').pop(),
                     date: new Date().toLocaleDateString()
                 });
             }
@@ -333,7 +335,7 @@
                     alert('清空相册失败：' + error);
                 }
             });
-        }
+        },
     };
     
     // 初始化

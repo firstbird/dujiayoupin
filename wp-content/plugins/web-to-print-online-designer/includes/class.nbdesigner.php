@@ -4,6 +4,8 @@ if (!function_exists('add_action')) {
     exit;
 }
 use setasign\Fpdi;
+include NBDESIGNER_PLUGIN_DIR . 'includes/class-nbd-oss.php';
+
 class Nbdesigner_Plugin {
     public $textdomain;
     public $plugin_id;
@@ -57,6 +59,51 @@ class Nbdesigner_Plugin {
             $this->frontend_hook();
         }
         add_action( 'wpmu_new_blog', array( $this, 'install_in_new_blog' ), 10, 6 );
+    }
+    public function nbd_oss_list_files() {
+        error_log('nbd_oss_list_files: 开始处理请求');
+        
+        // 获取token参数
+        $token = isset($_POST['token']) ? sanitize_text_field($_POST['token']) : '';
+        error_log('nbd_oss_list_files: token = ' . $token);
+        
+        try {
+            // 从环境变量获取OSS配置
+            $accessKeyId = getenv('ALIYUN_OSS_ACCESS_KEY_ID');
+            $accessKeySecret = getenv('ALIYUN_OSS_ACCESS_KEY_SECRET');
+            
+            if (!$accessKeyId || !$accessKeySecret) {
+                throw new Exception('阿里云OSS配置未设置，请检查环境变量');
+            }
+            
+            // OSS配置
+            $config = [
+                'accessKeyId' => $accessKeyId,
+                'accessKeySecret' => $accessKeySecret,
+                'bucket' => 'mzl-debug-bucket',
+                'region' => 'oss-cn-shanghai.aliyuncs.com'
+            ];
+            
+            $oss = new NBD_OSS($config);
+            error_log('nbd_oss_list_files: 开始获取文件列表');
+            
+            // 分页获取文件
+            $result = $oss->listObjects('images/dujia/background/', $token, 10);
+            error_log('nbd_oss_list_files: 获取文件列表成功，结果：' . json_encode($result));
+            
+            // 返回JSON响应
+            wp_send_json_success([
+                'files' => $result['files'],
+                'hasMore' => $result['isTruncated'],
+                'nextToken' => $result['nextContinuationToken']
+            ]);
+            
+        } catch (Exception $e) {
+            error_log('nbd_oss_list_files: 获取文件列表失败：' . $e->getMessage());
+            wp_send_json_error([
+                'message' => $e->getMessage()
+            ]);
+        }
     }
     public function ajax(){
         // Nbdesigner_EVENT => nopriv
@@ -126,7 +173,8 @@ class Nbdesigner_Plugin {
             'check_flysystem_connected'                 => true,
             'nbd_get_instagram_token'                   => true,
             'nbdesigner_get_customer_files'              => true,
-            'nbdesigner_clear_customer_album'            => true
+            'nbdesigner_clear_customer_album'            => true,
+            'nbd_oss_list_files'                        => true
         );
         foreach( $ajax_events as $ajax_event => $nopriv ) {
             add_action( 'wp_ajax_' . $ajax_event, array( $this, $ajax_event ) );
@@ -3915,7 +3963,7 @@ class Nbdesigner_Plugin {
             // ));
         }
     }
-
+    
     public function nbd_save_customer_design(){
         error_log('nbd_save_customer_design begin');
         if ( ( !wp_verify_nonce( $_POST['nonce'], 'save-design' ) && NBDESIGNER_ENABLE_NONCE ) || !isset( $_POST['product_id'] ) ) {
