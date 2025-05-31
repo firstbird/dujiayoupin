@@ -293,7 +293,7 @@ if(!class_exists('NBD_RESOURCE')){
                         }
                         
                         $response['data'] = array(
-                            'arts' => $images,
+                            'bgs' => $images,
                             'length' => count($images),
                             // 'total' => 100,
                             // 'currentPage' => 1,

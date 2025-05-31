@@ -98,8 +98,8 @@
             <div class="nbd-items-dropdown" >
                 <div>
                     <div class="background-wrap">
-                        <div class="background-item" nbd-drag="art.url" extenal="false" type="svg"  ng-repeat="art in resource.background.filteredArts" repeat-end="onEndRepeat('background')">
-                            <img  ng-src="{{art.url}}" ng-click="addArt(art, true, true)" alt="{{art.name}}">
+                        <div class="background-item" nbd-drag="bg.url" extenal="false" type="svg"  ng-repeat="bg in resource.background.filteredBackground" repeat-end="onEndRepeat('background')">
+                            <img  ng-src="{{bg.url}}" ng-click="setBackgroundInner(bg.url)" alt="{{bg.name}}">
                         </div>
                     </div>
                     <div class="loading-photo" >
@@ -107,7 +107,7 @@
                             <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
                         </svg>
                     </div>
-                    <div class="tab-load-more" style="display: none;" ng-show="!resource.background.onload && resource.background.filteredArts.length && resource.background.filter.currentPage * resource.background.filter.perPage < resource.background.filter.total">
+                    <div class="tab-load-more" style="display: none;" ng-show="!resource.background.onload && resource.background.filteredBackground.length && resource.background.filter.currentPage * resource.background.filter.perPage < resource.background.filter.total">
                         <a class="nbd-button" ng-click="scrollLoadMore('#tab-svg', 'background')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
                     </div>
                 </div>
