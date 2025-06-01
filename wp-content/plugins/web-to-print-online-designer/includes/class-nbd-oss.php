@@ -121,12 +121,19 @@ class NBD_OSS {
             
             $files = [];
             foreach ($listObjectInfo->getObjectList() as $objectInfo) {
-                $files[] = [
-                    'key' => $objectInfo->getKey(),
-                    'size' => $objectInfo->getSize(),
-                    'lastModified' => $objectInfo->getLastModified(),
-                    'url' => $this->getObjectUrl($objectInfo->getKey())
-                ];
+                // 获取文件扩展名
+                $extension = strtolower(pathinfo($objectInfo->getKey(), PATHINFO_EXTENSION));
+                
+                // 只处理图片文件
+                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
+                    $files[] = [
+                        'key' => $objectInfo->getKey(),
+                        'size' => $objectInfo->getSize(),
+                        'lastModified' => $objectInfo->getLastModified(),
+                        'url' => $this->getObjectUrl($objectInfo->getKey()),
+                        'type' => $extension
+                    ];
+                }
             }
 
             return [

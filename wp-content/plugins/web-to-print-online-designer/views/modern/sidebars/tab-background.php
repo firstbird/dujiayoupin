@@ -90,29 +90,25 @@
                     <div class="color-picker-wrapper">
                         <input type="color" class="color-bar" ng-model="currentColor" ng-change="changeBackgroundCanvas(currentColor)">
                     </div>
-                    <?php do_action('nbd_modern_sidebar_photo_images'); ?>
-                </div>
-                <div class="divider"></div>
-            </div>
-            <h3 class="color-palette-label"><?php esc_html_e('免费背景图片todo','web-to-print-online-designer'); ?></h3>
-
-            <div class="nbd-items-dropdown" >
-                <div>
-                <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">
-                    <div class="mansory-wrap">
-                        <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.filteredBackground" repeat-end="onEndRepeat('background')">
-                            <div class="mansory-item__inner">
-                                <img ng-src="{{bg.url}}" /><span class="photo-desc">{{bg.name}}</span>
-                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                                </span>
+                    <div class="divider"></div>
+                    <h3 class="color-palette-label"><?php esc_html_e('免费背景图片','web-to-print-online-designer'); ?></h3>
+                    <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">
+                        <div class="mansory-wrap">
+                            <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.data" repeat-end="onEndRepeat('background')">
+                                <div class="mansory-item__inner">
+                                    <img ng-src="{{bg.url}}" /><span class="photo-desc">{{bg.name}}</span>
+                                    <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                        <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                        <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                
                 </div>
+
             </div>
-        </div>
     </div>
 </div>
 
@@ -546,6 +542,7 @@
 .background-item:hover img {
     transform: scale(1.05);
 }
+
 </style>
 
 <script>
@@ -601,7 +598,39 @@ angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$doc
         });
     });
 
-    
+    // 设置 mansory-wrap 和 mansory-item 的样式
+    $timeout(function() {
+        var mansoryWrap = document.querySelector('.mansory-wrap');
+        if(mansoryWrap) {
+            mansoryWrap.style.display = 'grid';
+            mansoryWrap.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            mansoryWrap.style.gap = '4px';
+            mansoryWrap.style.padding = '2px';
+        }
+
+        var mansoryItems = document.querySelectorAll('.mansory-item');
+        mansoryItems.forEach(function(item) {
+            var width = item.offsetWidth;
+            item.style.height = width + 'px';
+            item.style.position = 'relative';
+            item.style.overflow = 'hidden';
+            item.style.display = 'flex';
+            item.style.alignItems = 'center';
+            item.style.justifyContent = 'center';
+            
+            var img = item.querySelector('img');
+            if(img) {
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.objectPosition = 'center';
+                img.style.position = 'absolute';
+                img.style.top = '50%';
+                img.style.left = '50%';
+                img.style.transform = 'translate(-50%, -50%) scale(1.1)';
+            }
+        });
+    });
 
 }]);
 </script>
