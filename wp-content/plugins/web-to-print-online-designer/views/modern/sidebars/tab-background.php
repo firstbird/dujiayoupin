@@ -1,4 +1,4 @@
-<div class="<?php if( $active_backgrounds ) echo 'active'; ?> tab" ng-if="settings['nbdesigner_enable_image'] == 'yes'" id="tab-photo" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-photo" data-type="background" data-offset="30">
+<div class="<?php if( $active_backgrounds ) echo 'active'; ?> tab" id="tab-background" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-background" data-type="background" data-offset="30">
     <div class="nbd-search">
         <input type="text" name="search" placeholder="<?php esc_html_e('Search background', 'web-to-print-online-designer'); ?>" ng-model="resource.photo.photoSearch"/>
         <i class="icon-nbd icon-nbd-fomat-search"></i>
@@ -95,23 +95,24 @@
                 <div class="divider"></div>
             </div>
             <h3 class="color-palette-label"><?php esc_html_e('免费背景图片todo','web-to-print-online-designer'); ?></h3>
+
             <div class="nbd-items-dropdown" >
                 <div>
-                    <div class="background-wrap">
-                        <div class="background-item" nbd-drag="bg.url" extenal="false" type="svg"  ng-repeat="bg in resource.background.filteredBackground" repeat-end="onEndRepeat('background')">
-                            <img  ng-src="{{bg.url}}" ng-click="setBackgroundInner(bg.url)" alt="{{bg.name}}">
+                <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">
+                    <div class="mansory-wrap">
+                        <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.filteredBackground" repeat-end="onEndRepeat('background')">
+                            <div class="mansory-item__inner">
+                                <img ng-src="{{bg.url}}" /><span class="photo-desc">{{bg.name}}</span>
+                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="loading-photo" >
-                        <svg class="circular" viewBox="25 25 50 50">
-                            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                        </svg>
-                    </div>
-                    <div class="tab-load-more" style="display: none;" ng-show="!resource.background.onload && resource.background.filteredBackground.length && resource.background.filter.currentPage * resource.background.filter.perPage < resource.background.filter.total">
-                        <a class="nbd-button" ng-click="scrollLoadMore('#tab-svg', 'background')"><?php esc_html_e('Load more','web-to-print-online-designer'); ?></a>
                     </div>
                 </div>
             </div>
+        </div>
     </div>
 </div>
 
