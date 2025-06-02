@@ -543,6 +543,16 @@
     transform: scale(1.05);
 }
 
+/* 隐藏滚动条但保持滚动功能 */
+.tab-scroll {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.tab-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
 </style>
 
 <script>
@@ -595,40 +605,6 @@ angular.module('nbdesigner').controller('nbdesignerController', ['$scope', '$doc
             interactive: true,
             trigger: 'hover',
             maxWidth: 300
-        });
-    });
-
-    // 设置 mansory-wrap 和 mansory-item 的样式
-    $timeout(function() {
-        var mansoryWrap = document.querySelector('.mansory-wrap');
-        if(mansoryWrap) {
-            mansoryWrap.style.display = 'grid';
-            mansoryWrap.style.gridTemplateColumns = 'repeat(3, 1fr)';
-            mansoryWrap.style.gap = '4px';
-            mansoryWrap.style.padding = '2px';
-        }
-
-        var mansoryItems = document.querySelectorAll('.mansory-item');
-        mansoryItems.forEach(function(item) {
-            var width = item.offsetWidth;
-            item.style.height = width + 'px';
-            item.style.position = 'relative';
-            item.style.overflow = 'hidden';
-            item.style.display = 'flex';
-            item.style.alignItems = 'center';
-            item.style.justifyContent = 'center';
-            
-            var img = item.querySelector('img');
-            if(img) {
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'cover';
-                img.style.objectPosition = 'center';
-                img.style.position = 'absolute';
-                img.style.top = '50%';
-                img.style.left = '50%';
-                img.style.transform = 'translate(-50%, -50%) scale(1.1)';
-            }
         });
     });
 
