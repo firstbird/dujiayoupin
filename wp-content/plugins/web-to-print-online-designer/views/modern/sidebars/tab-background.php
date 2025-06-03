@@ -1,4 +1,4 @@
-<div class="<?php if( $active_backgrounds ) echo 'active'; ?> tab" id="tab-background" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-background" data-type="background" data-offset="30">
+<div class="<?php if( $active_backgrounds ) echo 'active'; ?> tab" id="tab-background" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-background" data-type="background" data-offset="20">
     <div class="nbd-search">
         <input type="text" name="search" placeholder="<?php esc_html_e('Search background', 'web-to-print-online-designer'); ?>" ng-model="resource.background.filter.search"/>
         <i class="icon-nbd icon-nbd-fomat-search"></i>
@@ -92,7 +92,7 @@
                     </div>
                     <div class="divider"></div>
                     <h3 class="color-palette-label"><?php esc_html_e('免费背景图片','web-to-print-online-designer'); ?></h3>
-                    <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">
+                    <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">  
                         <div class="mansory-wrap">
                             <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.filteredBackgrounds | limitTo: resource.background.filter.currentPage * resource.background.filter.perPage" repeat-end="onEndRepeat('background')">
                                 <div class="mansory-item__inner">
