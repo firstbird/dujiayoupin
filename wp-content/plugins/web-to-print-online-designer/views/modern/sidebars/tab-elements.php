@@ -326,33 +326,37 @@
                             </div>
                         </div>
                     </div>
-                    <div class="content-item type-shapes" data-type="shapes" id="nbd-shape-wrap">
-                        <div class="mansory-wrap">
-                            <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addSvgFromMedia(art)" ng-repeat="art in resource.shape.data" repeat-end="onEndRepeat('shape')"><img ng-src="{{art.url}}"><span class="photo-desc">{{art.name}}</span></div>
-                        </div>
-                    </div>
-                    <div class="content-item type-icons" data-type="icons" id="nbd-icon-wrap">
-                        <div class="cliparts-category" ng-class="resource.icon.cat.length > 0 ? '' : 'nbd-hiden'">
-                            <div class="nbd-button nbd-dropdown nbd-cat-dropdown">
-                                <span>{{resource.icon.filter.currentCat.name}}</span>
-                                <i class="icon-nbd icon-nbd-chevron-right rotate90"></i>
-                                <div class="nbd-sub-dropdown" data-pos="center">
-                                    <ul class="nbd-perfect-scroll">
-                                        <li ng-click="changeCat('icon', cat)" ng-repeat="cat in resource.icon.cat"><span>{{cat.name}}</span><span>{{cat.total}}</span></li>
-                                    </ul>
+                    <div ng-if="!showSubPage">
+                        <div class="element-section">
+                            <div class="section-header">
+                                <span class="section-title">形状</span>
+                                <span class="section-more" ng-click="openSubPage('shape')">查看全部</span>
+                            </div>
+                            <div class="section-list">
+                                <div class="section-item" ng-repeat="art in resource.shape.data | limitTo:3" ng-click="addSvgFromMedia(art)">
+                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
                                 </div>
                             </div>
                         </div>
-                        <div class="mansory-wrap">
-                            <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addSvgFromMedia(art, $index)" ng-repeat="art in resource.icon.data" repeat-end="onEndRepeat('icon')">
-                                <div class="mansory-item__inner">
-                                    <img ng-src="{{art.url}}" /><span class="photo-desc">{{art.name}}</span>
-                                    <?php if(!$valid_license): ?>
-                                    <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                        <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                        <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                                    </span>
-                                    <?php endif; ?>
+                        <div class="element-section">
+                            <div class="section-header">
+                                <span class="section-title">图标</span>
+                                <span class="section-more" ng-click="openSubPage('icon')">查看全部</span>
+                            </div>
+                            <div class="section-list">
+                                <div class="section-item" ng-repeat="art in resource.icon.data | limitTo:3" ng-click="addSvgFromMedia(art)">
+                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="element-section">
+                            <div class="section-header">
+                                <span class="section-title">插画</span>
+                                <span class="section-more" ng-click="openSubPage('illustration')">查看全部</span>
+                            </div>
+                            <div class="section-list">
+                                <div class="section-item" ng-repeat="art in resource.illustration.data | limitTo:3" ng-click="addSvgFromMedia(art)">
+                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
                                 </div>
                             </div>
                         </div>
@@ -507,6 +511,54 @@
     </div>
 </div>
 
+<!-- 子页面 -->
+<div class="subpage" ng-if="showSubPage">
+    <div class="subpage-header" style="display: flex; align-items: center; padding: 16px 12px 8px 12px; background: #3a495a; z-index: 9999; position: relative;">
+        <span class="icon-back" ng-click="closeSubPage()" style="font-size:22px;margin-right:12px;cursor:pointer;color:#fff;display:inline-block;">&#8592;</span>
+        <span class="subpage-title" style="color:#fff;font-size:18px;font-weight:bold;display:inline-block;">{{subPageTitle}}</span>
+    </div>
+    <div class="subpage-search">
+        <input type="text" ng-model="subPageSearch" placeholder="搜索{{subPageTitle}}">
+        <i class="icon-nbd icon-nbd-fomat-search"></i>
+    </div>
+    <div class="subpage-content">
+        <!-- 形状：无子分组，直接展示全部 -->
+        <div ng-if="subPageType === 'shape'">
+            <div class="section-list shape-grid">
+                <div class="section-item" ng-repeat="art in resource.shape.data | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
+                    <img ng-src="{{art.url}}" alt="{{art.name}}">
+                </div>
+            </div>
+        </div>
+        <!-- 图标：有动物、植物分组 -->
+        <div ng-if="subPageType === 'icon'">
+            <div class="element-section" ng-repeat="cat in iconSubGroups">
+                <div class="section-header">
+                    <span class="section-title">{{cat.title}}</span>
+                </div>
+                <div class="section-list">
+                    <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
+                        <img ng-src="{{art.url}}" alt="{{art.name}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 插画：有卡通、手绘分组 -->
+        <div ng-if="subPageType === 'illustration'">
+            <div class="element-section" ng-repeat="cat in illustrationSubGroups">
+                <div class="section-header">
+                    <span class="section-title">{{cat.title}}</span>
+                </div>
+                <div class="section-list">
+                    <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
+                        <img ng-src="{{art.url}}" alt="{{art.name}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .icon-nbd-square {
     display: inline-block;
@@ -533,4 +585,175 @@
     align-items: center;
     justify-content: center;
 }
+.element-section {
+    margin-bottom: 24px;
+}
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.section-title {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+.section-more {
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+}
+.section-list {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.section-item {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+.section-item:hover {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+.section-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.subpage {
+    background: #3a495a;
+    height: 100%;
+    color: #fff;
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    z-index: 100;
+}
+.subpage-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 12px 8px 12px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.icon-back {
+    font-size: 22px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+.subpage-search {
+    display: flex;
+    align-items: center;
+    background: #2d3845;
+    border-radius: 6px;
+    margin: 0 12px 16px 12px;
+    padding: 6px 10px;
+}
+.subpage-search input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    flex: 1;
+    font-size: 15px;
+    outline: none;
+}
+.icon-nbd-fomat-search {
+    color: #bbb;
+    font-size: 18px;
+}
+.subpage-content {
+    padding: 0 12px;
+}
+.shape-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+}
+.shape-grid .section-item {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.shape-grid .section-item:hover {
+    transform: scale(1.05);
+}
+.shape-grid .section-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.subpage-header {
+    background: #3a495a;
+    z-index: 9999;
+    position: relative;
+}
+.subpage-title {
+    color: #fff !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    display: inline-block !important;
+}
+.icon-back {
+    color: #fff !important;
+    display: inline-block !important;
+}
 </style>
+
+<script>
+// 伪代码，需放到AngularJS控制器中
+$scope.showSubPage = false;
+$scope.subPageType = '';
+$scope.subPageTitle = '';
+$scope.subPageSearch = '';
+
+// 假设icon和illustration的子分组数据结构如下
+$scope.iconSubGroups = [
+    { title: '动物', items: [] },
+    { title: '植物', items: [] }
+];
+$scope.illustrationSubGroups = [
+    { title: '卡通', items: [] },
+    { title: '手绘', items: [] }
+];
+
+$scope.openSubPage = function(type) {
+    $scope.showSubPage = true;
+    $scope.subPageType = type;
+    $scope.subPageSearch = '';
+    if(type === 'shape') {
+        $scope.subPageTitle = '形状';
+    } else if(type === 'icon') {
+        $scope.subPageTitle = '图标';
+        // 这里需要将 resource.icon.data 按"动物/植物"分组
+        $scope.iconSubGroups[0].items = $scope.resource.icon.data.filter(function(item){ return item.category === '动物'; });
+        $scope.iconSubGroups[1].items = $scope.resource.icon.data.filter(function(item){ return item.category === '植物'; });
+    } else if(type === 'illustration') {
+        $scope.subPageTitle = '插画';
+        // 这里需要将 resource.illustration.data 按"卡通/手绘"分组
+        $scope.illustrationSubGroups[0].items = $scope.resource.illustration.data.filter(function(item){ return item.category === '卡通'; });
+        $scope.illustrationSubGroups[1].items = $scope.resource.illustration.data.filter(function(item){ return item.category === '手绘'; });
+    }
+};
+$scope.closeSubPage = function() {
+    $scope.showSubPage = false;
+};
+</script>
