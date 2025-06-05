@@ -1,9 +1,5 @@
 <div class="<?php if( $active_photos ) echo 'active'; ?> tab" ng-if="settings['nbdesigner_enable_image'] == 'yes'" id="tab-photo" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-photo" data-type="photo" data-offset="30">
-    <div class="nbd-search">
-        <input ng-class="(resource.personal.status || !resource.photo.onclick) ? 'nbd-disabled' : ''" ng-keyup="$event.keyCode == 13 && getPhoto(resource.photo.type, 'search')" type="text" name="search" placeholder="<?php esc_html_e('Search photo', 'web-to-print-online-designer'); ?>" ng-model="resource.photo.photoSearch"/>
-        <i class="icon-nbd icon-nbd-fomat-search"></i>
-    </div>
-    <div class="tab-main tab-scroll">            
+    <div class="tab-main tab-scroll" style="margin-top: 15px; padding-top: 0;">            
             <div class="result-loaded">
                 <div class="content-items">
                     <div ng-class="settings['nbdesigner_upload_show_term'] !== 'yes' ? 'accept' : '' " class="content-item type-upload" data-type="image-upload">
