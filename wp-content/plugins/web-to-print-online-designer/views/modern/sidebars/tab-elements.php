@@ -330,7 +330,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">形状</span>
-                                <span class="section-more" ng-click="openSubPage('shape')">查看全部</span>
+                                <span class="section-more" ng-click="openSubPage('shape')">查看全部 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.shape.data | limitTo:3" ng-click="addSvgFromMedia(art)">
@@ -341,7 +341,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">图标</span>
-                                <span class="section-more" ng-click="openSubPage('icon')">查看全部</span>
+                                <span class="section-more" ng-click="openSubPage('icon')">查看全部 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.icon.data | limitTo:3" ng-click="addSvgFromMedia(art)">
@@ -352,7 +352,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">插画</span>
-                                <span class="section-more" ng-click="openSubPage('illustration')">查看全部</span>
+                                <span class="section-more" ng-click="openSubPage('illustration')">查看全部 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.illustration.data | limitTo:3" ng-click="addSvgFromMedia(art)">
@@ -524,23 +524,30 @@
     <div class="subpage-content">
         <!-- 形状：无子分组，直接展示全部 -->
         <div ng-if="subPageType === 'shape'">
-            <div class="section-list shape-grid">
-                <div class="section-item" ng-repeat="art in resource.shape.data | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
-                    <img ng-src="{{art.url}}" alt="{{art.name}}">
+
+                <div class="content-item type-shapes" data-type="shapes" id="nbd-shape-wrap">
+                    <div class="mansory-wrap">
+                        <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addSvgFromMedia(art)" ng-repeat="art in resource.shape.data" repeat-end="onEndRepeat('shape')"><img ng-src="{{art.url}}"><span class="photo-desc">{{art.name}}</span></div>
+                    </div>
                 </div>
-            </div>
         </div>
         <!-- 图标：有动物、植物分组 -->
         <div ng-if="subPageType === 'icon'">
             <div class="element-section" ng-repeat="cat in iconSubGroups">
                 <div class="section-header">
                     <span class="section-title">{{cat.title}}</span>
+                    <span class="section-more" ng-click="closeSubPage()">查看全部 ></span>
                 </div>
                 <div class="section-list">
                     <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
                         <img ng-src="{{art.url}}" alt="{{art.name}}">
                     </div>
                 </div>
+            </div>
+            <!-- 调试信息 -->
+            <div style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                <h4>调试信息：</h4>
+                <pre>{{iconSubGroups | json}}</pre>
             </div>
         </div>
         <!-- 插画：有卡通、手绘分组 -->
@@ -593,15 +600,18 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+    color: white;
 }
 .section-title {
-    font-size: 14px;
-    color: #333;
-    font-weight: bold;
+    font-size: 16px;
+    color: #fff !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    display: inline-block !important;
 }
 .section-more {
     font-size: 12px;
-    color: #888;
+    color: #fff !important;
     cursor: pointer;
 }
 .section-list {
@@ -716,6 +726,7 @@
     color: #fff !important;
     display: inline-block !important;
 }
+
 </style>
 
 <script>
@@ -727,8 +738,16 @@ $scope.subPageSearch = '';
 
 // 假设icon和illustration的子分组数据结构如下
 $scope.iconSubGroups = [
-    { title: '动物', items: [] },
-    { title: '植物', items: [] }
+    { title: '动物', items: [
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/02/vecteezy_cute-cartoon-sea-animal-shark-character_10838184.png', name: '鲨鱼' },
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/elephant-1837462.svg', name: '大象' },
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/teddy_bear1-1.jpg', name: '泰迪熊' }
+    ]},
+    { title: '植物', items: [
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2.jpg', name: '包1' },
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2-2.jpg', name: '包2' },
+        { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag1.jpg', name: '包3' }
+    ]}
 ];
 $scope.illustrationSubGroups = [
     { title: '卡通', items: [] },
@@ -743,9 +762,20 @@ $scope.openSubPage = function(type) {
         $scope.subPageTitle = '形状';
     } else if(type === 'icon') {
         $scope.subPageTitle = '图标';
-        // 这里需要将 resource.icon.data 按"动物/植物"分组
-        $scope.iconSubGroups[0].items = $scope.resource.icon.data.filter(function(item){ return item.category === '动物'; });
-        $scope.iconSubGroups[1].items = $scope.resource.icon.data.filter(function(item){ return item.category === '植物'; });
+        // 手动填充 iconSubGroups 数据
+        $scope.iconSubGroups = [
+            { title: '动物', items: [
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/02/vecteezy_cute-cartoon-sea-animal-shark-character_10838184.png', name: '鲨鱼' },
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/elephant-1837462.svg', name: '大象' },
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/teddy_bear1-1.jpg', name: '泰迪熊' }
+            ]},
+            { title: '植物', items: [
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2.jpg', name: '包1' },
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2-2.jpg', name: '包2' },
+                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag1.jpg', name: '包3' }
+            ]}
+        ];
+        console.log('iconSubGroups:', $scope.iconSubGroups); // 调试日志
     } else if(type === 'illustration') {
         $scope.subPageTitle = '插画';
         // 这里需要将 resource.illustration.data 按"卡通/手绘"分组
