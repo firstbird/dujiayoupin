@@ -11,12 +11,15 @@ class Nbdesigner_Plugin {
     public $plugin_id;
     public $activedomain;
     public $removedomain;
+    public $pathMap; // 添加pathMap属性
+
     public function __construct() {
         $this->plugin_id    = 'nbdesigner';
         $this->activedomain = 'activedomain/netbase/';
         $this->removedomain = 'removedomain/netbase/';
         $this->init_settings();
     }
+
     private function init_settings() {
         // 初始化颜色设置
         $color_settings = get_option('nbdesigner_color_settings', array());
@@ -44,7 +47,21 @@ class Nbdesigner_Plugin {
             return $settings;
         });
     }
+
     public function init(){
+        // 初始化pathMap
+        $this->pathMap = [
+            'background' => 'images/dujia/background/',
+            'shape' => 'images/dujia/element/shape/',
+            'font' => 'images/dujia/font/',
+            'pattern' => 'images/dujia/pattern/',
+            'art' => 'images/dujia/art/',
+            'text' => 'images/dujia/text/',
+            'icon' => 'images/dujia/icon/',
+            'image' => 'images/dujia/image/',
+            'video' => 'images/dujia/video/',
+        ];
+
         $this->hook();
         $this->schehule();
         $this->nbdesigner_lincense_notices();
@@ -60,11 +77,13 @@ class Nbdesigner_Plugin {
         }
         add_action( 'wpmu_new_blog', array( $this, 'install_in_new_blog' ), 10, 6 );
     }
+
     public function nbd_oss_list_files() {
         error_log('nbd_oss_list_files: 开始处理请求');
         
         // 获取token参数
         $token = isset($_POST['token']) ? sanitize_text_field($_POST['token']) : '';
+        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : '';
         error_log('nbd_oss_list_files: token = ' . $token);
         
         try {
@@ -84,11 +103,14 @@ class Nbdesigner_Plugin {
                 'region' => 'oss-cn-shanghai.aliyuncs.com'
             ];
             
+            // 根据type获取对应的path
+            $path = isset($this->pathMap[$type]) ? $this->pathMap[$type] : 'images/dujia/background/';
+            
             $oss = new NBD_OSS($config);
             error_log('nbd_oss_list_files: 开始获取文件列表');
             
             // 分页获取文件
-            $result = $oss->listObjects('images/dujia/background/', $token, 10);
+            $result = $oss->listObjects($path, $token, 10);
             error_log('nbd_oss_list_files: 获取文件列表成功，结果：' . json_encode($result));
             
             // 返回JSON响应
@@ -105,6 +127,7 @@ class Nbdesigner_Plugin {
             ]);
         }
     }
+
     public function ajax(){
         // Nbdesigner_EVENT => nopriv
         $ajax_events = array(
@@ -183,6 +206,7 @@ class Nbdesigner_Plugin {
             }
         }
     }
+
     public function nbd_get_user_designs(){
         // error_log('nbd_get_user_designs begin');
         $user_id = wp_get_current_user()->ID;
@@ -317,6 +341,7 @@ class Nbdesigner_Plugin {
 
         wp_send_json_success(array('message' => '设计已成功删除'));
     }
+
     public function hook(){
         add_action( 'plugins_loaded', array( $this, 'translation_load_textdomain' ) );
         add_filter( 'cron_schedules', array( $this, 'set_schedule' ) );
@@ -348,22 +373,26 @@ class Nbdesigner_Plugin {
             add_action( 'nbd_w3_flush_cache', array( $this, 'w3_flush_cache' ) ); 
         }
     }
+
     public function w3_flush_cache(){
         if ( function_exists( 'w3tc_flush_all' ) ){
             w3tc_flush_all();
         }
     }
+
     public function w3tc_cache_flush(){
         if ( ! wp_next_scheduled( 'nbd_w3_flush_cache' ) ) {
             wp_schedule_event( current_time( 'timestamp' ), 'every6hours', 'nbd_w3_flush_cache' );
         }
     }
+
     public function forcelogin_rest_access( $result ){
         if ( null === $result && ! is_user_logged_in() ) {
             return new WP_Error( 'rest_unauthorized', __( "Only authenticated users can access the REST API.", 'web-to-print-online-designer' ), array( 'status' => rest_authorization_required_code() ) );
         }
         return $result;
     }
+
     public function force_login( ){
         // Exceptions for AJAX, Cron, or WP-CLI requests
         if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
@@ -391,6 +420,7 @@ class Nbdesigner_Plugin {
             }
         }
     }
+
     private function is_request($type) {
         switch ($type) {
             case 'admin':
@@ -403,6 +433,7 @@ class Nbdesigner_Plugin {
                 return (!is_admin() || defined('DOING_AJAX') ) && !defined('DOING_CRON');
         }
     }
+
     public function nbd_check_use_logged_in(){
         wp_send_json(
             array(
