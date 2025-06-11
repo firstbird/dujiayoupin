@@ -1,10 +1,10 @@
 <div class="<?php if( $active_elements ) echo 'active'; ?> tab" id="tab-element" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-element" data-type="element" data-offset="20">
-    <div class="nbd-search">
+    <!-- <div class="nbd-search">
         <input ng-class="(!(resource.element.type == 'icon' || resource.element.type == 'flaticon' || resource.element.type == 'storyset') || !resource.element.onclick) ? 'nbd-disabled' : ''" ng-keyup="$event.keyCode == 13 && getMedia(resource.element.type, 'search')" type="text" name="search" placeholder="<?php esc_html_e('Search element', 'web-to-print-online-designer'); ?>" ng-model="resource.element.contentSearch"/>
         <i class="icon-nbd icon-nbd-fomat-search"></i>
-    </div>     
-    <div class="tab-main tab-scroll" >
-        <div class="elements-content">
+    </div>      -->
+    <!-- <div class="tab-main tab-scroll" > -->
+        <div class="elements-content tab-scroll">
             <div class="main-items">
                 <div class="items">
                     <!-- 已删除 Draw, Shapes, Icons 按钮 -->
@@ -16,8 +16,8 @@
                     <div class="content-item type-draw" data-type="draw">
                         <div class="main-type">
                             <div class="free-draw-settings">
-                                <span class="heading-title"><?php esc_html_e('Free Drawing','web-to-print-online-designer'); ?></span>
-                                <div class="draw-item" ng-class="resource.drawMode.status ? 'active' : ''" ng-click="enableDrawMode()" title="<?php esc_html_e('Free Draw','web-to-print-online-designer'); ?>">
+                                <span class="section-title"><?php esc_html_e('画笔','web-to-print-online-designer'); ?></span>
+                                <div class="draw-item" ng-class="{'active': resource.drawMode.status}" ng-click="resource.drawMode.status = !resource.drawMode.status; enableDrawMode()" title="<?php esc_html_e('Free Draw','web-to-print-online-designer'); ?>">
                                     <i class="icon-nbd icon-nbd-drawing"></i>
                                 </div>
                                 <!-- <div class="brush" >
@@ -33,18 +33,15 @@
                                         </div>
                                     </button>
                                 </div> -->
-                                <ul class="main-ranges" >
-                                    <li class="range range-brightness">
-                                        <label><?php esc_html_e('Brush width ','web-to-print-online-designer'); ?></label>
-                                        <div class="main-track">
-                                            <input class="slide-input" type="range" step="1" min="1" max="100" ng-change="changeBush()" ng-model="resource.drawMode.brushWidth">
-                                            <span class="range-track"></span>
-                                        </div>
-                                        <span class="value-display">{{resource.drawMode.brushWidth}}</span>
-                                    </li>
-                                </ul>
+                                <div class="range">
+                                    <div class="section-title"><?php esc_html_e('画笔宽度','web-to-print-online-designer'); ?></div>
+                                    <div class="main-track">
+                                        <input class="slide-input" type="range" step="1" min="1" max="100" ng-change="changeBush()" ng-model="resource.drawMode.brushWidth">
+                                    </div>
+                                    <span class="value-display">{{resource.drawMode.brushWidth}}</span>
+                                </div>
                                 <div class="color">
-                                    <h3 class="color-palette-label" ><?php esc_html_e('Brush color','web-to-print-online-designer'); ?></h3>
+                                    <span class="section-title"><?php esc_html_e('画笔颜色','web-to-print-online-designer'); ?></span>
                                     <ul class="main-color-palette nbd-perfect-scroll" >
                                         <li class="color-palette-add" ng-init="showBrushColorPicker = false" ng-click="showBrushColorPicker = !showBrushColorPicker;" ng-style="{'background-color': currentColor}"></li>
                                         <li ng-repeat="color in listAddedColor track by $index" ng-click="resource.drawMode.brushColor=color; changeBush()" class="color-palette-item" data-color="{{color}}" title="{{color}}" ng-style="{'background-color': color}"></li>
@@ -133,7 +130,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">形状</span>
-                                <span class="section-more" ng-click="openSubPage('shape')">查看全部 ></span>
+                                <span class="section-more" ng-click="openSubPage('shape')">更多 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="draw-item" ng-click="addGeometricalObject( 'circle' )" title="<?php esc_html_e('Circle','web-to-print-online-designer'); ?>">
@@ -164,7 +161,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">图标</span>
-                                <span class="section-more" ng-click="openSubPage('icon')">查看全部 ></span>
+                                <span class="section-more" ng-click="openSubPage('icon')">更多 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.icon.data | limitTo:3" ng-click="addSvgFromMedia(art)">
@@ -175,7 +172,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">插画</span>
-                                <span class="section-more" ng-click="openSubPage('illustration')">查看全部 ></span>
+                                <span class="section-more" ng-click="openSubPage('illustration')">更多 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.illustration.data | limitTo:3" ng-click="addSvgFromMedia(art)">
@@ -320,18 +317,18 @@
                 </div>
                 <div class="nbdesigner-gallery" id="nbdesigner-gallery">
                 </div>
-                <div class="loading-photo" >
+                <!-- <div class="loading-photo" >
                     <svg class="circular" viewBox="25 25 50 50">
                         <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
                     </svg>
-                </div>
+                </div> -->
             </div>
             <div class="info-support">
                 <span>Facebook</span>
                 <i class="icon-nbd icon-nbd-clear close-result-loaded" ng-click="onClickTab('', 'element')"></i>
             </div>
         </div>
-    </div>
+    <!-- </div> -->
 </div>
 
 <!-- 子页面 -->
@@ -372,7 +369,7 @@
             <div class="element-section" ng-repeat="cat in iconSubGroups">
                 <div class="section-header">
                     <span class="section-title">{{cat.title}}</span>
-                    <span class="section-more" ng-click="closeSubPage()">查看全部 ></span>
+                    <span class="section-more" ng-click="closeSubPage()">更多 ></span>
                 </div>
                 <div class="section-list">
                     <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
@@ -422,10 +419,10 @@
 
 .draw-item {
     position: relative;
-    width: 100%;
-    aspect-ratio: 1/1;
-    min-width: 0;
-    min-height: 0;
+    width: 90px;
+    height: 90px;
+    min-width: 90px;
+    min-height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -435,6 +432,7 @@
     color: #fff;
     background: transparent;
     padding: 0;
+    margin-right: 8px;
 }
 
 .draw-item:hover {
@@ -442,12 +440,17 @@
 }
 
 .draw-item.active {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 236, 179, 0.3);
+    color: #FFD54F;
+}
+
+.draw-item.active:hover {
+    background: rgba(255, 236, 179, 0.4);
 }
 
 .draw-item img, .draw-item svg {
-    width: 100%;
-    height: 100%;
+    width: 24px;
+    height: 24px;
     object-fit: contain;
     display: block;
     margin: 0 auto;
@@ -491,17 +494,32 @@
     align-items: center;
     margin-bottom: 8px;
     color: white;
+    height: 36px;
 }
 
 .section-title {
-    font-size: 16px;
+    font-size: 14px !important;
     color: #fff !important;
+    border-bottom: none;
+    margin: 0;
+    padding: 0;
+    line-height: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    font-weight: normal;
 }
 
 .section-more {
-    font-size: 12px;
-    color: #fff !important;
+    font-size: 14px !important;
+    color:rgb(117, 188, 243) !important;
     cursor: pointer;
+    margin: 0;
+    padding: 0;
+    line-height: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
 }
 
 /* 确保所有文字在深色背景上清晰可见 */
@@ -679,6 +697,34 @@ input[type="text"]:focus {
     fill: #fff !important;
 }
 
+.range {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.range .section-title {
+    display: block;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.range .main-track {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.range .slide-input {
+    flex: 1;
+}
+
+.range .value-display {
+    min-width: 30px;
+    text-align: right;
+    color: #fff;
+}
+
 </style>
 
 <script>
@@ -737,5 +783,19 @@ $scope.openSubPage = function(type) {
 };
 $scope.closeSubPage = function() {
     $scope.showSubPage = false;
+};
+
+$scope.handleDrawMode = function() {
+    // 先切换状态
+    $scope.resource.drawMode.status = !$scope.resource.drawMode.status;
+    
+    // 如果状态为true，启用画笔
+    if ($scope.resource.drawMode.status) {
+        $scope.enableDrawMode();
+    } else {
+        // 如果状态为false，禁用画笔
+        $scope.resource.drawMode.status = false;
+        $scope.enableDrawMode();
+    }
 };
 </script>
