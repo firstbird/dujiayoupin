@@ -17,7 +17,7 @@
                         <div class="main-type">
                             <div class="free-draw-settings">
                                 <span class="section-title"><?php esc_html_e('画笔','web-to-print-online-designer'); ?></span>
-                                <div class="draw-item" ng-class="{'active': resource.drawMode.status}" ng-click="resource.drawMode.status = !resource.drawMode.status; enableDrawMode()" title="<?php esc_html_e('Free Draw','web-to-print-online-designer'); ?>">
+                                <div class="draw-item" ng-class="{'active': resource.drawMode.status}" ng-click="onSwitchDrawMode()" title="<?php esc_html_e('Free Draw','web-to-print-online-designer'); ?>">
                                     <i class="icon-nbd icon-nbd-drawing"></i>
                                 </div>
                                 <!-- <div class="brush" >
