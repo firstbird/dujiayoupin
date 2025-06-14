@@ -642,11 +642,11 @@ input[type="text"]:focus {
     padding: 0 12px;
 }
 
-.shape-grid {
+/* .shape-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    align-items: center;
+    align-items: left;
     background: #f5f5f5;
     padding: 12px;
     border-radius: 8px;
@@ -672,7 +672,7 @@ input[type="text"]:focus {
     width: 100%;
     height: 100%;
     object-fit: contain;
-}
+} */
 
 .subpage-header {
     background: #3a495a;

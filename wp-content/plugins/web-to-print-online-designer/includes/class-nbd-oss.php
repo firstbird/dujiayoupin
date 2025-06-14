@@ -111,11 +111,16 @@ class NBD_OSS {
      */
     public function listObjects($prefix = '', $marker = '', $maxKeys = 10) {
         try {
+            if ($marker == '') {
+                $maxKeys += 1;
+            }
             $options = array(
                 'prefix' => $prefix,
                 'max-keys' => $maxKeys,
                 'marker' => $marker
             );
+            error_log("listObjects: " . json_encode($options));
+
             
             $listObjectInfo = $this->ossClient->listObjects($this->bucket, $options);
             
@@ -133,6 +138,8 @@ class NBD_OSS {
                         'url' => $this->getObjectUrl($objectInfo->getKey()),
                         'type' => $extension
                     ];
+                } else {
+                    error_log("ignore file: " . $objectInfo->getKey());
                 }
             }
 
