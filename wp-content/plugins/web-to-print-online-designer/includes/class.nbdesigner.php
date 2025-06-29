@@ -57,7 +57,7 @@ class Nbdesigner_Plugin {
             'pattern' => 'images/dujia/pattern/',
             'art' => 'images/dujia/art/',
             'text' => 'images/dujia/text/',
-            'icon' => 'images/dujia/icon/',
+            'icon' => 'images/dujia/element/icon/',
             'image' => 'images/dujia/image/',
             'video' => 'images/dujia/video/',
         ];
@@ -84,7 +84,8 @@ class Nbdesigner_Plugin {
         // 获取token参数
         $token = isset($_POST['token']) ? sanitize_text_field($_POST['token']) : '';
         $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : '';
-        error_log('nbd_oss_list_files: token = ' . $token);
+        $num = isset($_POST['num']) ? intval($_POST['num']) : 10;
+        error_log('nbd_oss_list_files: token = ' . $token . ' type = ' . $type . ' num = ' . $num);
         
         try {
             // 从环境变量获取OSS配置
@@ -110,7 +111,7 @@ class Nbdesigner_Plugin {
             error_log('nbd_oss_list_files: 开始获取文件列表');
             
             // 分页获取文件
-            $result = $oss->listObjects($path, $token, 10);
+            $result = $oss->listObjects($path, $token, $num);
             error_log('nbd_oss_list_files: 获取文件列表成功，结果：' . json_encode($result));
             
             // 返回JSON响应

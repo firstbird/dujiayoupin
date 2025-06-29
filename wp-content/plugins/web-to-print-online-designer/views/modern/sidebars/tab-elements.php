@@ -4,7 +4,7 @@
         <i class="icon-nbd icon-nbd-fomat-search"></i>
     </div>      -->
     <!-- <div class="tab-main tab-scroll" > -->
-        <div class="elements-content tab-scroll">
+        <div class="elements-content">
             <div class="main-items">
                 <div class="items">
                     <!-- 已删除 Draw, Shapes, Icons 按钮 -->
@@ -365,22 +365,42 @@
 
         </div>
         <!-- 图标：有动物、植物分组 -->
-        <div ng-if="subPageType === 'icon'">
-            <div class="element-section" ng-repeat="cat in iconSubGroups">
-                <div class="section-header">
-                    <span class="section-title">{{cat.title}}</span>
-                    <span class="section-more" ng-click="closeSubPage()">更多 ></span>
-                </div>
-                <div class="section-list">
-                    <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
-                        <img ng-src="{{art.url}}" alt="{{art.name}}">
+        <div ng-if="subPageType === 'icon'" class="icon-subpage-content">
+        <div class="active" id="tab-icon" data-container="#tab-icon" nbd-scroll="scrollLoadMore(container, type)" data-type="icon" data-offset="20">
+                <!-- <div class="elements-content tab-scroll"> -->
+                <div class="tab-main tab-scroll">
+                    <div class="result-loaded">
+                    <div class="content-items">    
+                    
+                        <div class="content-item type-icon" data-type="icon" id="nbd-icon-wrap">  
+                            <div class="mansory-wrap">
+                                <div nbd-drag="icon.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(icon, true, true)" ng-repeat="icon in resource.icon.filteredIcons" repeat-end="onEndRepeat('icon')">
+                                    <div class="mansory-item__inner">
+                                        <img ng-src="{{icon.url}}" /><span class="photo-desc">{{icon.name}}</span>
+                                        <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                            <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                            <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 底部提示文字 -->
+                            <div class="bottom-tip" ng-if="resource.icon.filteredIcons && resource.icon.filteredIcons.length > 0">
+                                <!-- 加载指示器 -->
+                                <div class="loading-indicator" ng-if="isLoadingMoreIcons">
+                                    <svg class="circular" viewBox="25 25 50 50">
+                                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                                    </svg>
+                                    正在加载更多图标...
+                                </div>
+                                <!-- 到底部提示 -->
+                                <span class="loading-indicator" ng-if="!isLoadingMoreIcons">已经到底部了</span>
+                            </div>
+                        </div>
+                    <!-- </div> -->
+                    </div>
                     </div>
                 </div>
-            </div>
-            <!-- 调试信息 -->
-            <div style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
-                <h4>调试信息：</h4>
-                <pre>{{iconSubGroups | json}}</pre>
             </div>
         </div>
         <!-- 插画：有卡通、手绘分组 -->
@@ -574,7 +594,7 @@ input[type="text"]:focus {
 }
 
 /* 调整滚动条样式 */
-.tab-scroll::-webkit-scrollbar {
+/* .tab-scroll::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
@@ -590,8 +610,15 @@ input[type="text"]:focus {
 
 .tab-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+} */
+.tab-scroll {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
 
+.tab-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
 .subpage {
     background: #3a495a;
     height: 100%;
@@ -642,37 +669,57 @@ input[type="text"]:focus {
     padding: 0 12px;
 }
 
-/* .shape-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    align-items: left;
-    background: #f5f5f5;
-    padding: 12px;
-    border-radius: 8px;
+/* 图标子页面滚动样式 */
+.icon-subpage-content {
+    height: calc(100vh - 120px); /* 减去头部和搜索框的高度 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
 }
 
-.shape-grid .section-item {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s;
+.icon-subpage-content::-webkit-scrollbar {
+    width: 8px;
 }
 
-.shape-grid .section-item:hover {
-    transform: scale(1.05);
+.icon-subpage-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
-.shape-grid .section-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-} */
+.icon-subpage-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.icon-subpage-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 确保内容区域有足够的高度来触发滚动 */
+.icon-subpage-content .content-item {
+    min-height: 100%;
+}
+
+/* 滚动加载时的加载指示器 */
+.icon-subpage-content .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.icon-subpage-content .loading-indicator svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 .subpage-header {
     background: #3a495a;
@@ -725,6 +772,39 @@ input[type="text"]:focus {
     color: #fff;
 }
 
+/* 底部提示样式 */
+.bottom-tip {
+    text-align: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.bottom-tip-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    font-style: italic;
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 底部提示中的加载指示器样式 */
+.bottom-tip .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.bottom-tip .loading-indicator svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
 </style>
 
 <script>
@@ -733,6 +813,14 @@ $scope.showSubPage = false;
 $scope.subPageType = '';
 $scope.subPageTitle = '';
 $scope.subPageSearch = '';
+
+// 滚动位置恢复配置
+$scope.scrollRestoreConfig = {
+    enabled: true,           // 是否启用滚动位置恢复
+    method: 'simple',        // 恢复方法: 'simple' 或 'advanced'
+    delay: 50,              // DOM更新延迟时间(ms)
+    verify: true            // 是否验证恢复结果
+};
 
 // 假设icon和illustration的子分组数据结构如下
 $scope.iconSubGroups = [
@@ -774,6 +862,14 @@ $scope.openSubPage = function(type) {
             ]}
         ];
         console.log('iconSubGroups:', $scope.iconSubGroups); // 调试日志
+        
+        // 初始化图标数据
+        // $scope.initializeIconData();
+        
+        // 在下一个digest cycle中绑定滚动事件
+        // $timeout(function() {
+        //     $scope.bindIconScrollEvent();
+        // });
     } else if(type === 'illustration') {
         $scope.subPageTitle = '插画';
         // 这里需要将 resource.illustration.data 按"卡通/手绘"分组
@@ -781,8 +877,164 @@ $scope.openSubPage = function(type) {
         $scope.illustrationSubGroups[1].items = $scope.resource.illustration.data.filter(function(item){ return item.category === '手绘'; });
     }
 };
+
+// 加载更多图标
+$scope.loadMoreIcons = function() {
+    // 防止重复加载
+    if ($scope.isLoadingMoreIcons) {
+        console.log('正在加载中，跳过重复请求');
+        return;
+    }
+    
+    // 获取当前滚动容器
+    var iconContainer = document.querySelector('.icon-subpage-content');
+    if (!iconContainer) {
+        console.warn('未找到图标容器元素');
+        return;
+    }
+    
+    // 保存当前滚动位置和容器高度
+    var scrollTop = iconContainer.scrollTop;
+    var scrollHeight = iconContainer.scrollHeight;
+    var clientHeight = iconContainer.clientHeight;
+    
+    console.log('保存滚动位置:', {
+        scrollTop: scrollTop,
+        scrollHeight: scrollHeight,
+        clientHeight: clientHeight
+    });
+    
+    $scope.isLoadingMoreIcons = true;
+    console.log('开始加载更多图标...');
+    
+    // 模拟异步加载
+    setTimeout(function() {
+        // 这里可以添加实际的API调用来获取更多图标
+        // 例如：
+        // $http.get('/api/icons?page=' + nextPage).then(function(response) {
+        //     $scope.resource.icon.filteredIcons = $scope.resource.icon.filteredIcons.concat(response.data);
+        //     $scope.isLoadingMoreIcons = false;
+        //     $scope.restoreScrollPosition(iconContainer, scrollTop, scrollHeight);
+        // });
+        
+        // 临时添加一些示例数据
+        var moreIcons = [
+            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon1.png', name: '图标1' },
+            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon2.png', name: '图标2' },
+            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon3.png', name: '图标3' }
+        ];
+        
+        if (!$scope.resource.icon.filteredIcons) {
+            $scope.resource.icon.filteredIcons = [];
+        }
+        
+        $scope.resource.icon.filteredIcons = $scope.resource.icon.filteredIcons.concat(moreIcons);
+        $scope.isLoadingMoreIcons = false;
+        console.log('已加载更多图标，总数:', $scope.resource.icon.filteredIcons.length);
+        
+        // 强制更新视图
+        if (!$scope.$$phase) {
+            $scope.$apply();
+        }
+        
+        // 恢复滚动位置
+        // if ($scope.scrollRestoreConfig.enabled) {
+            if ($scope.scrollRestoreConfig.method === 'advanced') {
+                $scope.advancedScrollPositionRestore(iconContainer, scrollTop, scrollHeight);
+            } else {
+                $scope.restoreScrollPosition(iconContainer, scrollTop, scrollHeight);
+            }
+        // }
+        
+        // 或者使用高级滚动位置恢复方法（取消注释下面的行来启用）
+        // $scope.advancedScrollPositionRestore(iconContainer, scrollTop, scrollHeight);
+        
+    }, 1000); // 模拟1秒的加载时间
+};
+
+// 恢复滚动位置
+$scope.restoreScrollPosition = function(container, oldScrollTop, oldScrollHeight) {
+    // 使用配置中的延迟时间
+    var delay = $scope.scrollRestoreConfig.delay || 50;
+    
+    // 使用 $timeout 确保DOM更新完成后再恢复滚动位置
+    $timeout(function() {
+        if (container) {
+            var newScrollHeight = container.scrollHeight;
+            var heightDifference = newScrollHeight - oldScrollHeight;
+            
+            // 计算新的滚动位置
+            var newScrollTop = oldScrollTop + heightDifference;
+            
+            console.log('恢复滚动位置:', {
+                oldScrollTop: oldScrollTop,
+                oldScrollHeight: oldScrollHeight,
+                newScrollHeight: newScrollHeight,
+                heightDifference: heightDifference,
+                newScrollTop: newScrollTop
+            });
+            
+            // 设置新的滚动位置
+            container.scrollTop = newScrollTop;
+            
+            // 根据配置决定是否验证滚动位置
+            if ($scope.scrollRestoreConfig.verify) {
+                setTimeout(function() {
+                    console.log('验证滚动位置:', {
+                        expected: newScrollTop,
+                        actual: container.scrollTop,
+                        difference: Math.abs(container.scrollTop - newScrollTop),
+                        success: Math.abs(container.scrollTop - newScrollTop) < 5
+                    });
+                }, 100);
+            }
+        }
+    }, delay);
+};
+
+// 高级滚动位置保持功能
+$scope.advancedScrollPositionRestore = function(container, oldScrollTop, oldScrollHeight) {
+    // 创建临时锚点元素
+    var anchorElement = document.createElement('div');
+    anchorElement.style.position = 'absolute';
+    anchorElement.style.top = oldScrollTop + 'px';
+    anchorElement.style.left = '0';
+    anchorElement.style.width = '1px';
+    anchorElement.style.height = '1px';
+    anchorElement.style.pointerEvents = 'none';
+    anchorElement.style.opacity = '0';
+    anchorElement.id = 'scroll-anchor-' + Date.now();
+    
+    // 将锚点添加到容器中
+    container.appendChild(anchorElement);
+    
+    // 使用 $timeout 确保DOM更新完成
+    $timeout(function() {
+        if (container && anchorElement) {
+            // 滚动到锚点位置
+            anchorElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+            
+            // 移除锚点元素
+            setTimeout(function() {
+                if (anchorElement.parentNode) {
+                    anchorElement.parentNode.removeChild(anchorElement);
+                }
+            }, 100);
+            
+            console.log('使用锚点恢复滚动位置完成');
+        }
+    }, 100);
+};
+
 $scope.closeSubPage = function() {
+    // 清理滚动事件监听器
+    $scope.cleanupIconScrollEvent();
+    
     $scope.showSubPage = false;
+    $scope.subPageType = '';
+    $scope.subPageTitle = '';
+    $scope.subPageSearch = '';
+    $scope.isLoadingMoreIcons = false;
 };
 
 $scope.handleDrawMode = function() {
@@ -796,6 +1048,38 @@ $scope.handleDrawMode = function() {
         // 如果状态为false，禁用画笔
         $scope.resource.drawMode.status = false;
         $scope.enableDrawMode();
+    }
+};
+
+// 监听自定义滚动事件（供其他组件使用）
+$scope.$on('iconPageScrolled', function(event, data) {
+    console.log('收到图标页面滚动事件:', data);
+    
+    // 这里可以添加其他处理逻辑
+    // 例如：更新进度条、触发动画等
+    
+    // 示例：更新滚动进度
+    if (data.scrollPercentage !== undefined) {
+        $scope.scrollProgress = data.scrollPercentage;
+    }
+    
+    // 示例：当滚动到顶部时执行某些操作
+    if (data.scrollTop === 0) {
+        console.log('滚动到顶部');
+    }
+    
+    // 示例：当滚动到底部时执行某些操作
+    if (data.isAtBottom) {
+        console.log('滚动到底部');
+    }
+});
+
+// 清理滚动事件监听器
+$scope.cleanupIconScrollEvent = function() {
+    if ($scope.iconScrollContainer) {
+        $scope.iconScrollContainer.removeEventListener('scroll', $scope.handleIconScroll);
+        $scope.iconScrollContainer = null;
+        console.log('已清理图标页面滚动事件监听器');
     }
 };
 </script>
