@@ -24,3 +24,10 @@
         </div>
     </div>
 </div>
+<style>
+.nbd-sidebar {
+    background: #3a495a !important;
+    color: #3a495a !important;
+}
+
+</style>

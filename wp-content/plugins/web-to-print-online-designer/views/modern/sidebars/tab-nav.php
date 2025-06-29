@@ -36,3 +36,7 @@
     <div class="keyboard-shortcuts"><i class="icon-nbd icon-nbd-info-circle nbd-tooltip-hover tooltipstered nbd-hover-shadow"></i></div>
     <div class="nbd-sidebar-close"><i class="icon-nbd icon-nbd-clear"></i></div>
 </div>
+
+<style>
+
+</style>

@@ -1,17 +1,7 @@
-<div class="<?php if( $active_elements ) echo 'active'; ?> tab" id="tab-element" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-element" data-type="element" data-offset="20">
-    <!-- <div class="nbd-search">
-        <input ng-class="(!(resource.element.type == 'icon' || resource.element.type == 'flaticon' || resource.element.type == 'storyset') || !resource.element.onclick) ? 'nbd-disabled' : ''" ng-keyup="$event.keyCode == 13 && getMedia(resource.element.type, 'search')" type="text" name="search" placeholder="<?php esc_html_e('Search element', 'web-to-print-online-designer'); ?>" ng-model="resource.element.contentSearch"/>
-        <i class="icon-nbd icon-nbd-fomat-search"></i>
-    </div>      -->
-    <!-- <div class="tab-main tab-scroll" > -->
-        <div class="elements-content">
-            <div class="main-items">
-                <div class="items">
-                    <!-- 已删除 Draw, Shapes, Icons 按钮 -->
-                </div>
-                <div class="pointer"></div>
-            </div>
-            <div class="result-loaded">
+<div class="<?php if( $active_elements ) echo 'active'; ?> tab tab-last" id="tab-element">
+
+    
+    <div class="element-main tab-scroll">
                 <div class="content-items">
                     <div class="content-item type-draw" data-type="draw">
                         <div class="main-type">
@@ -46,12 +36,7 @@
                                         <li class="color-palette-add" ng-init="showBrushColorPicker = false" ng-click="showBrushColorPicker = !showBrushColorPicker;" ng-style="{'background-color': currentColor}"></li>
                                         <li ng-repeat="color in listAddedColor track by $index" ng-click="resource.drawMode.brushColor=color; changeBush()" class="color-palette-item" data-color="{{color}}" title="{{color}}" ng-style="{'background-color': color}"></li>
                                     </ul>
-                                    <div class="pinned-palette default-palette" >
-                                        <!-- <h3 class="color-palette-label" ><?php esc_html_e('Default palette','web-to-print-online-designer'); ?></h3>
-                                        <ul class="main-color-palette" ng-repeat="palette in resource.defaultPalette" >
-                                            <li ng-class="{'first-left': $first, 'last-right': $last}" ng-repeat="color in palette track by $index" ng-click="resource.drawMode.brushColor=color; changeBush()" class="color-palette-item" data-color="{{color}}" title="{{color}}" ng-style="{'background': color}"></li>
-                                        </ul> -->
-                                    </div>
+
                                     <div class="nbd-text-color-picker" id="nbd-bg-color-picker" ng-class="showBrushColorPicker ? 'active' : ''" >
                                         <spectrum-colorpicker
                                             ng-model="currentColor"
@@ -180,155 +165,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="content-item type-flaticon" data-type="flaticon" id="nbd-flaticon-wrap">
-                        <div class="mansory-wrap">
-                            <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(art, true, true)" ng-repeat="art in resource.flaticon.data" repeat-end="onEndRepeat('flaticon')"><img ng-src="{{art.url}}"><span class="photo-desc">{{art.name}}</span></div>
-                        </div>
-                    </div>
-                    <div class="content-item type-storyset" data-type="storyset" id="nbd-storyset-wrap">
-                        <div class="mansory-wrap">
-                            <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(art, true, true)" ng-repeat="art in resource.storyset.data" repeat-end="onEndRepeat('storyset')"><img ng-src="{{art.url}}"><span class="photo-desc">{{art.name}}</span></div>
-                        </div>
-                    </div>
-                    <div class="content-item type-lines" data-type="lines" id="nbd-line-wrap">
-                        <div class="mansory-wrap">
-                            <div nbd-drag="art.url" extenal="true" type="svg" class="mansory-item" ng-click="addSvgFromMedia(art)" ng-repeat="art in resource.line.data" repeat-end="onEndRepeat('line')"><img ng-src="{{art.url}}"><span class="photo-desc">{{art.name}}</span></div>
-                        </div>
-                    </div>
-                    <div class="content-item type-qrcode" data-type="qr-code">
-                        <div class="main-type">
-                            <div class="main-input">
-                                <input ng-model="resource.qrText" type="text" class="nbd-input input-qrcode" name="qr-code" placeholder="https://yourcompany.com">
-                            </div>
-                            <button ng-class="resource.qrText != '' ? '' : 'nbd-disabled'" class="nbd-button" ng-click="addQrCode()"><?php esc_html_e('Create QRCode','web-to-print-online-designer'); ?></button>
-                            <button ng-class="resource.qrText != '' ? '' : 'nbd-disabled'" class="nbd-button" ng-click="addBarCode()"><?php esc_html_e('Create BarCode','web-to-print-online-designer'); ?></button>
-                            <div class="main-qrcode">
-                                
-                            </div>
-                            <svg id="barcode" ></svg>
-                        </div>
-                    </div>
-                    <div ng-if="settings['nbdesigner_enable_vcard'] == 'yes'" class="content-item type-vcard" data-type="vcard">
-                        <p><?php esc_html_e('Your information','web-to-print-online-designer'); ?></p>
-                        <div ng-repeat="field in settings.vcard_fields" class="md-input-wrap">
-                            <input id="vf-{{field.key}}" ng-model="field.value" ng-class="field.value.length > 0 ? 'holder' : ''"/>
-                            <label for="vf-{{field.key}}" >{{field.name}}<label/>
-                        </div>
-                        <p>
-                            <span class="nbd-button" ng-click="generateVcard()"><?php esc_html_e('Generate','web-to-print-online-designer'); ?></span>
-                        </p>
-                    </div>
-                    <div class="content-item type-frame" data-type="frame">
-                        <div class="frames-wrapper">
-                            <div class="frame-wrap" ng-repeat="frame in resource.frames track by $index" ng-click="addFrame(frame)">
-                                <photo-frame data-frame="frame"></photo-frame>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="content-item type-photoFrame" data-type="photoFrame" id="nbd-photoFrame-wrap">
-                        <div class="mansory-wrap">
-                            <div class="mansory-item" ng-click="addPhotoFrame(frame)" ng-repeat="frame in [] | range: ( resource.photoFrame.filter.currentPage * resource.photoFrame.filter.perPage > resource.photoFrame.filter.total ? resource.photoFrame.filter.total : ( resource.photoFrame.filter.currentPage * resource.photoFrame.filter.perPage ) )" repeat-end="onEndRepeat('photoFrame')">
-                                <img ng-src="{{'//dpeuzbvf3y4lr.cloudfront.net/frames/preview/f' + ( frame + 1 ) + '.png'}}" alt="Photo Frame" />
-                            </div>
-                        </div>
-                    </div>
-                    <?php if( $task == 'create' || ( $task == 'edit' && $design_type == 'template' ) ): ?>
-                    <div class="content-item type-image-shape" data-type="image-shape">
-                        <div class="image-shape-wrapper">
-                            <div>
-                                <span class="shape_mask shape-type-{{n}}" ng-click="addMask(n)" ng-repeat="n in [] | range:25"></span>
-                            </div>
-                            <div class="custom_image_shape-wrapper">
-                                <div><?php esc_html_e('Custom Shape','web-to-print-online-designer'); ?></div>
-                                <textarea class="form-control hover-shadow nbdesigner_svg_code" rows="5" ng-change="getPathCommand()" ng-model="svgPath" placeholder="<?php esc_html_e('Enter svg code','web-to-print-online-designer'); ?>"/></textarea>
-                                <button ng-class="pathCommand !='' ? '' : 'nbd-disabled'" class="nbd-button" ng-click="addMask(-1)"><?php esc_html_e('Aadd Shape','web-to-print-online-designer'); ?></button>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-                    <div ng-if="settings['nbdesigner_enable_google_maps'] == 'yes' && settings['nbdesigner_static_map_api_key'] != ''" class="content-item type-maps" data-type="maps">
-                        <div class="google-maps-options">
-                            <div class="google-maps-search">
-                                <input ng-keyup="$event.keyCode == 13 && updateMapUrl()" ng-model="resource.maps.address" type="text" name="search" placeholder="<?php esc_attr_e('Your address','web-to-print-online-designer'); ?>">
-                                <i class="icon-nbd icon-nbd-fomat-search" ng-click="updateMapUrl()"></i>
-                            </div>
-                            <div class="google-maps-option">
-                                <select id="google-maps-maptype" ng-change="updateMapUrl()" ng-model="resource.maps.maptype">
-                                    <option value="roadmap"><?php esc_html_e('Roadmap','web-to-print-online-designer'); ?></option>
-                                    <option value="satellite"><?php esc_html_e('Satellite','web-to-print-online-designer'); ?></option>
-                                    <option value="terrain"><?php esc_html_e('Terrain','web-to-print-online-designer'); ?></option>
-                                    <option value="hybrid"><?php esc_html_e('Hybrid','web-to-print-online-designer'); ?></option>
-                                </select>
-                                <label for="google-maps-maptype" ><?php esc_html_e('Map type','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <select id="google-maps-maptype" ng-change="updateMapUrl()" ng-model="resource.maps.zoom">
-                                    <?php foreach( range(1, 20) as $range ): ?>
-                                    <option value="<?php echo $range; ?>"><?php echo $range; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="google-maps-maptype" ><?php esc_html_e('Map zoom','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <input type="number" ng-min="100" ng-max="640" ng-step="1" ng-model="resource.maps.width" id="google-maps-width" />
-                                <label for="google-maps-width" ><?php esc_html_e('Map width','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <input type="number" ng-min="100" ng-max="640" ng-step="1" ng-model="resource.maps.height" id="google-maps-height" />
-                                <label for="google-maps-height" ><?php esc_html_e('Map height','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <select id="google-maps-markers-label" ng-change="updateMapUrl()" ng-model="resource.maps.markers.label">
-                                    <?php 
-                                        $marker_labels = array_merge( array(''), range( 0, 9 ), range( 'A', 'Z' ) );
-                                        foreach( $marker_labels as $marker_label ): 
-                                    ?>
-                                    <option value="<?php echo $marker_label; ?>"><?php echo $marker_label === '' ? __('None','web-to-print-online-designer') : $marker_label; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="google-maps-markers-label" ><?php esc_html_e('Marker label','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <select id="google-maps-markers-size" ng-change="updateMapUrl()" ng-model="resource.maps.markers.size">
-                                    <option value="normal"><?php esc_html_e('Normal','web-to-print-online-designer'); ?></option>
-                                    <option value="mid"><?php esc_html_e('Mid','web-to-print-online-designer'); ?></option>
-                                    <option value="small"><?php esc_html_e('Small','web-to-print-online-designer'); ?></option>
-                                </select>
-                                <label for="google-maps-markers-size" ><?php esc_html_e('Marker size','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-option">
-                                <select id="google-maps-markers-color" ng-change="updateMapUrl()" ng-model="resource.maps.markers.color">
-                                    <option ng-style="{'background-color': color, color: '#fff'}" ng-repeat="color in resource.defaultPalette[0]" value="{{color}}">{{color}}</option>
-                                </select>
-                                <label for="google-maps-markers-color" ><?php esc_html_e('Marker color','web-to-print-online-designer'); ?><label/>
-                            </div>
-                            <div class="google-maps-preview google-maps-option" ng-class="resource.maps.loading ? 'loading' : ''" ng-if="resource.maps.url !=''">
-                                <span class="nbd-button" ng-click="addImageFromUrl( resource.maps.url )"><?php esc_html_e('Insert map','web-to-print-online-designer'); ?></span>
-                                <img ng-click="addImageFromUrl( resource.maps.url )" ng-src="{{resource.maps.url}}" title="<?php esc_html_e('Click to insert this map','web-to-print-online-designer'); ?>"/>
-                                <div class="loading-maps" >
-                                    <svg class="circular" viewBox="25 25 50 50">
-                                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div>  
                 </div>
-                <div class="nbdesigner-gallery" id="nbdesigner-gallery">
-                </div>
-                <!-- <div class="loading-photo" >
-                    <svg class="circular" viewBox="25 25 50 50">
-                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                    </svg>
-                </div> -->
-            </div>
-            <div class="info-support">
-                <span>Facebook</span>
-                <i class="icon-nbd icon-nbd-clear close-result-loaded" ng-click="onClickTab('', 'element')"></i>
-            </div>
-        </div>
-    <!-- </div> -->
+    </div>
 </div>
 
 <!-- 子页面 -->
@@ -366,10 +205,7 @@
         </div>
         <!-- 图标：有动物、植物分组 -->
         <div ng-if="subPageType === 'icon'" class="icon-subpage-content">
-        <div class="active" id="tab-icon" data-container="#tab-icon" nbd-scroll="scrollLoadMore(container, type)" data-type="icon" data-offset="20">
-                <!-- <div class="elements-content tab-scroll"> -->
-                <div class="tab-main tab-scroll">
-                    <div class="result-loaded">
+
                     <div class="content-items">    
                     
                         <div class="content-item type-icon" data-type="icon" id="nbd-icon-wrap">  
@@ -398,9 +234,7 @@
                             </div>
                         </div>
                     <!-- </div> -->
-                    </div>
-                    </div>
-                </div>
+
             </div>
         </div>
         <!-- 插画：有卡通、手绘分组 -->
@@ -420,15 +254,36 @@
 </div>
 
 <style>
-.elements-content {
-    padding: 10px;
-    background: #3a495a;
-}
+
 
 .tab-main {
-    background: #3a495a;
+    background:rgb(147, 220, 235);
+    /* z-index: 9999; */
+    /* position: relat/ive; */
+    /* padding-top: 0px; */
 }
 
+/*
+siderbar
+.tabs-nav {
+    background:rgb(208, 38, 185) !important;
+    color:rgb(193, 212, 26) !important;
+} */
+.tab.active {
+    background:rgb(147, 220, 235) !important;
+    /* color:rgb(255, 255, 255) !important; */
+}
+/* main-tabs 被tab覆盖了*/
+.main-tabs {
+    /* background:rgb(208, 19, 19); */
+    color:rgb(26, 187, 212)
+}
+.tab-nav {
+    background: #3a495a;
+} 
+.tab {
+    background:#3a495a;
+}
 .icon-nbd-square {
     display: inline-block;
     line-height: 1;
@@ -592,25 +447,10 @@ input[type="text"]:focus {
 .color-palette-item {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
-
-/* 调整滚动条样式 */
-/* .tab-scroll::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+.element-main {
+    background: rgb(147, 220, 235);
 }
 
-.tab-scroll::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.tab-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-}
-
-.tab-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-} */
 .tab-scroll {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
