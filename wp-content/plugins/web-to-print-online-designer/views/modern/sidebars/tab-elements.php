@@ -255,9 +255,12 @@
 
 <style>
 
-
+.tab.active {
+    background:rgb(7, 129, 154) !important;
+    /* color:rgb(255, 255, 255) !important; */
+}
 .tab-main {
-    background:rgb(147, 220, 235);
+    background:rgb(7, 129, 154);
     /* z-index: 9999; */
     /* position: relat/ive; */
     /* padding-top: 0px; */
@@ -269,20 +272,20 @@ siderbar
     background:rgb(208, 38, 185) !important;
     color:rgb(193, 212, 26) !important;
 } */
-.tab.active {
-    background:rgb(147, 220, 235) !important;
-    /* color:rgb(255, 255, 255) !important; */
-}
+
 /* main-tabs 被tab覆盖了*/
-.main-tabs {
+/* .main-tabs { */
     /* background:rgb(208, 19, 19); */
-    color:rgb(26, 187, 212)
-}
+    /* color:rgb(26, 187, 212) */
+/* } */
 .tab-nav {
     background: #3a495a;
 } 
 .tab {
-    background:#3a495a;
+    background: #3a495a;
+}
+.element-main {
+    background: rgb(7, 129, 154);
 }
 .icon-nbd-square {
     display: inline-block;
@@ -447,9 +450,7 @@ input[type="text"]:focus {
 .color-palette-item {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.element-main {
-    background: rgb(147, 220, 235);
-}
+
 
 .tab-scroll {
     scrollbar-width: none; /* Firefox */

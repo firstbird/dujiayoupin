@@ -10,7 +10,7 @@
             </div>
         </div>
         <hr class="seperate" ng-if="settings.nbdesigner_hide_typo_section == 'no'" />
-        <div ng-if="settings.nbdesigner_hide_typo_section == 'no'" class="typography-body">
+        <div class="typography-body">
             <ul class="typography-items">
                 <li nbd-drag="typo.folder" type="typo" ng-click="insertTypography(typo)" class="typography-item" ng-repeat="typo in resource.typography.data | limitTo: resource.typography.filter.currentPage * resource.typography.filter.perPage" repeat-end="onEndRepeat('typography')">
                     <img ng-src="{{generateTypoLink(typo)}}" alt="Typography" />
