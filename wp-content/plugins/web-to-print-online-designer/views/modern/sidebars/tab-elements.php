@@ -148,9 +148,14 @@
                                 <span class="section-title">图标</span>
                                 <span class="section-more" ng-click="openSubPage('icon')">更多 ></span>
                             </div>
-                            <div class="section-list">
+                            <!-- <div class="section-list">
                                 <div class="section-item" ng-repeat="art in resource.icon.data | limitTo:3" ng-click="addSvgFromMedia(art)">
                                     <img ng-src="{{art.url}}" alt="{{art.name}}">
+                                </div>
+                            </div> -->
+                            <div class="section-list">
+                                <div class="draw-item" ng-repeat="item in iconList" ng-click="addImage(item.icon)" title="{{item.title}}">
+                                    <img ng-src="{{item.icon}}" alt="{{item.title}}">
                                 </div>
                             </div>
                         </div>
