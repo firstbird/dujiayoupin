@@ -165,8 +165,8 @@
                                 <span class="section-more" ng-click="openSubPage('illustration')">更多 ></span>
                             </div>
                             <div class="section-list">
-                                <div class="section-item" ng-repeat="art in resource.illustration.data | limitTo:3" ng-click="addSvgFromMedia(art)">
-                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
+                                <div class="draw-item" ng-repeat="item in paintList" ng-click="addImage(item.icon)" title="{{item.title}}">
+                                    <img ng-src="{{item.icon}}" alt="{{item.title}}">
                                 </div>
                             </div>
                         </div>
@@ -588,6 +588,14 @@ input[type="text"]:focus {
 .draw-item .icon-nbd {
     color: #fff !important;
     fill: #fff !important;
+}
+
+.draw-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* 保证图片完整显示且不变形 */
+    object-position: center;
+    display: block;
 }
 
 .range {
