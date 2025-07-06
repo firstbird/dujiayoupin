@@ -148,11 +148,6 @@
                                 <span class="section-title">图标</span>
                                 <span class="section-more" ng-click="openSubPage('icon')">更多 ></span>
                             </div>
-                            <!-- <div class="section-list">
-                                <div class="section-item" ng-repeat="art in resource.icon.data | limitTo:3" ng-click="addSvgFromMedia(art)">
-                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
-                                </div>
-                            </div> -->
                             <div class="section-list">
                                 <div class="draw-item" ng-repeat="item in iconList" ng-click="addImage(item.icon)" title="{{item.title}}">
                                     <img ng-src="{{item.icon}}" alt="{{item.title}}">
@@ -162,7 +157,7 @@
                         <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">插画</span>
-                                <span class="section-more" ng-click="openSubPage('illustration')">更多 ></span>
+                                <span class="section-more" ng-click="openSubPage('paint')">更多 ></span>
                             </div>
                             <div class="section-list">
                                 <div class="draw-item" ng-repeat="item in paintList" ng-click="addImage(item.icon)" title="{{item.title}}">
@@ -187,23 +182,35 @@
     </div>
     <div class="subpage-content">
         <!-- 形状：无子分组，直接展示全部 -->
-        <div ng-if="subPageType === 'shape'">
-            <div class="nbd-search">
-                <input type="text" name="search" placeholder="<?php esc_html_e('Search shape', 'web-to-print-online-designer'); ?>" ng-model="resource.shape.filter.search"/>
-                <i class="icon-nbd icon-nbd-fomat-search"></i>
-            </div>
-            <div class="content-item type-shape" data-type="shape" id="nbd-shape-wrap">  
-                <div class="mansory-wrap">
-                    <div nbd-drag="shape.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(shape, true, true)" ng-repeat="shape in resource.shape.filteredShapes | limitTo: resource.shape.filter.currentPage * resource.shape.filter.perPage" repeat-end="onEndRepeat('shape')">
-                        <div class="mansory-item__inner">
-                            <img ng-src="{{shape.url}}" /><span class="photo-desc">{{shape.name}}</span>
-                            <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                            </span>
+        <div ng-if="subPageType === 'shape'" class="shape-subpage-content">
+            <div class="content-items">    
+                
+                <div class="content-item type-shape" data-type="shape" id="nbd-shape-wrap">  
+                    <div class="mansory-wrap">
+                        <div nbd-drag="shape.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(shape, true, true)" ng-repeat="shape in resource.shape.filteredShapes" repeat-end="onEndRepeat('shape')">
+                            <div class="mansory-item__inner">
+                                <img ng-src="{{shape.url}}" /><span class="photo-desc">{{shape.name}}</span>
+                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                </span>
+                            </div>
                         </div>
                     </div>
+                    <!-- 底部提示文字 -->
+                    <div class="bottom-tip" ng-if="resource.shape.filteredShapes && resource.shape.filteredShapes.length > 0">
+                        <!-- 加载指示器 -->
+                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
+                            <svg class="circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                            </svg>
+                            正在加载更多形状...
+                        </div>
+                        <!-- 到底部提示 -->
+                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
+                    </div>
                 </div>
+
             </div>
 
 
@@ -211,48 +218,66 @@
         <!-- 图标：有动物、植物分组 -->
         <div ng-if="subPageType === 'icon'" class="icon-subpage-content">
 
-                    <div class="content-items">    
-                    
-                        <div class="content-item type-icon" data-type="icon" id="nbd-icon-wrap">  
-                            <div class="mansory-wrap">
-                                <div nbd-drag="icon.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(icon, true, true)" ng-repeat="icon in resource.icon.filteredIcons" repeat-end="onEndRepeat('icon')">
-                                    <div class="mansory-item__inner">
-                                        <img ng-src="{{icon.url}}" /><span class="photo-desc">{{icon.name}}</span>
-                                        <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                            <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                            <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- 底部提示文字 -->
-                            <div class="bottom-tip" ng-if="resource.icon.filteredIcons && resource.icon.filteredIcons.length > 0">
-                                <!-- 加载指示器 -->
-                                <div class="loading-indicator" ng-if="isLoadingMoreIcons">
-                                    <svg class="circular" viewBox="25 25 50 50">
-                                        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                                    </svg>
-                                    正在加载更多图标...
-                                </div>
-                                <!-- 到底部提示 -->
-                                <span class="loading-indicator" ng-if="!isLoadingMoreIcons">已经到底部了</span>
+            <div class="content-items">    
+            
+                <div class="content-item type-icon" data-type="icon" id="nbd-icon-wrap">  
+                    <div class="mansory-wrap">
+                        <div nbd-drag="icon.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(icon, true, true)" ng-repeat="icon in resource.icon.filteredIcons" repeat-end="onEndRepeat('icon')">
+                            <div class="mansory-item__inner">
+                                <img ng-src="{{icon.url}}" /><span class="photo-desc">{{icon.name}}</span>
+                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                </span>
                             </div>
                         </div>
-                    <!-- </div> -->
+                    </div>
+                    <!-- 底部提示文字 -->
+                    <div class="bottom-tip" ng-if="resource.icon.filteredIcons && resource.icon.filteredIcons.length > 0">
+                        <!-- 加载指示器 -->
+                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
+                            <svg class="circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                            </svg>
+                            正在加载更多图标...
+                        </div>
+                        <!-- 到底部提示 -->
+                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
+                    </div>
+                </div>
 
             </div>
         </div>
         <!-- 插画：有卡通、手绘分组 -->
-        <div ng-if="subPageType === 'illustration'">
-            <div class="element-section" ng-repeat="cat in illustrationSubGroups">
-                <div class="section-header">
-                    <span class="section-title">{{cat.title}}</span>
-                </div>
-                <div class="section-list">
-                    <div class="section-item" ng-repeat="art in cat.items | filter:subPageSearch" ng-click="addSvgFromMedia(art)">
-                        <img ng-src="{{art.url}}" alt="{{art.name}}">
+        <div ng-if="subPageType === 'paint'" class="paint-subpage-content">
+            <div class="content-items">    
+                
+                <div class="content-item type-paint" data-type="paint" id="nbd-paint-wrap">  
+                    <div class="mansory-wrap">
+                        <div nbd-drag="paint.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(paint, true, true)" ng-repeat="paint in resource.paint.filteredPaints" repeat-end="onEndRepeat('paint')">
+                            <div class="mansory-item__inner">
+                                <img ng-src="{{paint.url}}" /><span class="photo-desc">{{paint.name}}</span>
+                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 底部提示文字 -->
+                    <div class="bottom-tip" ng-if="resource.paint.filteredPaints && resource.paint.filteredPaints.length > 0">
+                        <!-- 加载指示器 -->
+                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
+                            <svg class="circular" viewBox="25 25 50 50">
+                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                            </svg>
+                            正在加载更多插画...
+                        </div>
+                        <!-- 到底部提示 -->
+                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -516,6 +541,52 @@ input[type="text"]:focus {
 }
 
 /* 图标子页面滚动样式 */
+.shape-subpage-content {
+    height: calc(100vh - 120px); /* 减去头部和搜索框的高度 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+}
+
+.shape-subpage-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.shape-subpage-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.shape-subpage-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.shape-subpage-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 确保内容区域有足够的高度来触发滚动 */
+.shape-subpage-content .content-item {
+    min-height: 100%;
+}
+
+/* 滚动加载时的加载指示器 */
+.shape-subpage-content .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.shape-subpage-content .loading-indicator svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+/* icon page */
 .icon-subpage-content {
     height: calc(100vh - 120px); /* 减去头部和搜索框的高度 */
     overflow-y: auto;
@@ -556,6 +627,53 @@ input[type="text"]:focus {
 }
 
 .icon-subpage-content .loading-indicator svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+/* paint page */
+.paint-subpage-content {
+    height: calc(100vh - 120px); /* 减去头部和搜索框的高度 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+}
+
+.paint-subpage-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.paint-subpage-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.paint-subpage-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.paint-subpage-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 确保内容区域有足够的高度来触发滚动 */
+.paint-subpage-content .content-item {
+    min-height: 100%;
+}
+
+/* 滚动加载时的加载指示器 */
+.paint-subpage-content .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.paint-subpage-content .loading-indicator svg {
     width: 20px;
     height: 20px;
     margin-right: 8px;
@@ -676,7 +794,7 @@ $scope.scrollRestoreConfig = {
     verify: true            // 是否验证恢复结果
 };
 
-// 假设icon和illustration的子分组数据结构如下
+// 假设icon和paint的子分组数据结构如下
 $scope.iconSubGroups = [
     { title: '动物', items: [
         { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/02/vecteezy_cute-cartoon-sea-animal-shark-character_10838184.png', name: '鲨鱼' },
@@ -689,122 +807,7 @@ $scope.iconSubGroups = [
         { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag1.jpg', name: '包3' }
     ]}
 ];
-$scope.illustrationSubGroups = [
-    { title: '卡通', items: [] },
-    { title: '手绘', items: [] }
-];
 
-$scope.openSubPage = function(type) {
-    $scope.showSubPage = true;
-    $scope.subPageType = type;
-    $scope.subPageSearch = '';
-    if(type === 'shape') {
-        $scope.subPageTitle = '形状';
-    } else if(type === 'icon') {
-        $scope.subPageTitle = '图标';
-        // 手动填充 iconSubGroups 数据
-        $scope.iconSubGroups = [
-            { title: '动物', items: [
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/02/vecteezy_cute-cartoon-sea-animal-shark-character_10838184.png', name: '鲨鱼' },
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/elephant-1837462.svg', name: '大象' },
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/teddy_bear1-1.jpg', name: '泰迪熊' }
-            ]},
-            { title: '植物', items: [
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2.jpg', name: '包1' },
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag2-2.jpg', name: '包2' },
-                { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/Bag1.jpg', name: '包3' }
-            ]}
-        ];
-        console.log('iconSubGroups:', $scope.iconSubGroups); // 调试日志
-        
-        // 初始化图标数据
-        // $scope.initializeIconData();
-        
-        // 在下一个digest cycle中绑定滚动事件
-        // $timeout(function() {
-        //     $scope.bindIconScrollEvent();
-        // });
-    } else if(type === 'illustration') {
-        $scope.subPageTitle = '插画';
-        // 这里需要将 resource.illustration.data 按"卡通/手绘"分组
-        $scope.illustrationSubGroups[0].items = $scope.resource.illustration.data.filter(function(item){ return item.category === '卡通'; });
-        $scope.illustrationSubGroups[1].items = $scope.resource.illustration.data.filter(function(item){ return item.category === '手绘'; });
-    }
-};
-
-// 加载更多图标
-$scope.loadMoreIcons = function() {
-    // 防止重复加载
-    if ($scope.isLoadingMoreIcons) {
-        console.log('正在加载中，跳过重复请求');
-        return;
-    }
-    
-    // 获取当前滚动容器
-    var iconContainer = document.querySelector('.icon-subpage-content');
-    if (!iconContainer) {
-        console.warn('未找到图标容器元素');
-        return;
-    }
-    
-    // 保存当前滚动位置和容器高度
-    var scrollTop = iconContainer.scrollTop;
-    var scrollHeight = iconContainer.scrollHeight;
-    var clientHeight = iconContainer.clientHeight;
-    
-    console.log('保存滚动位置:', {
-        scrollTop: scrollTop,
-        scrollHeight: scrollHeight,
-        clientHeight: clientHeight
-    });
-    
-    $scope.isLoadingMoreIcons = true;
-    console.log('开始加载更多图标...');
-    
-    // 模拟异步加载
-    setTimeout(function() {
-        // 这里可以添加实际的API调用来获取更多图标
-        // 例如：
-        // $http.get('/api/icons?page=' + nextPage).then(function(response) {
-        //     $scope.resource.icon.filteredIcons = $scope.resource.icon.filteredIcons.concat(response.data);
-        //     $scope.isLoadingMoreIcons = false;
-        //     $scope.restoreScrollPosition(iconContainer, scrollTop, scrollHeight);
-        // });
-        
-        // 临时添加一些示例数据
-        var moreIcons = [
-            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon1.png', name: '图标1' },
-            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon2.png', name: '图标2' },
-            { url: 'https://www.dujiayoupin.com/wp-content/uploads/2025/01/icon3.png', name: '图标3' }
-        ];
-        
-        if (!$scope.resource.icon.filteredIcons) {
-            $scope.resource.icon.filteredIcons = [];
-        }
-        
-        $scope.resource.icon.filteredIcons = $scope.resource.icon.filteredIcons.concat(moreIcons);
-        $scope.isLoadingMoreIcons = false;
-        console.log('已加载更多图标，总数:', $scope.resource.icon.filteredIcons.length);
-        
-        // 强制更新视图
-        if (!$scope.$$phase) {
-            $scope.$apply();
-        }
-        
-        // 恢复滚动位置
-        // if ($scope.scrollRestoreConfig.enabled) {
-            if ($scope.scrollRestoreConfig.method === 'advanced') {
-                $scope.advancedScrollPositionRestore(iconContainer, scrollTop, scrollHeight);
-            } else {
-                $scope.restoreScrollPosition(iconContainer, scrollTop, scrollHeight);
-            }
-        // }
-        
-        // 或者使用高级滚动位置恢复方法（取消注释下面的行来启用）
-        // $scope.advancedScrollPositionRestore(iconContainer, scrollTop, scrollHeight);
-        
-    }, 1000); // 模拟1秒的加载时间
-};
 
 // 恢复滚动位置
 $scope.restoreScrollPosition = function(container, oldScrollTop, oldScrollHeight) {
@@ -888,7 +891,7 @@ $scope.closeSubPage = function() {
     $scope.subPageType = '';
     $scope.subPageTitle = '';
     $scope.subPageSearch = '';
-    $scope.isLoadingMoreIcons = false;
+    $scope.isLoadingMoreResources = false;
 };
 
 $scope.handleDrawMode = function() {

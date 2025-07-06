@@ -53,6 +53,7 @@ class Nbdesigner_Plugin {
         $this->pathMap = [
             'background' => 'images/dujia/background/',
             'shape' => 'images/dujia/element/shape/',
+            'paint' => 'images/dujia/element/paint/',
             'font' => 'images/dujia/font/',
             'pattern' => 'images/dujia/pattern/',
             'art' => 'images/dujia/art/',
