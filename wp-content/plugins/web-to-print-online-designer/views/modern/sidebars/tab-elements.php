@@ -182,7 +182,7 @@
     </div>
     <div class="subpage-content">
         <!-- 形状：无子分组，直接展示全部 -->
-        <div ng-if="subPageType === 'shape'" class="shape-subpage-content">
+        <div ng-if="subPageType === 'shape'" class="subpage-content-inner">
             <div class="content-items">    
                 
                 <div class="content-item type-shape" data-type="shape" id="nbd-shape-wrap">  
@@ -216,7 +216,7 @@
 
         </div>
         <!-- 图标：有动物、植物分组 -->
-        <div ng-if="subPageType === 'icon'" class="icon-subpage-content">
+        <div ng-if="subPageType === 'icon'" class="subpage-content-inner">
 
             <div class="content-items">    
             
@@ -249,7 +249,7 @@
             </div>
         </div>
         <!-- 插画：有卡通、手绘分组 -->
-        <div ng-if="subPageType === 'paint'" class="paint-subpage-content">
+        <div ng-if="subPageType === 'paint'" class="subpage-content-inner">
             <div class="content-items">    
                 
                 <div class="content-item type-paint" data-type="paint" id="nbd-paint-wrap">  
@@ -541,46 +541,46 @@ input[type="text"]:focus {
 }
 
 /* 图标子页面滚动样式 */
-.shape-subpage-content {
+.subpage-content-inner {
     height: calc(100vh - 120px); /* 减去头部和搜索框的高度 */
     overflow-y: auto;
     overflow-x: hidden;
     padding-bottom: 20px;
 }
 
-.shape-subpage-content::-webkit-scrollbar {
+.subpage-content-inner::-webkit-scrollbar {
     width: 8px;
 }
 
-.shape-subpage-content::-webkit-scrollbar-track {
+.subpage-content-inner::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
 }
 
-.shape-subpage-content::-webkit-scrollbar-thumb {
+.subpage-content-inner::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.3);
     border-radius: 4px;
     transition: background 0.2s ease;
 }
 
-.shape-subpage-content::-webkit-scrollbar-thumb:hover {
+.subpage-content-inner::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
 /* 确保内容区域有足够的高度来触发滚动 */
-.shape-subpage-content .content-item {
+.subpage-content-inner .content-item {
     min-height: 100%;
 }
 
 /* 滚动加载时的加载指示器 */
-.shape-subpage-content .loading-indicator {
+.subpage-content-inner .loading-indicator {
     text-align: center;
     padding: 20px;
     color: #fff;
     font-size: 14px;
 }
 
-.shape-subpage-content .loading-indicator svg {
+.subpage-content-inner .loading-indicator svg {
     width: 20px;
     height: 20px;
     margin-right: 8px;
