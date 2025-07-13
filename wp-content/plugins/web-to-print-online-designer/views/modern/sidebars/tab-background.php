@@ -94,7 +94,7 @@
                     <h3 class="color-palette-label"><?php esc_html_e('免费背景图片','web-to-print-online-designer'); ?></h3>
                     <div class="content-item type-background" data-type="backgrounds" id="nbd-background-wrap">  
                         <div class="mansory-wrap">
-                            <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.filteredBackgrounds | limitTo: resource.background.filter.currentPage * resource.background.filter.perPage" repeat-end="onEndRepeat('background')">
+                            <div nbd-drag="bg.url" extenal="true" type="svg" class="mansory-item" ng-click="setBackgroundInner(bg.url)" ng-repeat="bg in resource.background.filtered | limitTo: resource.background.filter.currentPage * resource.background.filter.perPage" repeat-end="onEndRepeat('background')">
                                 <div class="mansory-item__inner">
                                     <img ng-src="{{bg.url}}" /><span class="photo-desc">{{bg.name}}</span>
                                     <span class="nbd-pro-mark-wrap" ng-if="$index > 20">

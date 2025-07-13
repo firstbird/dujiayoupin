@@ -1,6 +1,102 @@
 <div class="<?php if( $active_elements ) echo 'active'; ?> tab tab-last" id="tab-element">
-
-    
+<?php
+        // 定义所有需要的内容类型
+        $content_types = array(
+            'shape' => array(
+                'title' => '形状',
+            ),
+            'icon' => array(
+                'title' => '图标',
+            ),
+            'paint' => array(
+                'title' => '插画',
+            ),
+            'text' => array(
+                'title' => '文字',
+            ),
+            'background' => array(
+                'title' => '背景',
+            ),
+            'character' => array(
+                'title' => '人物',
+            ),
+            'pet' => array(
+                'title' => '宠物',
+            ),
+            'chineseStyle' => array(
+                'title' => '中国风',
+            ),
+            'promotion' => array(
+                'title' => '促销',
+            ),
+            'food' => array(
+                'title' => '食物',
+            ),
+            'material' => array(
+                'title' => '材质',
+            ),
+            'cute' => array(
+                'title' => '可爱',
+            ),
+            'emoticon' => array(
+                'title' => '表情',
+            ),
+            'textBox' => array(
+                'title' => '文本框',
+            ),
+            'plant' => array(
+                'title' => '植物',
+            ),
+            'music' => array(
+                'title' => '音乐',
+            ),
+            'celestialBody' => array(
+                'title' => '天体',
+            ),
+            'starrySky' => array(
+                'title' => '星空',
+            ),
+            'weather' => array(
+                'title' => '天气',
+            ),
+            'game' => array(
+                'title' => '游戏',
+            ),
+            'cartoon' => array(
+                'title' => '卡通',
+            ),
+            'scenery' => array(
+                'title' => '风景',
+            ),
+            'fruit' => array(
+                'title' => '水果',
+            ),
+            'flower' => array(
+                'title' => '花朵',
+            ),
+            'blessing' => array(
+                'title' => '祝福',
+            ),
+            'fluid' => array(
+                'title' => '流体',
+            ),
+            'animal' => array(
+                'title' => '动物',
+            ),
+            'frame' => array(
+                'title' => '相框',
+            ),
+            'line' => array(
+                'title' => '线条',
+            ),
+            'dialogBox' => array(
+                'title' => '对话框',
+            ),
+            'expression' => array(
+                'title' => '表情',
+            )
+        );
+?>    
     <div class="element-main tab-scroll">
                 <div class="content-items">
                     <div class="content-item type-draw" data-type="draw">
@@ -112,7 +208,7 @@
                         </div>
                     </div>
                     <div ng-if="!showSubPage">
-                        <div class="element-section">
+                        <!-- <div class="element-section">
                             <div class="section-header">
                                 <span class="section-title">形状</span>
                                 <span class="section-more" ng-click="openSubPage('shape')">更多 ></span>
@@ -137,31 +233,15 @@
                                     <i class="icon-nbd" style="font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.87); width: 50px; height: 6px; background: currentColor;"></i>
                                 </div>
                             </div>
-                            <!-- <div class="section-list">
-                                <div class="section-item" ng-repeat="art in resource.shape.data | limitTo:3" ng-click="addSvgFromMedia(art)">
-                                    <img ng-src="{{art.url}}" alt="{{art.name}}">
-                                </div>
-                            </div> -->
-                        </div>
-                        <div class="element-section">
-                            <div class="section-header">
-                                <span class="section-title">图标</span>
-                                <span class="section-more" ng-click="openSubPage('icon')">更多 ></span>
+                        </div> -->
+                        <div class="element-section" ng-repeat="(type, config) in resource">
+                            <div class="section-header" ng-if="config.subPageTitle">
+                                <span class="section-title">{{config.subPageTitle}}</span>
+                                <span class="section-more" ng-click="openSubPage(type)">更多 ></span>
                             </div>
-                            <div class="section-list">
-                                <div class="draw-item" ng-repeat="item in iconList" ng-click="addImage(item.icon)" title="{{item.title}}">
-                                    <img ng-src="{{item.icon}}" alt="{{item.title}}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="element-section">
-                            <div class="section-header">
-                                <span class="section-title">插画</span>
-                                <span class="section-more" ng-click="openSubPage('paint')">更多 ></span>
-                            </div>
-                            <div class="section-list">
-                                <div class="draw-item" ng-repeat="item in paintList" ng-click="addImage(item.icon)" title="{{item.title}}">
-                                    <img ng-src="{{item.icon}}" alt="{{item.title}}">
+                            <div class="section-list" ng-if="config.subPageTitle">
+                                <div class="draw-item" ng-repeat="item in getListByType(type)" ng-click="addImage(item[type])" title="{{item.title}}">
+                                    <img ng-src="{{item}}">
                                 </div>
                             </div>
                         </div>
@@ -181,15 +261,18 @@
         <i class="icon-nbd icon-nbd-fomat-search"></i>
     </div>
     <div class="subpage-content">
-        <!-- 形状：无子分组，直接展示全部 -->
-        <div ng-if="subPageType === 'shape'" class="subpage-content-inner">
+        <?php
+        foreach ($content_types as $type => $config) {
+        ?>
+        <!-- <?php echo $config['title']; ?>：<?php echo $config['description']; ?> -->
+        <div ng-if="subPageType === '<?php echo $type; ?>'" class="subpage-content-inner">
             <div class="content-items">    
                 
-                <div class="content-item type-shape" data-type="shape" id="nbd-shape-wrap">  
+                <div class="content-item type-<?php echo $type; ?>" data-type="<?php echo $type; ?>" id="nbd-<?php echo $type; ?>-wrap">  
                     <div class="mansory-wrap">
-                        <div nbd-drag="shape.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(shape, true, true)" ng-repeat="shape in resource.shape.filteredShapes" repeat-end="onEndRepeat('shape')">
+                        <div nbd-drag="<?php echo $type; ?>.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(<?php echo $type; ?>, true, true)" ng-repeat="<?php echo $type; ?> in resource.<?php echo $type; ?>.filtered" repeat-end="onEndRepeat('<?php echo $type; ?>')">
                             <div class="mansory-item__inner">
-                                <img ng-src="{{shape.url}}" /><span class="photo-desc">{{shape.name}}</span>
+                                <img ng-src="{{<?php echo $type; ?>.url}}" /><span class="photo-desc">{{<?php echo $type; ?>.name}}</span>
                                 <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
                                     <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
                                     <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
@@ -198,48 +281,13 @@
                         </div>
                     </div>
                     <!-- 底部提示文字 -->
-                    <div class="bottom-tip" ng-if="resource.shape.filteredShapes && resource.shape.filteredShapes.length > 0">
+                    <div class="bottom-tip" ng-if="resource.<?php echo $type; ?>.filtered && resource.<?php echo $type; ?>.filtered.length > 0">
                         <!-- 加载指示器 -->
                         <div class="loading-indicator" ng-if="isLoadingMoreResources">
                             <svg class="circular" viewBox="25 25 50 50">
                                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
                             </svg>
-                            正在加载更多形状...
-                        </div>
-                        <!-- 到底部提示 -->
-                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
-                    </div>
-                </div>
-
-            </div>
-
-
-        </div>
-        <!-- 图标：有动物、植物分组 -->
-        <div ng-if="subPageType === 'icon'" class="subpage-content-inner">
-
-            <div class="content-items">    
-            
-                <div class="content-item type-icon" data-type="icon" id="nbd-icon-wrap">  
-                    <div class="mansory-wrap">
-                        <div nbd-drag="icon.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(icon, true, true)" ng-repeat="icon in resource.icon.filteredIcons" repeat-end="onEndRepeat('icon')">
-                            <div class="mansory-item__inner">
-                                <img ng-src="{{icon.url}}" /><span class="photo-desc">{{icon.name}}</span>
-                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 底部提示文字 -->
-                    <div class="bottom-tip" ng-if="resource.icon.filteredIcons && resource.icon.filteredIcons.length > 0">
-                        <!-- 加载指示器 -->
-                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
-                            <svg class="circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                            </svg>
-                            正在加载更多图标...
+                            <?php echo '正在加载更多' . $config['title'] . '...'; ?>
                         </div>
                         <!-- 到底部提示 -->
                         <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
@@ -248,38 +296,9 @@
 
             </div>
         </div>
-        <!-- 插画：有卡通、手绘分组 -->
-        <div ng-if="subPageType === 'paint'" class="subpage-content-inner">
-            <div class="content-items">    
-                
-                <div class="content-item type-paint" data-type="paint" id="nbd-paint-wrap">  
-                    <div class="mansory-wrap">
-                        <div nbd-drag="paint.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(paint, true, true)" ng-repeat="paint in resource.paint.filteredPaints" repeat-end="onEndRepeat('paint')">
-                            <div class="mansory-item__inner">
-                                <img ng-src="{{paint.url}}" /><span class="photo-desc">{{paint.name}}</span>
-                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
-                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
-                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 底部提示文字 -->
-                    <div class="bottom-tip" ng-if="resource.paint.filteredPaints && resource.paint.filteredPaints.length > 0">
-                        <!-- 加载指示器 -->
-                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
-                            <svg class="circular" viewBox="25 25 50 50">
-                                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                            </svg>
-                            正在加载更多插画...
-                        </div>
-                        <!-- 到底部提示 -->
-                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+        <?php
+        }
+        ?>
     </div>
 </div>
 
