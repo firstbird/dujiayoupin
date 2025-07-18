@@ -240,7 +240,7 @@
                                 <span class="section-more" ng-click="openSubPage(type)">更多 ></span>
                             </div>
                             <div class="section-list" ng-if="config.subPageTitle">
-                                <div class="draw-item" ng-repeat="item in getListByType(type)" ng-click="addImage(item[type])" title="{{item.title}}">
+                                <div class="draw-item" ng-repeat="item in getListByType(type)" ng-click="addImage(item)" title="{{item.title}}">
                                     <img ng-src="{{item}}">
                                 </div>
                             </div>
