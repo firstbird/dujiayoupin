@@ -256,11 +256,11 @@
         <span class="icon-back" ng-click="closeSubPage()" style="font-size:22px;margin-right:12px;cursor:pointer;color:#fff;display:inline-block;">&#8592;</span>
         <span class="subpage-title" style="color:#fff;font-size:18px;font-weight:bold;display:inline-block;">{{subPageTitle}}</span>
     </div>
-    <div class="nbd-search subpage-search">
+    <div class="subpage-search">
         <?php
         foreach ($content_types as $type => $config) {
         ?>
-        <input ng-if="subPageType === '<?php echo $type; ?>'" type="text" name="search" placeholder="<?php esc_html_e('Search background', 'web-to-print-online-designer'); ?>" ng-model="resource.<?php echo $type; ?>.filter.search"/>
+        <input ng-if="subPageType === '<?php echo $type; ?>'" type="text" name="search" placeholder="<?php esc_html_e('搜索' . $config['title'], 'web-to-print-online-designer'); ?>" ng-model="resource.<?php echo $type; ?>.filter.search"/>
         
         <?php
         }
