@@ -256,7 +256,15 @@
         <span class="icon-back" ng-click="closeSubPage()" style="font-size:22px;margin-right:12px;cursor:pointer;color:#fff;display:inline-block;">&#8592;</span>
         <span class="subpage-title" style="color:#fff;font-size:18px;font-weight:bold;display:inline-block;">{{subPageTitle}}</span>
     </div>
-    <div class="subpage-search">
+    <div class="loading-overlay" ng-if="resource[subPageType].onload">
+            <div class="loading-spinner">
+                <svg viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/>
+                </svg>
+                <span style="margin-left:10px;">正在加载...</span>
+            </div>
+    </div>
+    <div class="subpage-search" ng-if="!resource[subPageType].onload">
         <?php
         foreach ($content_types as $type => $config) {
         ?>
@@ -294,14 +302,14 @@
                     <!-- 底部提示文字 -->
                     <div class="bottom-tip" ng-if="resource.<?php echo $type; ?>.filtered && resource.<?php echo $type; ?>.filtered.length > 0">
                         <!-- 加载指示器 -->
-                        <div class="loading-indicator" ng-if="isLoadingMoreResources">
+                        <div class="loading-indicator" ng-if="resource[subPageType].onload && resource[subPageType].hasMore == 'true'">
                             <svg class="circular" viewBox="25 25 50 50">
                                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
                             </svg>
                             <?php echo '正在加载更多' . $config['title'] . '...'; ?>
                         </div>
                         <!-- 到底部提示 -->
-                        <span class="loading-indicator" ng-if="!isLoadingMoreResources">已经到底部了</span>
+                        <span class="loading-indicator" ng-if="!resource[subPageType].onload && resource[subPageType].hasMore == 'false'">已经到底部了</span>
                     </div>
                 </div>
 
@@ -568,6 +576,7 @@ input[type="text"]:focus {
 
 .subpage-content {
     padding: 0 12px;
+    position: relative;
 }
 
 /* 图标子页面滚动样式 */
@@ -807,6 +816,32 @@ input[type="text"]:focus {
     animation: spin 1s linear infinite;
 }
 
+.loading-overlay {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 2000;
+    pointer-events: all;
+    cursor: wait;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 16px;
+}
+.loading-spinner svg {
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 
 <script>
@@ -921,7 +956,7 @@ $scope.closeSubPage = function() {
     $scope.subPageType = '';
     $scope.subPageTitle = '';
     $scope.subPageSearch = '';
-    $scope.isLoadingMoreResources = false;
+    // $scope.isLoadingMoreResources = false;
 };
 
 $scope.handleDrawMode = function() {

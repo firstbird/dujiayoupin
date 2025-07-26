@@ -13,7 +13,6 @@ require_once 'aliyun-oss-php-sdk-master/autoload.php';
 use OSS\OssClient;
 use OSS\Core\OssException;
 use OSS\Credentials\EnvironmentVariableCredentialsProvider;
-
 // 添加初始化检查
 error_log('NBD_OSS: 类文件已加载');
 

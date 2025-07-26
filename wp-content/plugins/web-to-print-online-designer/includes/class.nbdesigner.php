@@ -50,6 +50,10 @@ class Nbdesigner_Plugin {
 
     public function init(){
         // 初始化pathMap
+        $this->endpoint = 'https://imm.cn-shanghai.aliyuncs.com';
+        $this->bucket = 'mzl-debug-bucket';
+        $this->hostHeader = 'imm.cn-shanghai.aliyuncs.com';
+        $this->immProjectName = 'design_resource_imm'; // 您的IMM项目名
         $this->pathMap = [
             'background' => 'images/dujia/background/',
             'shape' => 'images/dujia/element/shape/',
@@ -129,7 +133,7 @@ class Nbdesigner_Plugin {
                 'accessKeyId' => $accessKeyId,
                 'accessKeySecret' => $accessKeySecret,
                 'bucket' => 'mzl-debug-bucket',
-                'region' => 'oss-cn-shanghai.aliyuncs.com'
+                'region' => 'oss-cn-shanghai.aliyuncs.com',
             ];
             
             // 根据type获取对应的path
@@ -155,6 +159,192 @@ class Nbdesigner_Plugin {
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * 使用 IMM SimpleQuery 查询图片
+     * @link https://help.aliyun.com/zh/imm/developer-reference/api-imm-2020-09-30-simplequery
+     */
+    public function nbd_oss_search_images() {
+        $query = isset($_POST['searchKey']) ? sanitize_text_field($_POST['searchKey']) : '';
+        $limit = isset($_POST['num']) ? intval($_POST['num']) : 10;
+        $datasetName = 'design_resource_element';
+        error_log('nbd_oss_search_images query key: ' . $_POST['searchKey'] . ' num: ' . $_POST['num']);
+        
+        // 构建 SimpleQuery 查询条件
+        $queryArr = [
+            'SubQueries' => [
+                [
+                    'Field' => 'Labels.LabelName',
+                    'Value' => $query,
+                    'Operation' => 'eq'
+                ]
+            ],
+            'Operation' => 'and'
+        ];
+        
+        $params = [
+            'Action' => 'SimpleQuery',
+            'Version' => '2020-09-30',
+            'ProjectName' => $this->immProjectName, // IMM 项目名
+            'DatasetName' => $datasetName,          // IMM 数据集名
+            'MaxResults' => $limit,
+            'Query' => json_encode($queryArr)
+        ];
+        
+        error_log('IMM SimpleQuery Params: ' . print_r($params, true));
+        
+        try {
+            $response = $this->sendRequest('POST', $params);
+            $files = [];
+            if (isset($response['Files'])) {
+                foreach ($response['Files'] as $file) {
+                    if (isset($file['Labels']) && is_array($file['Labels'])) {
+                        foreach ($file['Labels'] as $label) {
+                            if (isset($label['LabelConfidence']) && floatval($label['LabelConfidence']) >= 0.7) {
+                                if (isset($file['URI'])) {
+                                    $oss_url = $file['URI'];
+                                    if (strpos($oss_url, 'oss://') === 0) {
+                                        $oss_url = substr($oss_url, 6);
+                                        $parts = explode('/', $oss_url, 2);
+                                        $bucket = $parts[0];
+                                        $object = isset($parts[1]) ? $parts[1] : '';
+                                        $domain = 'oss-cn-shanghai.aliyuncs.com'; // 替换为你的OSS域名
+                                        $http_url = 'https://' . $bucket . '.' . $domain . '/' . $object;
+                                    } else {
+                                        $http_url = $file['URI'];
+                                    }
+                                    $files[] = [
+                                        'url' => $http_url,
+                                        'hashKey' => $file['ObjectId'] ?? '',
+                                        'key' => $file['Filename'] ?? '',
+                                        'lastModified' => $file['CreateTime'] ?? '',
+                                        'size' => $file['Size'] ?? 0,
+                                        'type' => isset($file['ContentType']) ? preg_replace('/^image\//', '', $file['ContentType']) : ''
+                                    ];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            wp_send_json_success([
+                'total' => count($files),
+                'files' => $files
+            ]);
+        } catch (Exception $e) {
+            error_log('nbd_oss_search_images: SimpleQuery失败：' . $e->getMessage());
+            wp_send_json_error([
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * 发送带签名的 API 请求
+     * 
+     * @param string $method HTTP 方法
+     * @param array $params  请求参数
+     * @return array         解析后的 JSON 响应
+     */
+    private function sendRequest($method, $params) {
+        $accessKeyId = getenv('ALIYUN_OSS_ACCESS_KEY_ID');
+        $accessKeySecret = getenv('ALIYUN_OSS_ACCESS_KEY_SECRET');
+        
+        if (!$accessKeyId || !$accessKeySecret) {
+            throw new Exception('sendRequest error accessKeyId, accessKeySecret');
+        }
+        
+        // 添加公共参数
+        $publicParams = [
+            'Format' => 'JSON',
+            'Version' => $params['Version'],
+            'AccessKeyId' => $accessKeyId,
+            'SignatureMethod' => 'HMAC-SHA1',
+            'Timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+            'SignatureVersion' => '1.0',
+            'SignatureNonce' => uniqid()
+        ];
+        
+        // 合并参数
+        $allParams = array_merge($publicParams, $params);
+        
+        // 参数排序
+        ksort($allParams);
+        
+        // 构建规范化的查询字符串
+        $queryString = '';
+        foreach ($allParams as $key => $value) {
+            $queryString .= '&' . $this->percentEncode($key) . '=' . $this->percentEncode($value);
+        }
+        $queryString = substr($queryString, 1);
+        
+        // 构建待签名字符串
+        $stringToSign = $method . '&%2F&' . $this->percentEncode($queryString);
+        
+        // 计算签名
+        $signature = base64_encode(hash_hmac('sha1', $stringToSign, $accessKeySecret . '&', true));
+        
+        // 添加签名到参数
+        $allParams['Signature'] = $signature;
+        
+        // 重新构建查询字符串
+        $finalQueryString = http_build_query($allParams);
+        
+        // 初始化 cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->endpoint);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $finalQueryString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/x-www-form-urlencoded',
+            'Host: ' . $this->hostHeader
+        ]);
+        
+        // 执行请求
+        $response = curl_exec($ch);
+        
+        // 错误处理
+        if (curl_errno($ch)) {
+            throw new RuntimeException('cURL error: ' . curl_error($ch));
+        }
+        
+        // 关闭连接
+        curl_close($ch);
+        
+        // 调试：打印请求和响应
+        error_log('IMM API Request URL: ' . $this->endpoint);
+        error_log('IMM API Request Params: ' . print_r($allParams, true));
+        error_log('IMM API Response: ' . print_r($response, true));
+
+        // 解析 JSON 响应
+        $result = json_decode($response, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('JSON parse error: ' . json_last_error_msg());
+        }
+        
+        if (isset($result['Code'])) {
+            throw new RuntimeException("IMM API error [{$result['Code']}]: {$result['Message']}");
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * URL 编码
+     * 
+     * @param string $str 需要编码的字符串
+     * @return string     编码后的字符串
+     */
+    private function percentEncode($str) {
+        $res = urlencode($str);
+        $res = preg_replace('/\+/', '%20', $res);
+        $res = preg_replace('/\*/', '%2A', $res);
+        $res = preg_replace('/%7E/', '~', $res);
+        return $res;
     }
 
     public function ajax(){
@@ -226,7 +416,8 @@ class Nbdesigner_Plugin {
             'nbd_get_instagram_token'                   => true,
             'nbdesigner_get_customer_files'              => true,
             'nbdesigner_clear_customer_album'            => true,
-            'nbd_oss_list_files'                        => true
+            'nbd_oss_list_files'                        => true,
+            'nbd_oss_search_images'                        => true
         );
         foreach( $ajax_events as $ajax_event => $nopriv ) {
             add_action( 'wp_ajax_' . $ajax_event, array( $this, $ajax_event ) );
