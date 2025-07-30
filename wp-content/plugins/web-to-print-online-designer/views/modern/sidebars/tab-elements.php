@@ -268,12 +268,17 @@
         <?php
         foreach ($content_types as $type => $config) {
         ?>
-        <input ng-if="subPageType === '<?php echo $type; ?>'" type="text" name="search" placeholder="<?php esc_html_e('搜索' . $config['title'], 'web-to-print-online-designer'); ?>" ng-model="resource.<?php echo $type; ?>.filter.search"/>
+        <input ng-if="subPageType === '<?php echo $type; ?>'" 
+               type="text" 
+               name="search" 
+               placeholder="<?php esc_html_e('搜索' . $config['title'], 'web-to-print-online-designer'); ?>" 
+               ng-model="resource.<?php echo $type; ?>.filter.search"
+               ng-keyup="$event.keyCode === 13 && performSearch('<?php echo $type; ?>')"/>
         
         <?php
         }
         ?>
-        <i class="icon-nbd icon-nbd-fomat-search"></i>
+        <i class="icon-nbd icon-nbd-fomat-search" ng-click="performSearch(subPageType)" style="cursor: pointer;"></i>
     </div>
     <!-- <div class="subpage-search">
         <input type="text" ng-model="subPageSearch" placeholder="搜索{{subPageTitle}}">
@@ -1004,4 +1009,5 @@ $scope.cleanupIconScrollEvent = function() {
         console.log('已清理图标页面滚动事件监听器');
     }
 };
+
 </script>
