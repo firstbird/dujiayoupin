@@ -188,8 +188,8 @@ class Nbdesigner_Plugin {
             ]
         ];
         
-        // 如果指定了目录，添加URI前缀条件
-        if ($ossUri) {
+        // 如果指定了目录，添加URI前缀条件（全局搜索时不限制目录）
+        if ($ossUri && $type !== 'globalSearch') {
             $subQueries[] = [
                 'Field' => 'URI',
                 'Value' => $ossUri,

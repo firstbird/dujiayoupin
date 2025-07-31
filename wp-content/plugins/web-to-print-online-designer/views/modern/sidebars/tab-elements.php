@@ -98,7 +98,20 @@
         );
 ?>    
     <div class="element-main tab-scroll">
-                <div class="content-items">
+        <!-- 全局搜索栏 -->
+        <div class="global-search-bar">
+            <div class="search-input-wrapper">
+                <input type="text" 
+                       placeholder="搜索所有元素..." 
+                       ng-model="globalSearchTerm"
+                       ng-keyup="$event.keyCode === 13 && performGlobalSearch()"/>
+                <i class="icon-nbd icon-nbd-fomat-search" 
+                   ng-click="performGlobalSearch()" 
+                   style="cursor: pointer; color: #fff;"></i>
+            </div>
+        </div>
+        
+        <div class="content-items">
                     <div class="content-item type-draw" data-type="draw">
                         <div class="main-type">
                             <div class="free-draw-settings">
@@ -323,6 +336,33 @@
         <?php
         }
         ?>
+        
+        <!-- 全局搜索结果 -->
+        <div ng-if="subPageType === 'globalSearch'" class="subpage-content-inner">
+            <div class="content-items">    
+                <div class="content-item type-globalSearch" data-type="globalSearch" id="nbd-globalSearch-wrap">  
+                    <div class="mansory-wrap">
+                        <div nbd-drag="item.url" extenal="true" type="svg" class="mansory-item" ng-click="addArt(item, true, true)" ng-repeat="item in resource.globalSearch.filtered" repeat-end="onEndRepeat('globalSearch')">
+                            <div class="mansory-item__inner">
+                                <img ng-src="{{item.url}}" />
+                                <span class="photo-desc">{{item.key}}</span>
+                                <span class="nbd-pro-mark-wrap" ng-if="$index > 20">
+                                    <svg class="nbd-pro-mark" fill="#F3B600" xmlns="http://www.w3.org/2000/svg" viewBox="-505 380 12 10"><path d="M-503 388h8v1h-8zM-494 382.2c-.4 0-.8.3-.8.8 0 .1 0 .2.1.3l-2.3.7-1.5-2.2c.3-.2.5-.5.5-.8 0-.6-.4-1-1-1s-1 .4-1 1c0 .3.2.6.5.8l-1.5 2.2-2.3-.8c0-.1.1-.2.1-.3 0-.4-.3-.8-.8-.8s-.8.4-.8.8.3.8.8.8h.2l.8 3.3h8l.8-3.3h.2c.4 0 .8-.3.8-.8 0-.4-.4-.7-.8-.7z"></path></svg>
+                                    <?php esc_html_e('Pro','web-to-print-online-designer'); ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 底部提示文字 -->
+                    <div class="bottom-tip" ng-if="resource.globalSearch.filtered && resource.globalSearch.filtered.length > 0">
+                        <span class="loading-indicator">找到 {{resource.globalSearch.filtered.length}} 个结果</span>
+                    </div>
+                    <div class="bottom-tip" ng-if="!resource.globalSearch.filtered || resource.globalSearch.filtered.length === 0">
+                        <span class="loading-indicator">没有找到相关结果</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -533,6 +573,51 @@ input[type="text"]:focus {
 .tab-scroll::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
 }
+
+/* 全局搜索栏样式 */
+.global-search-bar {
+    padding: 16px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 16px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-input-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.search-input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-input-wrapper .icon-nbd-fomat-search {
+    margin-left: 8px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.2s ease;
+}
+
+.search-input-wrapper .icon-nbd-fomat-search:hover {
+    color: #fff;
+}
+
 .subpage {
     background: #3a495a;
     height: 100%;
@@ -1009,5 +1094,4 @@ $scope.cleanupIconScrollEvent = function() {
         console.log('已清理图标页面滚动事件监听器');
     }
 };
-
 </script>
