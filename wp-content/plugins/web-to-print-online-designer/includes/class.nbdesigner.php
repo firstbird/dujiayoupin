@@ -168,18 +168,37 @@ class Nbdesigner_Plugin {
     public function nbd_oss_search_images() {
         $query = isset($_POST['searchKey']) ? sanitize_text_field($_POST['searchKey']) : '';
         $limit = isset($_POST['num']) ? intval($_POST['num']) : 10;
+        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : '';
         $datasetName = 'design_resource_element';
-        error_log('nbd_oss_search_images query key: ' . $_POST['searchKey'] . ' num: ' . $_POST['num']);
+        error_log('nbd_oss_search_images query key: ' . $_POST['searchKey'] . ' type: ' . $type . ' num: ' . $_POST['num']);
+        
+        // 获取对应的OSS路径
+        $ossPath = isset($this->pathMap[$type]) ? $this->pathMap[$type] : '';
+        $ossUri = '';
+        if ($ossPath) {
+            $ossUri = 'oss://' . $this->bucket . '/' . $ossPath;
+        }
         
         // 构建 SimpleQuery 查询条件
+        $subQueries = [
+            [
+                'Field' => 'Labels.LabelName',
+                'Value' => $query,
+                'Operation' => 'eq'
+            ]
+        ];
+        
+        // 如果指定了目录，添加URI前缀条件
+        if ($ossUri) {
+            $subQueries[] = [
+                'Field' => 'URI',
+                'Value' => $ossUri,
+                'Operation' => 'prefix'
+            ];
+        }
+        
         $queryArr = [
-            'SubQueries' => [
-                [
-                    'Field' => 'Labels.LabelName',
-                    'Value' => $query,
-                    'Operation' => 'eq'
-                ]
-            ],
+            'SubQueries' => $subQueries,
             'Operation' => 'and'
         ];
         
