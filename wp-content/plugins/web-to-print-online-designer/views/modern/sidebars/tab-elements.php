@@ -112,114 +112,7 @@
         </div>
         
         <div class="content-items">
-                    <div class="content-item type-draw" data-type="draw">
-                        <div class="main-type">
-                            <div class="free-draw-settings">
-                                <span class="section-title"><?php esc_html_e('画笔','web-to-print-online-designer'); ?></span>
-                                <div class="draw-item" ng-class="{'active': resource.drawMode.status}" ng-click="onSwitchDrawMode()" title="<?php esc_html_e('Free Draw','web-to-print-online-designer'); ?>">
-                                    <i class="icon-nbd icon-nbd-drawing"></i>
-                                </div>
-                                <!-- <div class="brush" >
-                                    <h3 class="color-palette-label" ><?php esc_html_e('Choose ','web-to-print-online-designer'); ?></h3>
-                                    <button class="nbd-button nbd-dropdown">
-                                        <?php esc_html_e('Brush','web-to-print-online-designer'); ?> <i class="icon-nbd icon-nbd-arrow-drop-down"></i>
-                                        <div class="nbd-sub-dropdown" data-pos="left">
-                                            <ul class="tab-scroll">
-                                                <li ng-click="resource.drawMode.brushType = 'Pencil';changeBush()" ng-class="resource.drawMode.brushType == 'Pencil' ? 'active' : ''"><span><?php esc_html_e('Pencil','web-to-print-online-designer'); ?></span></li>
-                                                <li ng-click="resource.drawMode.brushType = 'Circle';changeBush()" ng-class="resource.drawMode.brushType == 'Circle' ? 'active' : ''"><span><?php esc_html_e('Circle','web-to-print-online-designer'); ?></span></li>
-                                                <li ng-click="resource.drawMode.brushType = 'Spray';changeBush()" ng-class="resource.drawMode.brushType == 'Spray' ? 'active' : ''"><span><?php esc_html_e('Spray','web-to-print-online-designer'); ?></span></li>
-                                            </ul>
-                                        </div>
-                                    </button>
-                                </div> -->
-                                <div class="range">
-                                    <div class="section-title"><?php esc_html_e('画笔宽度','web-to-print-online-designer'); ?></div>
-                                    <div class="main-track">
-                                        <input class="slide-input" type="range" step="1" min="1" max="100" ng-change="changeBush()" ng-model="resource.drawMode.brushWidth">
-                                    </div>
-                                    <span class="value-display">{{resource.drawMode.brushWidth}}</span>
-                                </div>
-                                <div class="color">
-                                    <span class="section-title"><?php esc_html_e('画笔颜色','web-to-print-online-designer'); ?></span>
-                                    <ul class="main-color-palette nbd-perfect-scroll" >
-                                        <li class="color-palette-add" ng-init="showBrushColorPicker = false" ng-click="showBrushColorPicker = !showBrushColorPicker;" ng-style="{'background-color': currentColor}"></li>
-                                        <li ng-repeat="color in listAddedColor track by $index" ng-click="resource.drawMode.brushColor=color; changeBush()" class="color-palette-item" data-color="{{color}}" title="{{color}}" ng-style="{'background-color': color}"></li>
-                                    </ul>
-
-                                    <div class="nbd-text-color-picker" id="nbd-bg-color-picker" ng-class="showBrushColorPicker ? 'active' : ''" >
-                                        <spectrum-colorpicker
-                                            ng-model="currentColor"
-                                            options="{
-                                                    preferredFormat: 'hex',
-                                                    color: '#fff',
-                                                    flat: true,
-                                                    showButtons: false,
-                                                    showInput: true,
-                                                    containerClassName: 'nbd-sp'
-                                            }">
-                                        </spectrum-colorpicker>
-                                        <div style="text-align: <?php echo (is_rtl()) ? 'right' : 'left'?>">
-                                            <button class="nbd-button" ng-click="addColor();changeBush(currentColor);showBrushColorPicker = false;"><?php esc_html_e('Choose','web-to-print-online-designer'); ?></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="nbd-color-palette-inner" >
-                                    <div class="working-palette" ng-if="settings['nbdesigner_show_all_color'] == 'yes'" >
-                                        <ul class="main-color-palette tab-scroll">
-                                            <li class="color-palette-item color-palette-add" ng-click="stageBgColorPicker.status = !stageBgColorPicker.status;" ></li>
-                                            <li ng-repeat="color in listAddedColor track by $index"
-                                                ng-click="changeBackgroundCanvas(color)"
-                                                class="color-palette-item"
-                                                data-color="{{color}}"
-                                                title="{{color}}"
-                                                ng-style="{'background-color': color}">
-                                            </li>
-                                        </ul>
-                                        <div class="nbd-text-color-picker" id="nbd-stage-bg-color-picker" ng-class="stageBgColorPicker.status ? 'active' : ''">
-                                            <spectrum-colorpicker
-                                                ng-model="stageBgColorPicker.currentColor"
-                                                options="{
-                                                preferredFormat: 'hex',
-                                                color: '#fff',
-                                                flat: true,
-                                                showButtons: false,
-                                                showInput: true,
-                                                containerClassName: 'nbd-sp'
-                                                }">
-                                            </spectrum-colorpicker>
-                                            <div>
-                                                <button class="nbd-button"
-                                                    ng-click="changeBackgroundCanvas(stageBgColorPicker.currentColor);">
-                                                        <?php esc_html_e('Choose', 'web-to-print-online-designer'); ?>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="pinned-palette default-palette" ng-if="settings['nbdesigner_show_all_color'] == 'yes'">
-                                        <h3 class="color-palette-label default" ><?php esc_html_e('Default palette', 'web-to-print-online-designer'); ?></h3>
-                                        <ul class="main-color-palette tab-scroll" ng-repeat="palette in resource.defaultPalette">
-                                            <li ng-class="{'first-left': $first, 'last-right': $last}"
-                                                ng-repeat="color in palette track by $index"
-                                                ng-click="changeBackgroundCanvas(color)"
-                                                class="color-palette-item"
-                                                data-color="{{color}}"
-                                                title="{{color}}"
-                                                ng-style="{'background': color}">
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="pinned-palette default-palette" ng-if="settings['nbdesigner_show_all_color'] == 'no'">
-                                        <h3 class="color-palette-label"><?php esc_html_e('Color palette', 'web-to-print-online-designer'); ?></h3>
-                                        <ul class="main-color-palette settings" >
-                                            <li ng-repeat="color in __colorPalette track by $index" ng-class="{'first-left': $first, 'last-right': $last}" ng-click="changeBackgroundCanvas(color)" class="color-palette-item" data-color="{{color}}" title="{{color}}" ng-style="{'background': color}"></li>
-                                        </ul>
-                                    </div>
-                                    <div><button class="nbd-button" ng-click="removeBackgroundCanvas()"><?php esc_html_e('Remove background', 'web-to-print-online-designer'); ?></button></div>
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </div>
+                    
                     <div ng-if="!showSubPage">
                         <!-- <div class="element-section">
                             <div class="section-header">
@@ -277,7 +170,7 @@
                 <span style="margin-left:10px;">正在加载...</span>
             </div>
     </div>
-    <div class="subpage-search" ng-if="!resource[subPageType].onload">
+    <div class="subpage-search" ng-if="!resource[subPageType].onload && subPageType !== 'globalSearch'">
         <?php
         foreach ($content_types as $type => $config) {
         ?>
