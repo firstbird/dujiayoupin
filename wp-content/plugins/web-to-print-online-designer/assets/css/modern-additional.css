@@ -776,43 +776,33 @@
     position: relative;
 }
 .color-palette-add:after {
-    position: absolute;
-    top: 0;
-    left:0;
-    width: 40px;
-    height: 40px;  
-    display: inline-block;
-    line-height: 40px;
-    content: "\e908";
-    text-align: center;
-    color: #404762;
-    font-family: online-design!important;
-    font-size: 20px;
-    text-shadow: 1px 1px 1px #fff;
+    display: none !important;
 }
 .nbd-text-color-picker {
-    position: absolute; 
-    left: 40px; 
-    top: 50px;
-    -webkit-transform: scale(.8);
-    -ms-transform: scale(.8);
-    transform: scale(.8); 
-    visibility: hidden;
-    opacity: 0;
-    -webkit-transition: all .3s;
-    -moz-transition: all .3s;        
-    transition: all .3s; 
-    -webkit-box-shadow: 1px 0 15px rgba(0,0,0,.2);    
-    box-shadow: 1px 0 15px rgba(0,0,0,.2);    
-    background-color: #fff;
-    overflow: hidden;
+    position: relative !important; 
+    left: 0 !important; 
+    top: 0 !important;
+    -webkit-transform: none !important;
+    -ms-transform: none !important;
+    transform: none !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+    -webkit-transition: none !important;
+    -moz-transition: none !important;        
+    transition: none !important; 
+    -webkit-box-shadow: none !important;    
+    box-shadow: none !important;    
+    background-color: transparent !important;
+    overflow: visible !important;
+    margin-top: 10px !important;
 }
 .nbd-text-color-picker.active {
-    opacity: 1;
-    visibility: visible;
-    -webkit-transform: scale(1);
-    -ms-transform: scale(1);
-    transform: scale(1);        
+    opacity: 1 !important;
+    visibility: visible !important;
+    -webkit-transform: none !important;
+    -ms-transform: none !important;
+    transform: none !important;        
+    margin-top: 10px !important;
 }
 .nbd-color-palette {
     opacity: 0;
