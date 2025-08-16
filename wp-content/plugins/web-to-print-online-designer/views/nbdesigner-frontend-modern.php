@@ -289,6 +289,8 @@
         <?php do_action( 'nbd_extra_js', $ui_mode ); ?>
         <script type="text/javascript" src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/js/designer-modern.min.js'; ?>"></script>
         <script type="text/javascript" src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/js/app-modern.min.js'; ?>"></script>
+        <!-- 字体加载修复脚本 -->
+        <script type="text/javascript" src="<?php echo NBDESIGNER_PLUGIN_URL .'assets/js/font-fix.js'; ?>"></script>
         <?php if(file_exists( NBDESIGNER_DATA_DIR . '/custom.js' )): ?>
         <script type="text/javascript" src="<?php echo NBDESIGNER_DATA_URL . '/custom.js'; ?>"></script>
         <?php endif; ?>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体加载测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .font-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .font-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .font-preview {
+            font-size: 24px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 3px;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>字体加载测试</h1>
+        <p>此页面用于测试字体加载功能是否正常工作。</p>
+        
+        <div class="font-test">
+            <div class="font-name">测试字体: nbfont7a5585df34 (Carrington)</div>
+            <div class="font-preview" id="font-preview">Sample Text - 示例文字</div>
+            <div class="status" id="font-status">加载中...</div>
+            <div class="debug-info" id="debug-info"></div>
+        </div>
+        
+        <div class="font-test">
+            <div class="font-name">默认字体对比</div>
+            <div class="font-preview" style="font-family: Arial;">Sample Text - 示例文字 (Arial)</div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fontfaceobserver/2.3.0/fontfaceobserver.js"></script>
+    <script>
+        $(document).ready(function() {
+            var fontName = 'nbfont7a5585df34';
+            var fontUrl = '/wp-content/uploads/nbdesigner/fonts/nbfont7a5585df34.ttf';
+            
+            $('#debug-info').html('字体名称: ' + fontName + '<br>字体URL: ' + fontUrl);
+            
+            // 添加字体CSS
+            var font_id = fontName.replace(/\s/gi, '').toLowerCase();
+            var css = "<style type='text/css' id='" + font_id + "'>";
+            css += "@font-face {font-family: '" + fontName + "';";
+            css += "src: url('" + fontUrl + "') format('truetype');";
+            css += "font-weight: normal;font-style: normal;";
+            css += "}";
+            css += "</style>";
+            
+            $("head").append(css);
+            $('#debug-info').append('<br>已添加CSS: ' + css);
+            
+            // 设置字体
+            $('#font-preview').css('font-family', fontName);
+            
+            // 使用FontFaceObserver检测字体加载
+            if (typeof FontFaceObserver !== 'undefined') {
+                var font = new FontFaceObserver(fontName);
+                font.load('Sample Text').then(function() {
+                    $('#font-status').removeClass('loading').addClass('success').text('字体加载成功');
+                    $('#debug-info').append('<br>FontFaceObserver: 字体加载成功');
+                }).catch(function() {
+                    $('#font-status').removeClass('loading').addClass('error').text('字体加载失败');
+                    $('#debug-info').append('<br>FontFaceObserver: 字体加载失败');
+                });
+            } else {
+                $('#font-status').removeClass('loading').addClass('error').text('FontFaceObserver未加载');
+                $('#debug-info').append('<br>FontFaceObserver: 未加载');
+            }
+            
+            // 检查字体是否可用
+            setTimeout(function() {
+                var testElement = $('<span>').text('Sample Text').css('font-family', fontName + ', Arial');
+                $('body').append(testElement);
+                var computedFont = testElement.css('font-family');
+                testElement.remove();
+                
+                $('#debug-info').append('<br>计算字体: ' + computedFont);
+                
+                if (computedFont.indexOf(fontName) !== -1) {
+                    $('#font-status').removeClass('loading error').addClass('success').text('字体可用');
+                } else {
+                    $('#font-status').removeClass('loading success').addClass('error').text('字体不可用');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html> 

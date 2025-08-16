@@ -45,8 +45,13 @@ if(!class_exists('NBD_RESOURCE')){
                         break;  
                     case 'get_typo':
                         $path = NBDESIGNER_PLUGIN_DIR . '/data/typography/store/'.$_REQUEST['folder'];
-                        $data['font'] = json_depcode( file_get_contents($path.'/used_font.json') );
-                        $data['design'] = json_decode( file_get_contents($path.'/design.json') );
+                        if (file_exists($path.'/used_font.json') && file_exists($path.'/design.json')) {
+                            $data['font'] = json_decode( file_get_contents($path.'/used_font.json') );
+                            $data['design'] = json_decode( file_get_contents($path.'/design.json') );
+                        } else {
+                            error_log('Typography files not found: ' . $path);
+                            $data = array('error' => 'Typography files not found');
+                        }
                         break;
                     case 'clipart':
                         $path_cat = NBDESIGNER_DATA_DIR . '/art_cat.json';

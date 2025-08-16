@@ -1,0 +1,19 @@
+{
+  "frame_0": {
+    "objects": [
+      {
+        "type": "text",
+        "text": "Sample Text",
+        "fontFamily": "nbfont7a5585df34",
+        "fontSize": 48,
+        "fontWeight": "normal",
+        "fontStyle": "normal",
+        "fill": "#000000",
+        "left": 100,
+        "top": 100,
+        "width": 200,
+        "height": 60
+      }
+    ]
+  }
+} 
