@@ -15,10 +15,10 @@
                 <li nbd-drag="typo.folder" type="typo" ng-click="insertTypography(typo)" class="typography-item" ng-repeat="typo in resource.typography.data | limitTo: resource.typography.filter.currentPage * resource.typography.filter.perPage" repeat-end="onEndRepeat('typography')">
                     <img ng-src="{{generateTypoLink(typo)}}" alt="Typography" />
                     <!-- 调试信息 -->
-                    <div class="typo-debug" style="font-size: 10px; color: #666; margin-top: 5px;">
+                    <!-- <div class="typo-debug" style="font-size: 10px; color: #666; margin-top: 5px;">
                         <div>ID: {{typo.id}}</div>
                         <div>Folder: {{typo.folder}}</div>
-                    </div>
+                    </div> -->
                 </li>
             </ul>
             <div class="loading-photo" >
