@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体数据加载测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .test-section h2 {
+            color: #007cba;
+            margin-top: 0;
+        }
+        
+        .status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+        }
+        
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #005a87;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>字体数据加载测试</h1>
+        
+        <div class="test-section">
+            <h2>测试控制</h2>
+            <button onclick="testFontDataLoading()">测试字体数据加载</button>
+            <button onclick="testAjaxRequest()">测试AJAX请求</button>
+            <button onclick="clearLog()">清除日志</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>测试结果</h2>
+            <div id="test-results">
+                <div class="status info">点击上方按钮开始测试</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>日志信息</h2>
+            <pre id="log-output">等待测试...</pre>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logOutput = document.getElementById('log-output');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.textContent += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log-output').textContent = '';
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function testFontDataLoading() {
+            log('开始测试字体数据加载...');
+            updateStatus('正在测试字体数据加载...', 'info');
+            
+            // 测试AJAX请求
+            const formData = new FormData();
+            formData.append('action', 'nbd_get_resource');
+            formData.append('nonce', 'test-nonce');
+            formData.append('type', 'typography');
+            formData.append('task', 'new');
+            
+            log('发送AJAX请求...');
+            log('请求参数: type=typography, task=new');
+            
+            fetch('/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                log('AJAX响应成功');
+                log('响应数据: ' + JSON.stringify(data, null, 2));
+                
+                if (data.flag === 1 && data.data) {
+                    updateStatus('字体数据加载成功！', 'info');
+                    log('字体数据加载成功，数据长度: ' + (data.data.length || 0));
+                    
+                    if (data.data.length > 0) {
+                        log('字体列表:');
+                        data.data.forEach((font, index) => {
+                            log(`  ${index + 1}. ID: ${font.id}, 文件夹: ${font.folder}, 语言: ${font.language || '未设置'}, 名称: ${font.name || '未设置'}`);
+                        });
+                    }
+                } else {
+                    updateStatus('字体数据加载失败', 'error');
+                    log('字体数据加载失败: ' + JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                log('AJAX请求失败: ' + error.message);
+                updateStatus('AJAX请求失败: ' + error.message, 'error');
+            });
+        }
+        
+        function testAjaxRequest() {
+            log('测试AJAX请求...');
+            updateStatus('正在测试AJAX请求...', 'info');
+            
+            // 简单的AJAX测试
+            fetch('/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=nbd_get_resource&nonce=test-nonce&type=typography&task=new'
+            })
+            .then(response => {
+                log('AJAX响应状态: ' + response.status);
+                return response.text();
+            })
+            .then(text => {
+                log('AJAX响应文本: ' + text);
+                try {
+                    const data = JSON.parse(text);
+                    log('解析后的JSON数据: ' + JSON.stringify(data, null, 2));
+                } catch (e) {
+                    log('JSON解析失败: ' + e.message);
+                }
+            })
+            .catch(error => {
+                log('AJAX测试失败: ' + error.message);
+                updateStatus('AJAX测试失败: ' + error.message, 'error');
+            });
+        }
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            log('页面加载完成');
+            log('开始检查环境...');
+            
+            // 检查jQuery
+            if (typeof jQuery !== 'undefined') {
+                log('jQuery已加载');
+            } else {
+                log('jQuery未加载');
+            }
+            
+            // 检查Angular
+            if (typeof angular !== 'undefined') {
+                log('Angular已加载');
+            } else {
+                log('Angular未加载');
+            }
+            
+            // 检查WordPress AJAX URL
+            if (typeof nbd_ajax !== 'undefined') {
+                log('WordPress AJAX URL: ' + nbd_ajax.ajax_url);
+            } else {
+                log('WordPress AJAX配置未找到');
+            }
+        });
+    </script>
+</body>
+</html>

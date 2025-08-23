@@ -1,10 +1,26 @@
 [
   {
     "id": 1,
-    "folder": "sample1"
+    "folder": "sample1",
+    "language": "chinese",
+    "name": "中文字体1"
   },
   {
     "id": 2,
-    "folder": "sample2"
+    "folder": "sample2",
+    "language": "english",
+    "name": "English Font 1"
+  },
+  {
+    "id": 3,
+    "folder": "sample3",
+    "language": "chinese",
+    "name": "中文字体2"
+  },
+  {
+    "id": 4,
+    "folder": "sample4",
+    "language": "english",
+    "name": "English Font 2"
   }
 ] 

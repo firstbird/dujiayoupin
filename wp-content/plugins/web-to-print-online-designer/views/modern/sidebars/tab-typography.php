@@ -10,15 +10,26 @@
             </div>
         </div>
         <hr class="seperate" ng-if="settings.nbdesigner_hide_typo_section == 'no'" />
+        
+        <!-- 语言切换标签 -->
+        <div class="language-tabs" ng-if="settings.nbdesigner_hide_typo_section == 'no'">
+            <div class="tab-switcher">
+                <button class="lang-tab" ng-class="{'active': currentLanguage === 'chinese'}" ng-click="switchLanguage('chinese')">
+                    <span class="lang-text">中文</span>
+                </button>
+                <button class="lang-tab" ng-class="{'active': currentLanguage === 'english'}" ng-click="switchLanguage('english')">
+                    <span class="lang-text">English</span>
+                </button>
+            </div>
+        </div>
+        
         <div class="typography-body">
             <ul class="typography-items">
                 <li nbd-drag="typo.folder" type="typo" ng-click="insertTypography(typo)" class="typography-item" ng-repeat="typo in resource.typography.data | limitTo: resource.typography.filter.currentPage * resource.typography.filter.perPage" repeat-end="onEndRepeat('typography')">
-                    <img ng-src="{{generateTypoLink(typo)}}" alt="Typography" />
-                    <!-- 调试信息 -->
-                    <!-- <div class="typo-debug" style="font-size: 10px; color: #666; margin-top: 5px;">
-                        <div>ID: {{typo.id}}</div>
-                        <div>Folder: {{typo.folder}}</div>
-                    </div> -->
+                    <div class="typo-item-content">
+                        <img ng-src="{{generateTypoLink(typo)}}" alt="Typography" class="typo-preview" />
+                        <div class="typo-name">{{typo.name || 'Font ' + typo.id}}</div>
+                    </div>
                 </li>
             </ul>
             <div class="loading-photo" >
@@ -35,16 +46,201 @@
     color: #3a495a !important;
 }
 
+/* 字体tab页面整体样式 */
+.nbd-sidebar .typography-body {
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* 确保字体列表容器居中 */
+.nbd-sidebar .typography-items,
+.nbd-sidebar ul.typography-items,
+.nbd-sidebar .typography-body .typography-items {
+    width: 100% !important;
+    max-width: 400px !important; /* 增加最大宽度以适应两列 */
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+}
+
+/* 响应式布局 */
+@media (max-width: 480px) {
+    .typography-items {
+        grid-template-columns: 1fr; /* 小屏幕时改为单列 */
+        max-width: 280px;
+    }
+    
+    .typo-preview {
+        max-width: 150px; /* 小屏幕时增加图片宽度 */
+    }
+    
+    .typo-name {
+        font-size: 13px; /* 小屏幕时增加字体大小 */
+    }
+}
+
+/* 语言切换标签样式 */
+.language-tabs {
+    padding: 20px 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    margin: 0 10px 20px 10px;
+}
+
+.tab-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+}
+
+.lang-tab {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 10px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    min-width: 80px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.lang-tab:hover {
+    background: #f8f9fa;
+    border-color: #007cba;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.lang-tab.active {
+    background: #007cba;
+    border-color: #007cba;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,124,186,0.3);
+}
+
+.lang-text {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 500;
+}
+
+/* 字体列表样式 */
+.typography-items {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important; /* 允许换行 */
+    gap: 15px !important;
+    width: 100% !important;
+    max-width: 400px !important; /* 增加最大宽度以适应两列 */
+    margin: 0 auto !important;
+}
+
+.typography-item {
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+    width: calc(50% - 7.5px) !important; /* 50%宽度减去gap的一半 */
+    height: 120px !important; /* 固定高度 */
+    min-width: 0 !important;
+    display: block !important; /* 确保显示为块级元素 */
+    flex-shrink: 0 !important; /* 防止收缩 */
+}
+
+.typography-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.typo-item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 垂直居中 */
+    padding: 20px 10px; /* 增加垂直内边距，因为不再有字体名称 */
+    text-align: center; /* 文本居中 */
+    width: 100%;
+    height: 100%; /* 占满整个字体项目高度 */
+    box-sizing: border-box; /* 确保padding不会增加总高度 */
+}
+
+.typo-preview {
+    width: 100%;
+    max-width: 120px; /* 减少最大宽度以适应两列 */
+    max-height: 80px; /* 增加最大高度，因为不再有字体名称 */
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 0; /* 移除底部间距，因为不再有字体名称 */
+    display: block; /* 确保图片正确显示 */
+    object-fit: contain; /* 保持图片比例 */
+}
+
+.typo-name {
+    display: none !important; /* 隐藏字体名称 */
+}
+
+/* 加载动画样式 */
+.loading-photo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.circular {
+    width: 40px;
+    height: 40px;
+    animation: rotate 2s linear infinite;
+}
+
+.path {
+    stroke: #007cba;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 150;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -124;
+    }
+}
+
 /* 调试样式 */
 .typo-debug {
     background: rgba(255,255,255,0.9);
     padding: 2px 4px;
     border-radius: 2px;
     font-family: monospace;
-}
-
-.typography-item {
-    position: relative;
 }
 
 .typography-item:hover .typo-debug {

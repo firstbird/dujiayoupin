@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐藏字体名称测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* 两列布局样式 */
+        .typography-items {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 15px !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+            list-style: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+            border: 2px solid #007cba !important;
+        }
+        
+        .typography-item {
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
+            width: calc(50% - 7.5px) !important;
+            height: 120px !important; /* 固定高度 */
+            min-width: 0 !important;
+            display: block !important;
+            flex-shrink: 0 !important;
+            border: 1px solid #ddd !important;
+        }
+        
+        .typography-item:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        }
+        
+        .typo-item-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 20px 10px !important; /* 增加垂直内边距 */
+            text-align: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .typo-preview {
+            width: 100% !important;
+            max-width: 120px !important;
+            max-height: 80px !important; /* 增加最大高度 */
+            height: auto !important;
+            border-radius: 4px !important;
+            margin-bottom: 0 !important; /* 移除底部间距 */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #f0f0f0 !important;
+            border: 1px solid #ccc !important;
+            font-size: 12px !important;
+            color: #666 !important;
+        }
+        
+        .typo-name {
+            display: none !important; /* 隐藏字体名称 */
+        }
+        
+        .test-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #007cba;
+        }
+        
+        .test-info h3 {
+            margin-top: 0;
+            color: #007cba;
+        }
+        
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .test-info li {
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>隐藏字体名称测试</h1>
+        
+        <div class="test-info">
+            <h3>测试说明</h3>
+            <ul>
+                <li>✅ 字体项目应该一行显示两个</li>
+                <li>✅ 每个字体项目宽度一致</li>
+                <li>✅ 每个字体项目高度一致（120px）</li>
+                <li>✅ 字体名称已隐藏，只显示预览图片</li>
+                <li>✅ 字体项目之间有15px间距</li>
+                <li>✅ 字体列表容器最大宽度400px</li>
+                <li>✅ 字体列表容器水平居中</li>
+            </ul>
+        </div>
+        
+        <ul class="typography-items" id="test-list">
+            <!-- 测试字体项目将通过JavaScript生成 -->
+        </ul>
+        
+        <div id="status-output">
+            <div class="status success">页面加载完成，正在生成测试字体项目...</div>
+        </div>
+    </div>
+
+    <script>
+        // 测试字体数据 - 包含不同长度的名称
+        const testFonts = [
+            { id: 1, name: "中文字体1", folder: "sample1" },
+            { id: 2, name: "English Font 1", folder: "sample2" },
+            { id: 3, name: "中文字体2", folder: "sample3" },
+            { id: 4, name: "English Font 2", folder: "sample4" },
+            { id: 5, name: "这是一个很长的中文字体名称测试", folder: "sample5" },
+            { id: 6, name: "Very Long English Font Name Test", folder: "sample6" }
+        ];
+        
+        function createTestItems() {
+            const container = document.getElementById('test-list');
+            container.innerHTML = '';
+            
+            testFonts.forEach(font => {
+                const li = document.createElement('li');
+                li.className = 'typography-item';
+                li.innerHTML = `
+                    <div class="typo-item-content">
+                        <div class="typo-preview">${font.name}</div>
+                        <div class="typo-name">${font.name}</div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', function() {
+                    console.log('点击字体:', font.name);
+                    alert(`选择了字体: ${font.name}`);
+                });
+                
+                container.appendChild(li);
+            });
+            
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            const statusOutput = document.getElementById('status-output');
+            const typographyList = document.querySelector('.typography-items');
+            
+            if (typographyList) {
+                const computedStyle = window.getComputedStyle(typographyList);
+                const isFlex = computedStyle.display === 'flex';
+                const isWrap = computedStyle.flexWrap === 'wrap';
+                
+                let statusHtml = '<h3>布局状态检查:</h3>';
+                
+                if (isFlex && isWrap) {
+                    statusHtml += '<div class="status success">✅ Flex布局已正确应用</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ Flex布局未正确应用</div>';
+                }
+                
+                // 检查字体项目高度
+                const items = document.querySelectorAll('.typography-item');
+                let allSameHeight = true;
+                let heights = [];
+                
+                items.forEach((item, index) => {
+                    const itemStyle = window.getComputedStyle(item);
+                    const height = itemStyle.height;
+                    heights.push(height);
+                    
+                    if (index > 0 && height !== heights[0]) {
+                        allSameHeight = false;
+                    }
+                });
+                
+                if (allSameHeight && heights.length > 0) {
+                    statusHtml += '<div class="status success">✅ 所有字体项目高度一致</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 字体项目高度不一致</div>';
+                }
+                
+                // 检查字体名称是否隐藏
+                const typoNames = document.querySelectorAll('.typo-name');
+                let allHidden = true;
+                
+                typoNames.forEach(typoName => {
+                    const nameStyle = window.getComputedStyle(typoName);
+                    if (nameStyle.display !== 'none') {
+                        allHidden = false;
+                    }
+                });
+                
+                if (allHidden) {
+                    statusHtml += '<div class="status success">✅ 所有字体名称已隐藏</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 部分字体名称未隐藏</div>';
+                }
+                
+                statusHtml += `
+                    <div class="info-box">
+                        <strong>布局信息:</strong><br>
+                        display: ${computedStyle.display}<br>
+                        flex-wrap: ${computedStyle.flexWrap}<br>
+                        gap: ${computedStyle.gap}<br>
+                        max-width: ${computedStyle.maxWidth}<br>
+                        字体项目数量: ${items.length}<br>
+                        字体项目高度: ${heights.join(', ')}<br>
+                        字体名称隐藏状态: ${allHidden ? '全部隐藏' : '部分显示'}
+                    </div>
+                `;
+                
+                statusOutput.innerHTML = statusHtml;
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，创建测试字体项目...');
+            createTestItems();
+        });
+    </script>
+</body>
+</html>

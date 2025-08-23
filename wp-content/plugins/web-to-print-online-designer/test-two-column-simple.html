@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>两列布局简单测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* 两列布局样式 */
+        .typography-items {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 15px !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+            list-style: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+            border: 2px solid #007cba !important;
+        }
+        
+        .typography-item {
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            display: block !important;
+            border: 1px solid #ddd !important;
+        }
+        
+        .typography-item:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        }
+        
+        .typo-item-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 15px 10px !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        .typo-preview {
+            width: 100% !important;
+            max-width: 120px !important;
+            height: 80px !important;
+            border-radius: 4px !important;
+            margin-bottom: 8px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #f0f0f0 !important;
+            border: 1px solid #ccc !important;
+            font-size: 12px !important;
+            color: #666 !important;
+        }
+        
+        .typo-name {
+            font-size: 12px !important;
+            color: #333 !important;
+            text-align: center !important;
+            font-weight: 500 !important;
+            margin-top: 6px !important;
+            width: 100% !important;
+            word-wrap: break-word !important;
+            line-height: 1.3 !important;
+            max-width: 100% !important;
+        }
+        
+        .test-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #007cba;
+        }
+        
+        .test-info h3 {
+            margin-top: 0;
+            color: #007cba;
+        }
+        
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .test-info li {
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>两列布局简单测试</h1>
+        
+        <div class="test-info">
+            <h3>测试说明</h3>
+            <ul>
+                <li>✅ 字体项目应该一行显示两个</li>
+                <li>✅ 每个字体项目宽度一致</li>
+                <li>✅ 字体项目之间有15px间距</li>
+                <li>✅ 字体列表容器最大宽度400px</li>
+                <li>✅ 字体列表容器水平居中</li>
+            </ul>
+        </div>
+        
+        <ul class="typography-items" id="test-list">
+            <!-- 测试字体项目将通过JavaScript生成 -->
+        </ul>
+        
+        <div id="status-output">
+            <div class="status success">页面加载完成，正在生成测试字体项目...</div>
+        </div>
+    </div>
+
+    <script>
+        // 测试字体数据
+        const testFonts = [
+            { id: 1, name: "中文字体1", folder: "sample1" },
+            { id: 2, name: "English Font 1", folder: "sample2" },
+            { id: 3, name: "中文字体2", folder: "sample3" },
+            { id: 4, name: "English Font 2", folder: "sample4" },
+            { id: 5, name: "中文字体3", folder: "sample5" },
+            { id: 6, name: "English Font 3", folder: "sample6" }
+        ];
+        
+        function createTestItems() {
+            const container = document.getElementById('test-list');
+            container.innerHTML = '';
+            
+            testFonts.forEach(font => {
+                const li = document.createElement('li');
+                li.className = 'typography-item';
+                li.innerHTML = `
+                    <div class="typo-item-content">
+                        <div class="typo-preview">${font.name}</div>
+                        <div class="typo-name">${font.name}</div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', function() {
+                    console.log('点击字体:', font.name);
+                    alert(`选择了字体: ${font.name}`);
+                });
+                
+                container.appendChild(li);
+            });
+            
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            const statusOutput = document.getElementById('status-output');
+            const typographyList = document.querySelector('.typography-items');
+            
+            if (typographyList) {
+                const computedStyle = window.getComputedStyle(typographyList);
+                const isGrid = computedStyle.display === 'grid';
+                const isTwoColumns = computedStyle.gridTemplateColumns === '1fr 1fr';
+                
+                let statusHtml = '<h3>布局状态检查:</h3>';
+                
+                if (isGrid && isTwoColumns) {
+                    statusHtml += '<div class="status success">✅ 两列布局已正确应用</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 两列布局未正确应用</div>';
+                }
+                
+                statusHtml += `
+                    <p><strong>display:</strong> ${computedStyle.display}</p>
+                    <p><strong>grid-template-columns:</strong> ${computedStyle.gridTemplateColumns}</p>
+                    <p><strong>gap:</strong> ${computedStyle.gap}</p>
+                    <p><strong>max-width:</strong> ${computedStyle.maxWidth}</p>
+                    <p><strong>字体项目数量:</strong> ${typographyList.children.length}</p>
+                `;
+                
+                statusOutput.innerHTML = statusHtml;
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，创建测试字体项目...');
+            createTestItems();
+        });
+    </script>
+</body>
+</html>

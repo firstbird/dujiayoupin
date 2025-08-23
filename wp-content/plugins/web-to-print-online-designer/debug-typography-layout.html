@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体布局调试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .debug-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .debug-section h2 {
+            color: #007cba;
+            margin-top: 0;
+        }
+        
+        /* 测试字体列表样式 */
+        .typography-items {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 15px !important;
+            width: 100% !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+            border: 2px solid #007cba !important;
+        }
+        
+        .typography-item {
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            display: block !important;
+            border: 1px solid #ddd !important;
+        }
+        
+        .typography-item:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        }
+        
+        .typo-item-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 15px 10px !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        .typo-preview {
+            width: 100% !important;
+            max-width: 120px !important;
+            height: auto !important;
+            border-radius: 4px !important;
+            margin-bottom: 8px !important;
+            display: block !important;
+            object-fit: contain !important;
+            background: #f0f0f0 !important;
+            border: 1px solid #ccc !important;
+        }
+        
+        .typo-name {
+            font-size: 12px !important;
+            color: #333 !important;
+            text-align: center !important;
+            font-weight: 500 !important;
+            margin-top: 6px !important;
+            width: 100% !important;
+            word-wrap: break-word !important;
+            line-height: 1.3 !important;
+            max-width: 100% !important;
+        }
+        
+        .css-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .test-button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: #005a87;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>字体布局调试</h1>
+        
+        <div class="debug-section">
+            <h2>CSS样式信息</h2>
+            <div class="css-info">
+                <strong>字体列表容器样式:</strong><br>
+                display: grid !important;<br>
+                grid-template-columns: 1fr 1fr !important;<br>
+                gap: 15px !important;<br>
+                max-width: 400px !important;
+            </div>
+            <button class="test-button" onclick="checkCSS()">检查CSS应用状态</button>
+        </div>
+        
+        <div class="debug-section">
+            <h2>字体列表测试</h2>
+            <ul class="typography-items" id="test-typography-list">
+                <!-- 测试字体项目 -->
+            </ul>
+        </div>
+        
+        <div class="debug-section">
+            <h2>调试信息</h2>
+            <div id="debug-output">
+                <p>点击"检查CSS应用状态"按钮查看详细信息</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 生成测试字体数据
+        const testFonts = [
+            { id: 1, name: "中文字体1", folder: "sample1" },
+            { id: 2, name: "English Font 1", folder: "sample2" },
+            { id: 3, name: "中文字体2", folder: "sample3" },
+            { id: 4, name: "English Font 2", folder: "sample4" }
+        ];
+        
+        function createTypographyItems() {
+            const container = document.getElementById('test-typography-list');
+            container.innerHTML = '';
+            
+            testFonts.forEach(font => {
+                const li = document.createElement('li');
+                li.className = 'typography-item';
+                li.innerHTML = `
+                    <div class="typo-item-content">
+                        <div class="typo-preview" style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                            ${font.name}
+                        </div>
+                        <div class="typo-name">${font.name}</div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', function() {
+                    console.log('点击字体:', font.name);
+                    alert(`选择了字体: ${font.name}`);
+                });
+                
+                container.appendChild(li);
+            });
+        }
+        
+        function checkCSS() {
+            const debugOutput = document.getElementById('debug-output');
+            const typographyList = document.querySelector('.typography-items');
+            
+            if (typographyList) {
+                const computedStyle = window.getComputedStyle(typographyList);
+                
+                debugOutput.innerHTML = `
+                    <h3>CSS应用状态:</h3>
+                    <p><strong>display:</strong> ${computedStyle.display}</p>
+                    <p><strong>grid-template-columns:</strong> ${computedStyle.gridTemplateColumns}</p>
+                    <p><strong>gap:</strong> ${computedStyle.gap}</p>
+                    <p><strong>max-width:</strong> ${computedStyle.maxWidth}</p>
+                    <p><strong>width:</strong> ${computedStyle.width}</p>
+                    <p><strong>margin:</strong> ${computedStyle.margin}</p>
+                    
+                    <h3>字体项目数量:</h3>
+                    <p>${typographyList.children.length} 个字体项目</p>
+                    
+                    <h3>布局状态:</h3>
+                    <p>${computedStyle.display === 'grid' ? '✅ Grid布局已应用' : '❌ Grid布局未应用'}</p>
+                    <p>${computedStyle.gridTemplateColumns === '1fr 1fr' ? '✅ 两列布局已应用' : '❌ 两列布局未应用'}</p>
+                `;
+            } else {
+                debugOutput.innerHTML = '<p>❌ 未找到字体列表容器</p>';
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，创建测试字体项目...');
+            createTypographyItems();
+            checkCSS();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "frame_0": {
+    "objects": [
+      {
+        "type": "text",
+        "text": "中文字体",
+        "fontFamily": "nbfont7c5585df36",
+        "fontSize": 24,
+        "fill": "#000000",
+        "left": 100,
+        "top": 100
+      }
+    ]
+  }
+}
