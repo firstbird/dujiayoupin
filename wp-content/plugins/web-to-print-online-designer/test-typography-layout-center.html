@@ -249,70 +249,70 @@
         
         let currentLanguage = 'chinese';
         
-        function generateTypoLink(typo) {
-            if (!typo || !typo.folder) {
-                return '';
-            }
+        // function generateTypoLink(typo) {
+        //     if (!typo || !typo.folder) {
+        //         return '';
+        //     }
             
-            var baseUrl = window.location.origin;
-            return baseUrl + '/wp-content/plugins/web-to-print-online-designer/data/typography/store/' + typo.folder + '/frame_0.png';
-        }
+        //     var baseUrl = window.location.origin;
+        //     return baseUrl + '/wp-content/plugins/web-to-print-online-designer/data/typography/store/' + typo.folder + '/frame_0.png';
+        // }
         
-        function switchLanguage(language) {
-            currentLanguage = language;
+        // function switchLanguage(language) {
+        //     currentLanguage = language;
             
-            // 更新按钮状态
-            document.querySelectorAll('.lang-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
+        //     // 更新按钮状态
+        //     document.querySelectorAll('.lang-tab').forEach(tab => {
+        //         tab.classList.remove('active');
+        //     });
+        //     event.target.classList.add('active');
             
-            // 更新字体列表
-            updateTypographyList();
-        }
+        //     // 更新字体列表
+        //     updateTypographyList();
+        // }
         
-        function updateTypographyList() {
-            const typographyList = document.getElementById('typography-list');
+        // function updateTypographyList() {
+        //     const typographyList = document.getElementById('typography-list');
             
-            // 过滤字体数据
-            const filteredData = typographyData.filter(typo => {
-                if (!typo.language) {
-                    return true;
-                }
-                return typo.language === currentLanguage;
-            });
+        //     // 过滤字体数据
+        //     const filteredData = typographyData.filter(typo => {
+        //         if (!typo.language) {
+        //             return true;
+        //         }
+        //         return typo.language === currentLanguage;
+        //     });
             
-            // 清空列表
-            typographyList.innerHTML = '';
+        //     // 清空列表
+        //     typographyList.innerHTML = '';
             
-            // 添加字体项目
-            filteredData.forEach(typo => {
-                const li = document.createElement('li');
-                li.className = 'typography-item';
-                li.innerHTML = `
-                    <div class="typo-item-content">
-                        <img src="${generateTypoLink(typo)}" alt="${typo.name}" class="typo-preview" />
-                        <div class="typo-name">${typo.name}</div>
-                    </div>
-                `;
+        //     // 添加字体项目
+        //     filteredData.forEach(typo => {
+        //         const li = document.createElement('li');
+        //         li.className = 'typography-item';
+        //         li.innerHTML = `
+        //             <div class="typo-item-content">
+        //                 <img src="${generateTypoLink(typo)}" alt="${typo.name}" class="typo-preview" />
+        //                 <div class="typo-name">${typo.name}</div>
+        //             </div>
+        //         `;
                 
-                // 添加点击事件
-                li.addEventListener('click', function() {
-                    console.log('点击字体:', typo.name);
-                    alert(`选择了字体: ${typo.name}`);
-                });
+        //         // 添加点击事件
+        //         li.addEventListener('click', function() {
+        //             console.log('点击字体:', typo.name);
+        //             alert(`选择了字体: ${typo.name}`);
+        //         });
                 
-                typographyList.appendChild(li);
-            });
+        //         typographyList.appendChild(li);
+        //     });
             
-            console.log(`显示 ${filteredData.length} 个字体 (语言: ${currentLanguage})`);
-        }
+        //     console.log(`显示 ${filteredData.length} 个字体 (语言: ${currentLanguage})`);
+        // }
         
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面加载完成，初始化字体列表...');
-            updateTypographyList();
-        });
+        // // 页面加载完成后初始化
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     console.log('页面加载完成，初始化字体列表...');
+        //     updateTypographyList();
+        // });
     </script>
 </body>
 </html>

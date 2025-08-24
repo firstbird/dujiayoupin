@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体类型按钮测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* 字体类型切换按钮样式 */
+        .font-type-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 10px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .font-type-btn {
+            background: white;
+            border: 2px solid #007cba;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #007cba;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .font-type-btn:hover {
+            background: #e7f3ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .font-type-btn.active {
+            background: #007cba;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,124,186,0.3);
+        }
+        
+        /* 两列布局样式 */
+        .typography-items {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 15px !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+            list-style: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+            border: 2px solid #007cba !important;
+        }
+        
+        .typography-item {
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
+            width: calc(50% - 7.5px) !important;
+            height: 120px !important;
+            min-width: 0 !important;
+            display: block !important;
+            flex-shrink: 0 !important;
+            border: 1px solid #ddd !important;
+        }
+        
+        .typography-item:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        }
+        
+        .typo-item-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 20px 10px !important;
+            text-align: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .typo-preview {
+            width: 100% !important;
+            max-width: 120px !important;
+            max-height: 80px !important;
+            height: auto !important;
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #f0f0f0 !important;
+            border: 1px solid #ccc !important;
+            font-size: 12px !important;
+            color: #666 !important;
+        }
+        
+        .typo-name {
+            display: none !important;
+        }
+        
+        .test-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #007cba;
+        }
+        
+        .test-info h3 {
+            margin-top: 0;
+            color: #007cba;
+        }
+        
+        .test-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .test-info li {
+            margin-bottom: 5px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .current-language {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>字体类型按钮测试</h1>
+        
+        <!-- 字体类型切换按钮 -->
+        <div class="font-type-buttons" id="font-type-buttons">
+            <button class="font-type-btn active" id="chinese-btn" onclick="switchLanguage('chinese')">
+                中文字体
+            </button>
+            <button class="font-type-btn" id="english-btn" onclick="switchLanguage('english')">
+                英文字体
+            </button>
+        </div>
+        
+        <div class="current-language" id="current-language">
+            当前语言: <strong>中文</strong>
+        </div>
+        
+        <div class="test-info">
+            <h3>测试说明</h3>
+            <ul>
+                <li>✅ 页面顶部应该显示"中文字体"和"英文字体"两个按钮</li>
+                <li>✅ 默认选中"中文字体"按钮</li>
+                <li>✅ 点击按钮可以切换当前语言</li>
+                <li>✅ 按钮有悬停和激活状态的视觉反馈</li>
+                <li>✅ 字体项目一行显示两个</li>
+                <li>✅ 字体名称已隐藏，只显示预览图片</li>
+            </ul>
+        </div>
+        
+        <ul class="typography-items" id="test-list">
+            <!-- 测试字体项目将通过JavaScript生成 -->
+        </ul>
+        
+        <div id="status-output">
+            <div class="status success">页面加载完成，正在生成测试字体项目...</div>
+        </div>
+    </div>
+
+    <script>
+        // 当前语言状态
+        let currentLanguage = 'chinese';
+        
+        // 测试字体数据
+        const testFonts = [
+            { id: 1, name: "中文字体1", folder: "sample1", language: "chinese" },
+            { id: 2, name: "English Font 1", folder: "sample2", language: "english" },
+            { id: 3, name: "中文字体2", folder: "sample3", language: "chinese" },
+            { id: 4, name: "English Font 2", folder: "sample4", language: "english" },
+            { id: 5, name: "中文字体3", folder: "sample5", language: "chinese" },
+            { id: 6, name: "English Font 3", folder: "sample6", language: "english" }
+        ];
+        
+        // 切换语言函数
+        function switchLanguage(language) {
+            currentLanguage = language;
+            
+            // 更新按钮状态
+            document.getElementById('chinese-btn').classList.toggle('active', language === 'chinese');
+            document.getElementById('english-btn').classList.toggle('active', language === 'english');
+            
+            // 更新当前语言显示
+            const languageDisplay = document.getElementById('current-language');
+            languageDisplay.innerHTML = `当前语言: <strong>${language === 'chinese' ? '中文' : 'English'}</strong>`;
+            
+            // 过滤并显示字体
+            filterAndDisplayFonts();
+            
+            console.log('🌐 语言已切换到:', language);
+        }
+        
+        // 过滤并显示字体
+        function filterAndDisplayFonts() {
+            const filteredFonts = testFonts.filter(font => font.language === currentLanguage);
+            createTestItems(filteredFonts);
+            updateStatus();
+        }
+        
+        // 创建测试字体项目
+        function createTestItems(fonts) {
+            const container = document.getElementById('test-list');
+            container.innerHTML = '';
+            
+            fonts.forEach(font => {
+                const li = document.createElement('li');
+                li.className = 'typography-item';
+                li.innerHTML = `
+                    <div class="typo-item-content">
+                        <div class="typo-preview">${font.name}</div>
+                        <div class="typo-name">${font.name}</div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', function() {
+                    console.log('点击字体:', font.name);
+                    alert(`选择了字体: ${font.name}`);
+                });
+                
+                container.appendChild(li);
+            });
+        }
+        
+        // 更新状态
+        function updateStatus() {
+            const statusOutput = document.getElementById('status-output');
+            const fontTypeButtons = document.querySelector('.font-type-buttons');
+            const typographyList = document.querySelector('.typography-items');
+            
+            let statusHtml = '<h3>功能状态检查:</h3>';
+            
+            // 检查字体类型按钮
+            if (fontTypeButtons) {
+                const computedStyle = window.getComputedStyle(fontTypeButtons);
+                const isFlex = computedStyle.display === 'flex';
+                const isCentered = computedStyle.justifyContent === 'center';
+                
+                if (isFlex && isCentered) {
+                    statusHtml += '<div class="status success">✅ 字体类型按钮布局正确</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 字体类型按钮布局异常</div>';
+                }
+                
+                const fontTypeBtns = fontTypeButtons.querySelectorAll('.font-type-btn');
+                statusHtml += `<div class="status success">✅ 字体类型按钮数量: ${fontTypeBtns.length}</div>`;
+            } else {
+                statusHtml += '<div class="status error">❌ 未找到字体类型按钮</div>';
+            }
+            
+            // 检查当前语言状态
+            const chineseBtn = document.getElementById('chinese-btn');
+            const englishBtn = document.getElementById('english-btn');
+            
+            if (chineseBtn && englishBtn) {
+                const chineseActive = chineseBtn.classList.contains('active');
+                const englishActive = englishBtn.classList.contains('active');
+                
+                if (currentLanguage === 'chinese' && chineseActive && !englishActive) {
+                    statusHtml += '<div class="status success">✅ 中文按钮激活状态正确</div>';
+                } else if (currentLanguage === 'english' && englishActive && !chineseActive) {
+                    statusHtml += '<div class="status success">✅ 英文按钮激活状态正确</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 按钮激活状态异常</div>';
+                }
+            }
+            
+            // 检查字体列表
+            if (typographyList) {
+                const computedStyle = window.getComputedStyle(typographyList);
+                const isFlex = computedStyle.display === 'flex';
+                const isWrap = computedStyle.flexWrap === 'wrap';
+                
+                if (isFlex && isWrap) {
+                    statusHtml += '<div class="status success">✅ 字体列表Flex布局正确</div>';
+                } else {
+                    statusHtml += '<div class="status error">❌ 字体列表布局异常</div>';
+                }
+                
+                const items = document.querySelectorAll('.typography-item');
+                const filteredFonts = testFonts.filter(font => font.language === currentLanguage);
+                
+                if (items.length === filteredFonts.length) {
+                    statusHtml += `<div class="status success">✅ 字体过滤正确，显示 ${items.length} 个字体</div>`;
+                } else {
+                    statusHtml += `<div class="status error">❌ 字体过滤异常，期望 ${filteredFonts.length} 个，实际 ${items.length} 个</div>`;
+                }
+            }
+            
+            statusHtml += `
+                <div class="info-box">
+                    <strong>当前状态:</strong><br>
+                    当前语言: ${currentLanguage}<br>
+                    字体类型按钮数量: ${fontTypeButtons ? fontTypeButtons.querySelectorAll('.font-type-btn').length : 0}<br>
+                    显示的字体数量: ${typographyList ? typographyList.querySelectorAll('.typography-item').length : 0}<br>
+                    总字体数量: ${testFonts.length}
+                </div>
+            `;
+            
+            statusOutput.innerHTML = statusHtml;
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，初始化字体类型按钮测试...');
+            filterAndDisplayFonts();
+        });
+    </script>
+</body>
+</html>
+

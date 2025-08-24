@@ -1,5 +1,15 @@
 <div class="tab <?php if( $active_typos ) echo 'active'; ?> " ng-if="settings['nbdesigner_enable_text'] == 'yes'" id="tab-typography" nbd-scroll="scrollLoadMore(container, type)" data-container="#tab-typography" data-type="typography" data-offset="20">
     <div class="tab-main tab-scroll">
+        <!-- 字体类型切换按钮 -->
+        <div class="font-type-buttons">
+            <button class="font-type-btn" ng-class="{'active': currentLanguage === 'chinese'}" ng-click="switchLanguage('chinese')">
+                中文字体
+            </button>
+            <button class="font-type-btn" ng-class="{'active': currentLanguage === 'english'}" ng-click="switchLanguage('english')">
+                英文字体
+            </button>
+        </div>
+        
         <div class="typography-head">
             <span class="text-guide" ><?php esc_html_e('Click to add text','web-to-print-online-designer'); ?></span>
             <div class="head-main">
@@ -11,23 +21,18 @@
         </div>
         <hr class="seperate" ng-if="settings.nbdesigner_hide_typo_section == 'no'" />
         
-        <!-- 语言切换标签 -->
-        <div class="language-tabs" ng-if="settings.nbdesigner_hide_typo_section == 'no'">
-            <div class="tab-switcher">
-                <button class="lang-tab" ng-class="{'active': currentLanguage === 'chinese'}" ng-click="switchLanguage('chinese')">
-                    <span class="lang-text">中文</span>
-                </button>
-                <button class="lang-tab" ng-class="{'active': currentLanguage === 'english'}" ng-click="switchLanguage('english')">
-                    <span class="lang-text">English</span>
-                </button>
-            </div>
-        </div>
-        
         <div class="typography-body">
             <ul class="typography-items">
-                <li nbd-drag="typo.folder" type="typo" ng-click="insertTypography(typo)" class="typography-item" ng-repeat="typo in resource.typography.data | limitTo: resource.typography.filter.currentPage * resource.typography.filter.perPage" repeat-end="onEndRepeat('typography')">
+                <li nbd-drag="typo.folder" type="typo" ng-click="insertTypography(typo)" class="typography-item" ng-repeat="typo in filteredTypographyData | limitTo: resource.typography.filter.currentPage * resource.typography.filter.perPage track by typo.id" repeat-end="onEndRepeat('typography')">
                     <div class="typo-item-content">
-                        <img ng-src="{{generateTypoLink(typo)}}" alt="Typography" class="typo-preview" />
+                        <img ng-src="{{typo._cachedSrc || (typo._cachedSrc = generateTypoLink(typo))}}" 
+                             alt="Typography" 
+                             class="typo-preview" 
+                             onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                             onload="this.onload=null; this.nextElementSibling.style.display='none';" />
+                        <div class="typo-fallback" style="width: 100%; height: 80px; background: #f5f5f5; border-radius: 4px; display: none; align-items: center; justify-content: center; color: #999; font-size: 12px;">
+                            <span>图片加载失败</span>
+                        </div>
                         <div class="typo-name">{{typo.name || 'Font ' + typo.id}}</div>
                     </div>
                 </li>
@@ -69,6 +74,17 @@
 
 /* 响应式布局 */
 @media (max-width: 480px) {
+    .font-type-buttons {
+        padding: 12px 8px;
+        gap: 8px;
+    }
+    
+    .font-type-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+        min-width: 70px;
+    }
+    
     .typography-items {
         grid-template-columns: 1fr; /* 小屏幕时改为单列 */
         max-width: 280px;
@@ -81,6 +97,45 @@
     .typo-name {
         font-size: 13px; /* 小屏幕时增加字体大小 */
     }
+}
+
+/* 字体类型切换按钮样式 */
+.font-type-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+}
+
+.font-type-btn {
+    background: white;
+    border: 2px solid #007cba;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    color: #007cba;
+    min-width: 80px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.font-type-btn:hover {
+    background: #e7f3ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.font-type-btn.active {
+    background: #007cba;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,124,186,0.3);
 }
 
 /* 语言切换标签样式 */
@@ -192,6 +247,24 @@
 
 .typo-name {
     display: none !important; /* 隐藏字体名称 */
+}
+
+/* 图片加载失败时的样式 */
+.typo-fallback {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%) !important;
+    border: 1px solid #ddd !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8) !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+.typo-fallback span {
+    background: rgba(255,255,255,0.8) !important;
+    padding: 4px 8px !important;
+    border-radius: 3px !important;
+    font-size: 11px !important;
+    letter-spacing: 0.5px !important;
 }
 
 /* 加载动画样式 */

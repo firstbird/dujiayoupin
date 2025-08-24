@@ -170,80 +170,80 @@
             document.getElementById('log-output').textContent = '';
         }
         
-        function generateTypoLink(typo) {
-            if (!typo || !typo.folder) {
-                return '';
-            }
+        // function generateTypoLink(typo) {
+        //     if (!typo || !typo.folder) {
+        //         return '';
+        //     }
             
-            var baseUrl = window.location.origin;
-            return baseUrl + '/wp-content/plugins/web-to-print-online-designer/data/typography/store/' + typo.folder + '/frame_0.png';
-        }
+        //     var baseUrl = window.location.origin;
+        //     return baseUrl + '/wp-content/plugins/web-to-print-online-designer/data/typography/store/' + typo.folder + '/frame_0.png';
+        // }
         
-        function testImage(font) {
-            return new Promise((resolve) => {
-                const imageUrl = generateTypoLink(font);
-                const img = new Image();
+        // function testImage(font) {
+        //     return new Promise((resolve) => {
+        //         const imageUrl = generateTypoLink(font);
+        //         const img = new Image();
                 
-                img.onload = function() {
-                    resolve({
-                        font: font,
-                        url: imageUrl,
-                        success: true,
-                        width: img.naturalWidth,
-                        height: img.naturalHeight
-                    });
-                };
+        //         img.onload = function() {
+        //             resolve({
+        //                 font: font,
+        //                 url: imageUrl,
+        //                 success: true,
+        //                 width: img.naturalWidth,
+        //                 height: img.naturalHeight
+        //             });
+        //         };
                 
-                img.onerror = function() {
-                    resolve({
-                        font: font,
-                        url: imageUrl,
-                        success: false,
-                        error: '图片加载失败'
-                    });
-                };
+        //         img.onerror = function() {
+        //             resolve({
+        //                 font: font,
+        //                 url: imageUrl,
+        //                 success: false,
+        //                 error: '图片加载失败'
+        //             });
+        //         };
                 
-                img.src = imageUrl;
-            });
-        }
+        //         img.src = imageUrl;
+        //     });
+        // }
         
-        function testAllImages() {
-            log('开始测试字体预览图片...');
+        // function testAllImages() {
+        //     log('开始测试字体预览图片...');
             
-            // 显示字体数据
-            document.getElementById('font-data').textContent = JSON.stringify(typographyData, null, 2);
+        //     // 显示字体数据
+        //     document.getElementById('font-data').textContent = JSON.stringify(typographyData, null, 2);
             
-            // 清空结果区域
-            document.getElementById('image-results').innerHTML = '';
+        //     // 清空结果区域
+        //     document.getElementById('image-results').innerHTML = '';
             
-            // 测试每个字体
-            typographyData.forEach((font, index) => {
-                const imageUrl = generateTypoLink(font);
+        //     // 测试每个字体
+        //     typographyData.forEach((font, index) => {
+        //         const imageUrl = generateTypoLink(font);
                 
-                // 创建图片测试项
-                const imageItem = document.createElement('div');
-                imageItem.className = 'image-item';
-                imageItem.innerHTML = `
-                    <h4>${font.name}</h4>
-                    <p>文件夹: ${font.folder}</p>
-                    <p>语言: ${font.language}</p>
-                    <img src="${imageUrl}" alt="${font.name}" onload="this.parentNode.querySelector('.status').textContent='✅ 加载成功'; this.parentNode.querySelector('.status').className='status success';" onerror="this.parentNode.querySelector('.status').textContent='❌ 加载失败'; this.parentNode.querySelector('.status').className='status error';">
-                    <div class="status loading">⏳ 加载中...</div>
-                    <p style="font-size: 10px; color: #666;">${imageUrl}</p>
-                `;
+        //         // 创建图片测试项
+        //         const imageItem = document.createElement('div');
+        //         imageItem.className = 'image-item';
+        //         imageItem.innerHTML = `
+        //             <h4>${font.name}</h4>
+        //             <p>文件夹: ${font.folder}</p>
+        //             <p>语言: ${font.language}</p>
+        //             <img src="${imageUrl}" alt="${font.name}" onload="this.parentNode.querySelector('.status').textContent='✅ 加载成功'; this.parentNode.querySelector('.status').className='status success';" onerror="this.parentNode.querySelector('.status').textContent='❌ 加载失败'; this.parentNode.querySelector('.status').className='status error';">
+        //             <div class="status loading">⏳ 加载中...</div>
+        //             <p style="font-size: 10px; color: #666;">${imageUrl}</p>
+        //         `;
                 
-                document.getElementById('image-results').appendChild(imageItem);
+        //         document.getElementById('image-results').appendChild(imageItem);
                 
-                // 测试图片
-                testImage(font).then(result => {
-                    if (result.success) {
-                        log(`✅ ${font.name} - 图片加载成功 (${result.width}x${result.height})`);
-                    } else {
-                        log(`❌ ${font.name} - 图片加载失败: ${result.error}`);
-                    }
-                });
-            });
-        }
+        //         // 测试图片
+        //         testImage(font).then(result => {
+        //             if (result.success) {
+        //                 log(`✅ ${font.name} - 图片加载成功 (${result.width}x${result.height})`);
+        //             } else {
+        //                 log(`❌ ${font.name} - 图片加载失败: ${result.error}`);
+        //             }
+        //         });
+        //     });
+        // }
         
         // 页面加载完成后的初始化
         document.addEventListener('DOMContentLoaded', function() {
