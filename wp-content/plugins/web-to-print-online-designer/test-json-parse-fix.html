@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 JSON.parse 修复</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>测试 JSON.parse 修复</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试数据格式检测</h2>
+        <button onclick="testDataFormatDetection()">测试数据格式检测</button>
+        <div id="format-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 测试 JSON.parse 修复逻辑</h2>
+        <button onclick="testJsonParseFix()">测试修复逻辑</button>
+        <div id="parse-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 测试响应标准化</h2>
+        <button onclick="testResponseStandardization()">测试响应标准化</button>
+        <div id="standardization-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 测试完整流程</h2>
+        <button onclick="testCompleteFlow()">测试完整流程</button>
+        <div id="complete-result" class="result"></div>
+    </div>
+
+    <script>
+        // 模拟 NBDDataFactory.getResource 方法
+        function getResource(data, callback) {
+            console.log('模拟 getResource 调用，参数:', data);
+            
+            // 模拟不同类型的响应
+            var mockResponses = {
+                'background': {
+                    status: 'success',
+                    message: '获取背景图片成功',
+                    data: {
+                        bgs: [
+                            { id: 1, name: 'Background 1', url: 'bg1.jpg' },
+                            { id: 2, name: 'Background 2', url: 'bg2.jpg' }
+                        ],
+                        length: 2
+                    }
+                },
+                'typography': {
+                    flag: 1,
+                    data: [
+                        { id: 1, name: 'Font 1', alias: 'font1' },
+                        { id: 2, name: 'Font 2', alias: 'font2' }
+                    ]
+                },
+                'clipart': {
+                    flag: 0,
+                    message: '获取失败'
+                }
+            };
+            
+            var response = mockResponses[data.type] || { flag: 1, data: [] };
+            
+            // 模拟异步响应
+            setTimeout(function() {
+                callback(response);
+            }, 500);
+        }
+        
+        // 测试数据格式检测
+        function testDataFormatDetection() {
+            $('#format-result').html('<span class="info">正在测试...</span>');
+            
+            var testCases = [
+                { data: '{"flag": 1, "data": []}', type: 'string', description: 'JSON 字符串' },
+                { data: { flag: 1, data: [] }, type: 'object', description: '对象' },
+                { data: null, type: 'null', description: 'null 值' },
+                { data: undefined, type: 'undefined', description: 'undefined 值' }
+            ];
+            
+            var results = [];
+            testCases.forEach(function(testCase) {
+                var type = typeof testCase.data;
+                var isValid = testCase.data !== null && testCase.data !== undefined;
+                var result = {
+                    description: testCase.description,
+                    type: type,
+                    isValid: isValid,
+                    needsParse: type === 'string' && isValid
+                };
+                results.push(result);
+            });
+            
+            var html = '<span class="success">✓ 数据格式检测测试完成</span><br><pre>' + JSON.stringify(results, null, 2) + '</pre>';
+            $('#format-result').html(html);
+        }
+        
+        // 测试 JSON.parse 修复逻辑
+        function testJsonParseFix() {
+            $('#parse-result').html('<span class="info">正在测试...</span>');
+            
+            var testCases = [
+                { 
+                    input: '{"flag": 1, "data": [{"id": 1, "name": "test"}]}', 
+                    description: 'JSON 字符串',
+                    expectedType: 'string'
+                },
+                { 
+                    input: { flag: 1, data: [{ id: 1, name: 'test' }] }, 
+                    description: '对象',
+                    expectedType: 'object'
+                }
+            ];
+            
+            var results = [];
+            testCases.forEach(function(testCase) {
+                var input = testCase.input;
+                var inputType = typeof input;
+                var output;
+                var parseError = null;
+                
+                if (inputType === 'string') {
+                    try {
+                        output = JSON.parse(input);
+                        parseError = null;
+                    } catch (e) {
+                        output = null;
+                        parseError = e.message;
+                    }
+                } else {
+                    output = input; // 已经是对象，直接使用
+                    parseError = null;
+                }
+                
+                var result = {
+                    description: testCase.description,
+                    inputType: inputType,
+                    outputType: typeof output,
+                    parseError: parseError,
+                    success: parseError === null && output !== null
+                };
+                results.push(result);
+            });
+            
+            var html = '<span class="success">✓ JSON.parse 修复逻辑测试完成</span><br><pre>' + JSON.stringify(results, null, 2) + '</pre>';
+            $('#parse-result').html(html);
+        }
+        
+        // 测试响应标准化
+        function testResponseStandardization() {
+            $('#standardization-result').html('<span class="info">正在测试...</span>');
+            
+            var testCases = [
+                {
+                    input: { flag: 1, data: [{ id: 1 }] },
+                    description: '标准格式',
+                    expectedFlag: 1
+                },
+                {
+                    input: { status: 'success', data: { bgs: [{ id: 1 }] } },
+                    description: '新格式 (background)',
+                    expectedFlag: 1
+                },
+                {
+                    input: { status: 'error', message: '失败' },
+                    description: '错误格式',
+                    expectedFlag: 0
+                }
+            ];
+            
+            var results = [];
+            testCases.forEach(function(testCase) {
+                var response = testCase.input;
+                var standardizedResponse;
+                
+                if (response && response.flag !== undefined) {
+                    // 标准 nbd_get_resource 响应格式
+                    standardizedResponse = response;
+                } else if (response && response.status !== undefined) {
+                    // 新的响应格式，转换为标准格式
+                    standardizedResponse = {
+                        flag: response.status === 'success' ? 1 : 0,
+                        data: response.data || response.bgs || [],
+                        message: response.message || '请求成功',
+                        status: response.status
+                    };
+                } else {
+                    // 其他格式，尝试标准化
+                    standardizedResponse = {
+                        flag: 1,
+                        data: response || [],
+                        message: '请求成功'
+                    };
+                }
+                
+                var result = {
+                    description: testCase.description,
+                    input: response,
+                    output: standardizedResponse,
+                    success: standardizedResponse.flag === testCase.expectedFlag
+                };
+                results.push(result);
+            });
+            
+            var html = '<span class="success">✓ 响应标准化测试完成</span><br><pre>' + JSON.stringify(results, null, 2) + '</pre>';
+            $('#standardization-result').html(html);
+        }
+        
+        // 测试完整流程
+        function testCompleteFlow() {
+            $('#complete-result').html('<span class="info">正在测试完整流程...</span>');
+            
+            var testTypes = ['background', 'typography', 'clipart'];
+            var results = [];
+            
+            testTypes.forEach(function(type) {
+                getResource({ type: type }, function(response) {
+                    // 模拟修复后的处理逻辑
+                    var data = response;
+                    
+                    // 检查 data 是否已经是对象，如果是则直接使用，否则尝试解析
+                    if (typeof data === 'string') {
+                        try {
+                            data = JSON.parse(data);
+                        } catch (e) {
+                            console.error('JSON.parse 失败:', e, '原始数据:', data);
+                            results.push({
+                                type: type,
+                                success: false,
+                                error: e.message
+                            });
+                            return;
+                        }
+                    }
+                    
+                    // 检查数据结构
+                    if (!data || !data.data) {
+                        results.push({
+                            type: type,
+                            success: false,
+                            error: '数据格式错误'
+                        });
+                        return;
+                    }
+                    
+                    results.push({
+                        type: type,
+                        success: true,
+                        dataLength: Array.isArray(data.data) ? data.data.length : 0,
+                        flag: data.flag
+                    });
+                    
+                    // 如果所有测试都完成了，显示结果
+                    if (results.length === testTypes.length) {
+                        var html = '<span class="success">✓ 完整流程测试完成</span><br><pre>' + JSON.stringify(results, null, 2) + '</pre>';
+                        $('#complete-result').html(html);
+                    }
+                });
+            });
+        }
+        
+        // 页面加载完成后的初始化
+        $(document).ready(function() {
+            console.log('测试页面加载完成');
+        });
+    </script>
+</body>
+</html>

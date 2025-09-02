@@ -13,9 +13,12 @@ if(!class_exists('NBD_RESOURCE')){
             return self::$instance;
 	}        
         public function init(){
-            if (is_admin()) {
-                $this->ajax();
-            }
+            // 确保 AJAX 动作在所有情况下都被注册
+            $this->ajax();
+            
+            // 添加调试日志
+            error_log('NBD_RESOURCE init() called');
+            error_log('AJAX actions registered for nbd_get_resource');
         }   
         public function ajax(){
             $ajax_events = array(
@@ -26,14 +29,25 @@ if(!class_exists('NBD_RESOURCE')){
                 if ($nopriv) {
                     add_action('wp_ajax_nopriv_' . $ajax_event, array($this, $ajax_event));
                 }
-            }        
+                error_log("NBD_RESOURCE: Registered AJAX action 'wp_ajax_{$ajax_event}'");
+                if ($nopriv) {
+                    error_log("NBD_RESOURCE: Registered AJAX action 'wp_ajax_nopriv_{$ajax_event}'");
+                }
+            }
+            error_log('NBD_RESOURCE: AJAX actions registration completed');
         }
         public function nbd_get_resource(){
             $flag = 1;
             $data = array();
             error_log('nbd_get_resource begin ---');
+            error_log('REQUEST data: ' . print_r($_REQUEST, true));
+            error_log('POST data: ' . print_r($_POST, true));
+            error_log('GET data: ' . print_r($_GET, true));
+            
             if (!wp_verify_nonce($_REQUEST['nonce'], 'nbdesigner-get-data') && NBDESIGNER_ENABLE_NONCE) {
                 error_log('nbd_get_resource --- wp_verify_nonce failed');
+                error_log('Nonce received: ' . $_REQUEST['nonce']);
+                error_log('Nonce expected: ' . wp_create_nonce('nbdesigner-get-data'));
                 $flag = 0;
             }else{     
                 $rq_type = wc_clean( $_REQUEST['type'] );
@@ -49,7 +63,7 @@ if(!class_exists('NBD_RESOURCE')){
                         }
                         break;  
                     case 'get_typo':
-                        $path = NBDESIGNER_PLUGIN_DIR . '/data/typography/store/'.$_REQUEST['folder'];
+                        $path = NBDESIGNER_PLUGIN_DIR . '/data/typography/local/'.$_REQUEST['folder'];
                         if (file_exists($path.'/used_font.json') && file_exists($path.'/design.json')) {
                             $data['font'] = json_decode( file_get_contents($path.'/used_font.json') );
                             $data['design'] = json_decode( file_get_contents($path.'/design.json') );

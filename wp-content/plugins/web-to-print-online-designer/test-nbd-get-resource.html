@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 nbd_get_resource 新实现</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .loading { color: blue; font-style: italic; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body ng-app="testApp" ng-controller="TestController">
+    <h1>测试 nbd_get_resource 新实现</h1>
+    
+    <div class="test-section">
+        <h2>1. 检查配置</h2>
+        <button ng-click="checkConfig()">检查配置</button>
+        <div id="config-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 测试 NBDDataFactory.getResource 方法</h2>
+        <button ng-click="testGetResource('background')">测试 Background</button>
+        <button ng-click="testGetResource('typography')">测试 Typography</button>
+        <button ng-click="testGetResource('clipart')">测试 Clipart</button>
+        <div id="getresource-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 测试 NBDDataFactory.get 方法</h2>
+        <button ng-click="testGetMethod('background')">测试 get('nbd_get_resource')</button>
+        <div id="getmethod-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 测试直接 jQuery.ajax</h2>
+        <button ng-click="testDirectAjax()">测试直接 AJAX</button>
+        <div id="directajax-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. 测试错误处理</h2>
+        <button ng-click="testErrorHandling()">测试错误处理</button>
+        <div id="error-result" class="result"></div>
+    </div>
+
+    <script>
+        // 模拟 NBDESIGNCONFIG
+        var NBDESIGNCONFIG = {
+            ajax_url: '/wp-admin/admin-ajax.php',
+            nonce_get: 'test-nonce-get',
+            nonce: 'test-nonce'
+        };
+        
+        // 模拟 appConfig
+        var appConfig = {
+            mediaUrl: 'https://studio.cmsmart.net/v1'
+        };
+        
+        // 模拟 NBDDataFactory
+        var NBDDataFactory = {
+            get: function(action, data, callback, progressCallback) {
+                // 特殊处理 nbd_get_resource 请求，使用类似 nbd_oss_list_files 的方式
+                if (action === 'nbd_get_resource') {
+                    return this.getResource(data, callback);
+                }
+                
+                // 原有的 FormData 处理方式
+                var formData = new FormData();
+                formData.append("action", action);
+                var nonce = action == 'nbd_get_resource' ? NBDESIGNCONFIG['nonce_get'] : NBDESIGNCONFIG['nonce'];
+                formData.append("nonce", nonce);
+                
+                console.log('NBDDataFactory get --- action:', action);
+                angular.forEach(data, function (value, key) {
+                    formData.append(key, value);
+                });
+                
+                var url = NBDESIGNCONFIG['ajax_url'];
+                if( data.type == 'typography' || data.type == 'get_typo' ) url = appConfig.mediaUrl + '/typo';
+                if( data.source == 'media' ) url = appConfig.mediaUrl + '/template';
+                
+                console.log('NBDDataFactory url: ', url);
+                
+                // 模拟 $http.post
+                jQuery.ajax({
+                    url: url,
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('NBDDataFactory, response:', response);
+                        callback(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('NBDDataFactory AJAX Error, url:', url);
+                        console.log(error);
+                        callback({ error: error });
+                    }
+                });
+            },
+            
+            // 新增：专门处理 nbd_get_resource 请求的方法
+            getResource: function(data, callback) {
+                console.log('NBDDataFactory getResource --- 开始处理 nbd_get_resource 请求');
+                console.log('请求数据:', data);
+                
+                // 构建请求参数，类似 nbd_oss_list_files 的方式
+                var requestData = {
+                    action: 'nbd_get_resource',
+                    nonce: NBDESIGNCONFIG['nonce_get']
+                };
+                
+                // 添加其他参数
+                angular.forEach(data, function(value, key) {
+                    requestData[key] = value;
+                });
+                
+                console.log('NBDDataFactory getResource --- 最终请求数据:', requestData);
+                console.log('NBDDataFactory getResource --- AJAX URL:', NBDESIGNCONFIG['ajax_url']);
+                
+                // 使用 jQuery.ajax 方式，与 nbd_oss_list_files 保持一致
+                jQuery.ajax({
+                    url: NBDESIGNCONFIG['ajax_url'],
+                    method: "POST",
+                    data: requestData,
+                    beforeSend: function() {
+                        console.log('NBDDataFactory getResource --- 请求发送中...');
+                        // 可以在这里添加加载指示器
+                        if (data.type === 'background') {
+                            $('#getresource-result').html('<div class="loading">加载背景图片中...</div>');
+                        }
+                    },
+                    success: function(response) {
+                        console.log('NBDDataFactory getResource --- 请求成功:', response);
+                        
+                        // 检查响应格式
+                        if (response && response.flag !== undefined) {
+                            // 标准 nbd_get_resource 响应格式
+                            callback(response);
+                        } else if (response && response.status !== undefined) {
+                            // 新的响应格式（如 background 类型）
+                            callback(response);
+                        } else {
+                            // 其他格式，直接传递
+                            callback(response);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('NBDDataFactory getResource --- 请求失败:', error);
+                        console.error('状态:', status);
+                        console.error('响应:', xhr.responseText);
+                        
+                        // 显示错误信息
+                        if (data.type === 'background') {
+                            $('#getresource-result').html('<div class="error">加载失败：' + error + '</div>');
+                        }
+                        
+                        // 调用回调函数，传递错误信息
+                        callback({
+                            flag: 0,
+                            error: error,
+                            message: '请求失败：' + error
+                        });
+                    }
+                });
+            }
+        };
+        
+        angular.module('testApp', [])
+        .controller('TestController', function($scope) {
+            
+            $scope.checkConfig = function() {
+                $('#config-result').html('<span class="info">正在检查配置...</span>');
+                
+                let configInfo = '<span class="success">✓ 配置检查完成</span><br>';
+                configInfo += '<strong>AJAX URL:</strong> ' + NBDESIGNCONFIG.ajax_url + '<br>';
+                configInfo += '<strong>Nonce Get:</strong> ' + NBDESIGNCONFIG.nonce_get + '<br>';
+                configInfo += '<strong>Nonce:</strong> ' + NBDESIGNCONFIG.nonce + '<br>';
+                configInfo += '<strong>Media URL:</strong> ' + appConfig.mediaUrl + '<br>';
+                
+                $('#config-result').html(configInfo + '<pre>' + JSON.stringify(NBDESIGNCONFIG, null, 2) + '</pre>');
+            };
+            
+            $scope.testGetResource = function(type) {
+                $('#getresource-result').html('<span class="info">正在测试 getResource(' + type + ')...</span>');
+                
+                NBDDataFactory.getResource({ type: type }, function(response) {
+                    if (response.flag === 0 || response.error) {
+                        $('#getresource-result').html('<span class="error">✗ 请求失败</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    } else {
+                        $('#getresource-result').html('<span class="success">✓ 请求成功</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    }
+                });
+            };
+            
+            $scope.testGetMethod = function(type) {
+                $('#getmethod-result').html('<span class="info">正在测试 get("nbd_get_resource", ' + type + ')...</span>');
+                
+                NBDDataFactory.get('nbd_get_resource', { type: type }, function(response) {
+                    if (response.flag === 0 || response.error) {
+                        $('#getmethod-result').html('<span class="error">✗ 请求失败</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    } else {
+                        $('#getmethod-result').html('<span class="success">✓ 请求成功</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    }
+                });
+            };
+            
+            $scope.testDirectAjax = function() {
+                $('#directajax-result').html('<span class="info">正在测试直接 AJAX...</span>');
+                
+                jQuery.ajax({
+                    url: NBDESIGNCONFIG.ajax_url,
+                    method: "POST",
+                    data: {
+                        action: 'nbd_get_resource',
+                        type: 'background',
+                        nonce: NBDESIGNCONFIG.nonce_get
+                    },
+                    success: function(response) {
+                        $('#directajax-result').html('<span class="success">✓ 直接 AJAX 成功</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#directajax-result').html('<span class="error">✗ 直接 AJAX 失败</span><br><pre>状态: ' + status + '\n错误: ' + error + '</pre>');
+                    }
+                });
+            };
+            
+            $scope.testErrorHandling = function() {
+                $('#error-result').html('<span class="info">正在测试错误处理...</span>');
+                
+                // 测试无效的 nonce
+                NBDDataFactory.getResource({ 
+                    type: 'background', 
+                    nonce: 'invalid-nonce' 
+                }, function(response) {
+                    if (response.flag === 0) {
+                        $('#error-result').html('<span class="success">✓ 错误处理正常</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    } else {
+                        $('#error-result').html('<span class="info">响应: ' + JSON.stringify(response, null, 2) + '</span>');
+                    }
+                });
+            };
+            
+            // 页面加载完成后自动检查配置
+            $scope.$on('$viewContentLoaded', function() {
+                setTimeout($scope.checkConfig, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
