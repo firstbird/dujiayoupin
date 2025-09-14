@@ -148,8 +148,8 @@
             console.log('📝 缓存状态: 语言变化=' + (lastLanguage !== currentLanguage) + ', 数据变化=' + (lastDataHash !== currentDataHash));
             
             // 如果字体数据没有language属性，尝试根据文件夹名称或名称推断语言
-            $scope.resource.typography.data.forEach(function(typo) {
-                console.log('TypographyData check forEach typo: ', typo);
+            // $scope.resource.typography.data.forEach(function(typo) {
+                // console.log('TypographyData check forEach typo: ', typo);
                 // typo.language = 'english';
                 // if (!typo.language) {
                 //     // 根据文件夹名称推断语言
@@ -170,7 +170,7 @@
                 //         typo.language = 'chinese';
                 //     }
                 // }
-            });
+            // });
             
             // todo8.25
             console.log('updateFilteredTypographyData done typography.data: ', $scope.resource.typography.data);
@@ -643,52 +643,52 @@
     };
     
     // 临时函数 - 手动添加字体数据
-    window.addTestTypographyData = function() {
-        var app = angular.element(document.body).scope();
-        if (!app) {
-            app = angular.element(document.getElementById("designer-controller")).scope();
-        }
+    // window.addTestTypographyData = function() {
+    //     var app = angular.element(document.body).scope();
+    //     if (!app) {
+    //         app = angular.element(document.getElementById("designer-controller")).scope();
+    //     }
         
-        if (app && app.resource) {
-            if (!app.resource.typography) {
-                app.resource.typography = {};
-            }
+    //     if (app && app.resource) {
+    //         if (!app.resource.typography) {
+    //             app.resource.typography = {};
+    //         }
             
-            app.resource.typography.data = [
-                {
-                    id: 1,
-                    folder: "sample1",
-                    language: "chinese",
-                    name: "中文字体1"
-                },
-                {
-                    id: 2,
-                    folder: "sample2",
-                    language: "english",
-                    name: "English Font 1"
-                },
-                {
-                    id: 3,
-                    folder: "sample3",
-                    language: "chinese",
-                    name: "中文字体2"
-                },
-                {
-                    id: 4,
-                    folder: "sample4",
-                    language: "english",
-                    name: "English Font 2"
-                }
-            ];
+    //         app.resource.typography.data = [
+    //             {
+    //                 id: 1,
+    //                 folder: "sample1",
+    //                 language: "chinese",
+    //                 name: "中文字体1"
+    //             },
+    //             {
+    //                 id: 2,
+    //                 folder: "sample2",
+    //                 language: "english",
+    //                 name: "English Font 1"
+    //             },
+    //             {
+    //                 id: 3,
+    //                 folder: "sample3",
+    //                 language: "chinese",
+    //                 name: "中文字体2"
+    //             },
+    //             {
+    //                 id: 4,
+    //                 folder: "sample4",
+    //                 language: "english",
+    //                 name: "English Font 2"
+    //             }
+    //         ];
             
-            app.currentLanguage = 'chinese';
-            console.log('✅ 测试字体数据已添加，当前语言设置为中文');
+    //         app.currentLanguage = 'chinese';
+    //         console.log('✅ 测试字体数据已添加，当前语言设置为中文');
             
-            console.log('✅ 测试字体数据已添加');
-        } else {
-            console.log('❌ 无法添加测试数据，Angular应用或Resource对象不存在');
-        }
-    };
+    //         console.log('✅ 测试字体数据已添加');
+    //     } else {
+    //         console.log('❌ 无法添加测试数据，Angular应用或Resource对象不存在');
+    //     }
+    // };
     
     // 强制应用CSS样式的函数
     window.forceApplyTypographyCSS = function() {

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 NBDesigner AJAX 请求</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>测试 NBDesigner AJAX 请求</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试 AJAX 基础功能</h2>
+        <button onclick="testBasicAjax()">测试基础 AJAX</button>
+        <div id="basic-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 测试 nbd_get_resource 请求</h2>
+        <button onclick="testNbdGetResource()">测试 nbd_get_resource</button>
+        <div id="nbd-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 测试不同资源类型</h2>
+        <button onclick="testResourceType('typography')">测试 Typography</button>
+        <button onclick="testResourceType('background')">测试 Background</button>
+        <button onclick="testResourceType('clipart')">测试 Clipart</button>
+        <div id="resource-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 测试错误处理</h2>
+        <button onclick="testErrorHandling()">测试错误处理</button>
+        <div id="error-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. 检查配置</h2>
+        <button onclick="checkConfig()">检查配置</button>
+        <div id="config-result" class="result"></div>
+    </div>
+
+    <script>
+        // 基础 AJAX 测试
+        function testBasicAjax() {
+            $('#basic-result').html('<span class="info">正在测试...</span>');
+            
+            $.ajax({
+                url: '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action: 'test_ajax',
+                    test: 'basic'
+                },
+                success: function(response) {
+                    $('#basic-result').html('<span class="success">✓ 基础 AJAX 工作正常</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    $('#basic-result').html('<span class="error">✗ 基础 AJAX 失败</span><br><pre>状态: ' + status + '\n错误: ' + error + '\n响应: ' + xhr.responseText + '</pre>');
+                }
+            });
+        }
+        
+        // 测试 nbd_get_resource
+        function testNbdGetResource() {
+            $('#nbd-result').html('<span class="info">正在测试 nbd_get_resource...</span>');
+            
+            $.ajax({
+                url: '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action: 'nbd_get_resource',
+                    type: 'background',
+                    nonce: 'test-nonce' // 这里应该使用正确的 nonce
+                },
+                success: function(response) {
+                    $('#nbd-result').html('<span class="success">✓ nbd_get_resource 请求成功</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    $('#nbd-result').html('<span class="error">✗ nbd_get_resource 请求失败</span><br><pre>状态: ' + status + '\n错误: ' + error + '\n响应: ' + xhr.responseText + '</pre>');
+                }
+            });
+        }
+        
+        // 测试不同资源类型
+        function testResourceType(type) {
+            $('#resource-result').html('<span class="info">正在测试 ' + type + '...</span>');
+            
+            $.ajax({
+                url: '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action: 'nbd_get_resource',
+                    type: type,
+                    nonce: 'test-nonce'
+                },
+                success: function(response) {
+                    $('#resource-result').html('<span class="success">✓ ' + type + ' 请求成功</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    $('#resource-result').html('<span class="error">✗ ' + type + ' 请求失败</span><br><pre>状态: ' + status + '\n错误: ' + error + '\n响应: ' + xhr.responseText + '</pre>');
+                }
+            });
+        }
+        
+        // 测试错误处理
+        function testErrorHandling() {
+            $('#error-result').html('<span class="info">正在测试错误处理...</span>');
+            
+            // 测试无效的 action
+            $.ajax({
+                url: '/wp-admin/admin-ajax.php',
+                type: 'POST',
+                data: {
+                    action: 'invalid_action',
+                    test: 'error'
+                },
+                success: function(response) {
+                    $('#error-result').html('<span class="info">无效 action 的响应</span><br><pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                },
+                error: function(xhr, status, error) {
+                    $('#error-result').html('<span class="info">无效 action 的错误</span><br><pre>状态: ' + status + '\n错误: ' + error + '</pre>');
+                }
+            });
+        }
+        
+        // 检查配置
+        function checkConfig() {
+            $('#config-result').html('<span class="info">正在检查配置...</span>');
+            
+            // 检查页面中是否有 NBDESIGNCONFIG
+            if (typeof NBDESIGNCONFIG !== 'undefined') {
+                let configInfo = '<span class="success">✓ NBDESIGNCONFIG 已定义</span><br>';
+                configInfo += '<strong>AJAX URL:</strong> ' + (NBDESIGNCONFIG.ajax_url || '未定义') + '<br>';
+                configInfo += '<strong>Nonce:</strong> ' + (NBDESIGNCONFIG.nonce || '未定义') + '<br>';
+                configInfo += '<strong>Nonce Get:</strong> ' + (NBDESIGNCONFIG.nonce_get || '未定义') + '<br>';
+                configInfo += '<strong>Plugin URL:</strong> ' + (NBDESIGNCONFIG.plg_url || '未定义') + '<br>';
+                
+                $('#config-result').html(configInfo + '<pre>' + JSON.stringify(NBDESIGNCONFIG, null, 2) + '</pre>');
+            } else {
+                $('#config-result').html('<span class="error">✗ NBDESIGNCONFIG 未定义</span><br>请确保在 NBDesigner 页面中运行此测试');
+            }
+        }
+        
+        // 页面加载完成后自动检查配置
+        $(document).ready(function() {
+            setTimeout(checkConfig, 1000);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

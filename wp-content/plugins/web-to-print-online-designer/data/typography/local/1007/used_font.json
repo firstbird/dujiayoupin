@@ -1,1 +1,50 @@
-[{"alias":"nbfont1007","name":"Local Font 1007","type":"ttf","file":{"r":"/nbfont1007.ttf"},"url":"/nbfont1007.ttf","subset":"all"}]
+[
+  {
+    "id": 1007,
+    "name": "Great Vibes",
+    "alias": "heiti",
+    "type": "custom",
+    "subset": "latin",
+    "file": {
+      "r": 1,
+      "i": 0,
+      "b": 0,
+      "bi": 0
+    },
+    "cat": [
+      "script"
+    ]
+  },
+  {
+    "id": 3002,
+    "name": "Hind Siliguri",
+    "alias": "Hind Siliguri",
+    "type": "custom",
+    "subset": "latin",
+    "file": {
+      "r": 1,
+      "i": 0,
+      "b": 1,
+      "bi": 0
+    },
+    "cat": [
+      "sans"
+    ]
+  },
+  {
+    "id": 3003,
+    "name": "Lustria",
+    "alias": "Lustria",
+    "type": "custom",
+    "subset": "latin",
+    "file": {
+      "r": 1,
+      "i": 0,
+      "b": 0,
+      "bi": 0
+    },
+    "cat": [
+      "serif"
+    ]
+  }
+]

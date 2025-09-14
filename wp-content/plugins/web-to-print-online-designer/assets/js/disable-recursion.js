@@ -64,3 +64,14 @@ window.addEventListener('error', function(event) {
 });
 
 console.log('=== �� 禁用递归脚本加载完成 ===');
+
+
+
+
+
+
+
+
+
+
+

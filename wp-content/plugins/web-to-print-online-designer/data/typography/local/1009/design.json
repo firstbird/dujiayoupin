@@ -1,1 +1,38 @@
-{"frame_0":{"objects":[{"type":"text","text":"Local Typography 1009","fontFamily":"nbfont1009","fontSize":48,"fontWeight":"normal","fontStyle":"normal","fill":"#000000","left":100,"top":100,"width":300,"height":60}]}}
+{
+  "frame_0": {
+    "version": "2.3.0",
+    "objects": [
+      {
+        "type": "i-text",
+        "version": "2.3.0",
+        "originX": "center",
+        "originY": "top",
+        "left": 400,
+        "top": 140,
+        "width": 600,
+        "height": 60,
+        "fill": "#000000",
+        "stroke": null,
+        "strokeWidth": 0,
+        "scaleX": 1,
+        "scaleY": 1,
+        "angle": 0,
+        "flipX": false,
+        "flipY": false,
+        "opacity": 1,
+        "visible": true,
+        "text": "宋体",
+        "fontSize": 48,
+        "fontWeight": "normal",
+        "fontFamily": "songti",
+        "fontStyle": "normal",
+        "lineHeight": 1.2,
+        "textAlign": "center",
+        "itemId": 1009001,
+        "selectable": true,
+        "lockRotation": true,
+        "styles": []
+      }
+    ]
+  }
+}
