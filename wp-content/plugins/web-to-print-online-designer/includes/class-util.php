@@ -19,21 +19,51 @@ class Nbdesigner_IO {
      * @return array Array path images in folder
      */
     public static function get_list_images($path, $level = 100) {
-        // error_log('Getting image list from path: ' . $path);
+        error_log('[get_list_images] 正在获取图片列表，路径: ' . $path);
         $files = array();
         if (is_dir($path)) {
-            $files = self::get_list_files_by_type($path, $level, 'image');
+            // 修复参数顺序：正确的顺序是 ($path, $type, $level)
+            $files = self::get_list_files_by_type($path, 'image', $level);
+        } else {
+            error_log('[get_list_images] 路径不是目录: ' . $path);
         }
-        // error_log('Found image files: ' . print_r($files, true));
+        error_log('[get_list_images] 找到图片文件: ' . count($files) . ' 个');
+        if(count($files) > 0) {
+            error_log('[get_list_images] 文件列表: ' . print_r($files, true));
+        }
         return $files;
     }
     public static function get_list_files_by_type($path, $type, $level = 100){
         $files = array();
         if(is_dir($path)){
             $files = self::get_list_files($path, $level);
-            $files = array_filter($files, function($file) use ($type) {
-                return strpos($file, $type) !== false;
-            });
+            
+            // 根据类型定义文件扩展名
+            $extensions = array();
+            if($type == 'image'){
+                $extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg');
+            } elseif($type == 'video'){
+                $extensions = array('mp4', 'avi', 'mov', 'wmv', 'flv', 'webm');
+            } elseif($type == 'pdf'){
+                $extensions = array('pdf');
+            }
+            
+            if(!empty($extensions)){
+                $files = array_filter($files, function($file) use ($path, $extensions) {
+                    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    return in_array($ext, $extensions);
+                });
+            } else {
+                // 如果没有定义扩展名，使用原来的逻辑
+                $files = array_filter($files, function($file) use ($type) {
+                    return strpos($file, $type) !== false;
+                });
+            }
+            
+            // 添加完整路径
+            $files = array_map(function($file) use ($path) {
+                return $path . '/' . $file;
+            }, $files);
         }
         return $files;
     }
@@ -462,7 +492,7 @@ class NBD_Image {
             error_log('nbdesigner nbdesigner_resize_imagejpg file: ' . $file);
             $src = imagecreatefromjpeg($file);
             $dst = imagecreatetruecolor($w, $h);
-            error_log('nbdesigner nbdesigner_resize_imagejpg $w ' . $w . ' $h ' . $h . ' $src ' . $src);
+            // error_log('nbdesigner nbdesigner_resize_imagejpg $w ' . $w . ' $h ' . $h . ' $src ' . $src);
             imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $width, $height);
             imagedestroy($src);
             if( $path == '' ){

@@ -447,47 +447,76 @@ class Nbdesigner_Plugin {
     }
 
     public function nbd_get_user_designs(){
-        // error_log('nbd_get_user_designs begin');
+        error_log('[nbd_get_user_designs] 开始执行');
         $user_id = wp_get_current_user()->ID;
         $result = array(
-            'flag'   =>  1
+            'flag'   =>  1,
+            'designs' => array()  // 初始化 designs 数组
         );
+        
+        error_log('[nbd_get_user_designs] user_id: ' . $user_id);
+        
         if( $user_id ){
             if( !isset($_POST['did']) ){
-                // error_log('nbd_get_user_designs $_POST not did');
                 global $wpdb;
                 $table_name =  $wpdb->prefix . 'nbdesigner_mydesigns';
+                
                 if( isset($_POST['product_id']) ){
                     $product_id     = absint( $_POST['product_id'] );
                     $variation_id   = absint( $_POST['variation_id'] );
-                    // error_log('nbd_get_user_designs product_id: ' . $product_id . ' variation_id: ' . $variation_id);
-                    $designs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = {$user_id} AND product_id = {$product_id} AND variation_id = {$variation_id} ORDER BY created_date DESC" );
+                    error_log('[nbd_get_user_designs] 查询参数 - product_id: ' . $product_id . ', variation_id: ' . $variation_id);
+                    $designs = $wpdb->get_results( $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = %d AND product_id = %d AND variation_id = %d ORDER BY created_date DESC",
+                        $user_id, $product_id, $variation_id
+                    ) );
                 }else{
-                    // error_log('nbd_get_user_designs no product_id: . variation_id: ' . $variation_id);
-                    $designs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = {$user_id} ORDER BY created_date DESC" );
+                    error_log('[nbd_get_user_designs] 查询所有设计');
+                    $designs = $wpdb->get_results( $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}nbdesigner_mydesigns WHERE user_id = %d ORDER BY created_date DESC",
+                        $user_id
+                    ) );
                 }
+                
+                error_log('[nbd_get_user_designs] 从数据库查询到 ' . count($designs) . ' 个设计');
+                
+                // 获取购物车中的设计ID
                 $cart_design_ids = array();
-                foreach(WC()->cart->cart_contents as $cart_item_key => $cart_item) {
-                    if(isset($cart_item['nbd_design_id'])) {
-                        // error_log('nbd_get_user_designs cart_design_id: ' . $cart_item['nbd_design_id']);
-                        $cart_design_ids[] = $cart_item['nbd_design_id'];
+                if(WC()->cart){
+                    foreach(WC()->cart->cart_contents as $cart_item_key => $cart_item) {
+                        if(isset($cart_item['nbd_design_id'])) {
+                            $cart_design_ids[] = $cart_item['nbd_design_id'];
+                        }
                     }
                 }
-                // error_log('nbd_get_user_designs cart_design_ids: ' . print_r($cart_design_ids, true));
+                error_log('[nbd_get_user_designs] 购物车中的设计ID: ' . print_r($cart_design_ids, true));
+                
+                // 遍历设计
                 foreach( $designs as $design ){
                     $path_preview   = NBDESIGNER_CUSTOMER_DIR .'/'.$design->folder. '/preview';
+                    error_log('[nbd_get_user_designs] 检查设计: ' . $design->folder . ', 路径: ' . $path_preview);
+                    
                     $listThumb      = Nbdesigner_IO::get_list_images( $path_preview );
+                    error_log('[nbd_get_user_designs] 找到 ' . count($listThumb) . ' 个预览图片');
+                    
                     $image          = '';
-                    // error_log('nbd_get_user_designs $design->folder: ' . $design->folder);
-                    if( !in_array($design->folder, $cart_design_ids) ){
+                    
+                    // 检查是否在购物车中
+                    $in_cart = in_array($design->folder, $cart_design_ids);
+                    error_log('[nbd_get_user_designs] 设计 ' . $design->folder . ' 在购物车中: ' . ($in_cart ? '是' : '否'));
+                    
+                    if( !$in_cart ){
                         if( count( $listThumb ) ){
                             asort($listThumb);
                             $image = Nbdesigner_IO::wp_convert_path_to_url( reset( $listThumb ) );
-                            $result['designs'][] = array(
+                            $design_data = array(
                                 'id'    => $design->folder,
                                 'src'   => $image,
                                 'created_date' => $design->created_date
                             );
+                            $result['designs'][] = $design_data;
+                            error_log('[nbd_get_user_designs] 添加设计到结果: ' . json_encode($design_data));
+                        } else {
+                            error_log('[nbd_get_user_designs] 设计 ' . $design->folder . ' 没有预览图片');
                         }
                     }
                 }
@@ -498,9 +527,11 @@ class Nbdesigner_Plugin {
             }  
         } else {
             $result['flag'] = 0;
-            // error_log('nbd_get_user_designs error');
+            error_log('[nbd_get_user_designs] 用户未登录');
         }
-        // error_log('nbd_get_user_designs end');
+        
+        error_log('[nbd_get_user_designs] 最终返回 ' . count($result['designs']) . ' 个设计');
+        error_log('[nbd_get_user_designs] 结果: ' . json_encode($result));
         wp_send_json_success($result);
         wp_die();
     }
@@ -4365,6 +4396,7 @@ class Nbdesigner_Plugin {
             }
             $result['flag']     = 'success';
             $result['folder']   = $nbd_item_key;
+            $result['design_id'] = $design_id;
             if( $ui_mode == '1' && nbdesigner_get_option( 'nbdesigner_enable_gallery_api', 'no' ) == 'yes' ){
                 $result['gallery']  = array();
                 $g_images           = $images;
@@ -6302,5 +6334,65 @@ class Nbdesigner_Plugin {
         error_log('NBDesigner filtered config: ' . print_r($filtered_config, true));
         
         return $filtered_config;
+    }
+
+    /**
+     * Add custom fields to product variation settings
+     * @param int $loop
+     * @param array $variation_data
+     * @param WP_Post $variation
+     */
+    public function nbdesigner_variation_settings_fields($loop, $variation_data, $variation) {
+        $variation_id = $variation->ID;
+        
+        // Get variation meta
+        $enable_design = get_post_meta($variation_id, '_nbdesigner_enable', true);
+        $enable_upload = get_post_meta($variation_id, '_nbdesigner_enable_upload', true);
+        
+        echo '<div class="form-row form-row-full nbdesigner-variation-options">';
+        echo '<h4>' . esc_html__('NBDesigner Options', 'web-to-print-online-designer') . '</h4>';
+        
+        // Enable design checkbox
+        woocommerce_wp_checkbox(array(
+            'id' => '_nbdesigner_enable[' . $loop . ']',
+            'label' => esc_html__('Enable Design', 'web-to-print-online-designer'),
+            'description' => esc_html__('Enable design tool for this variation', 'web-to-print-online-designer'),
+            'value' => $enable_design === 'on' ? 'yes' : 'no',
+            'wrapper_class' => 'form-row form-row-full',
+        ));
+        
+        // Enable upload checkbox
+        woocommerce_wp_checkbox(array(
+            'id' => '_nbdesigner_enable_upload[' . $loop . ']',
+            'label' => esc_html__('Enable Upload', 'web-to-print-online-designer'),
+            'description' => esc_html__('Enable upload function for this variation', 'web-to-print-online-designer'),
+            'value' => $enable_upload === 'on' ? 'yes' : 'no',
+            'wrapper_class' => 'form-row form-row-full',
+        ));
+        
+        echo '</div>';
+    }
+
+    /**
+     * Save custom fields for product variation
+     * @param int $variation_id
+     * @param int $i
+     */
+    public function nbdesigner_save_variation_settings_fields($variation_id, $i) {
+        // Save enable design
+        if (isset($_POST['_nbdesigner_enable'][$i])) {
+            $enable_design = $_POST['_nbdesigner_enable'][$i] === 'yes' ? 'on' : '';
+            update_post_meta($variation_id, '_nbdesigner_enable', $enable_design);
+        } else {
+            update_post_meta($variation_id, '_nbdesigner_enable', '');
+        }
+        
+        // Save enable upload
+        if (isset($_POST['_nbdesigner_enable_upload'][$i])) {
+            $enable_upload = $_POST['_nbdesigner_enable_upload'][$i] === 'yes' ? 'on' : '';
+            update_post_meta($variation_id, '_nbdesigner_enable_upload', $enable_upload);
+        } else {
+            update_post_meta($variation_id, '_nbdesigner_enable_upload', '');
+        }
     }
 }

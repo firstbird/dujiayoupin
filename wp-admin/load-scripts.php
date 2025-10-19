@@ -57,6 +57,7 @@ foreach ( $load as $handle ) {
 
 	$path = ABSPATH . $wp_scripts->registered[ $handle ]->src;
 	$out .= get_file( $path ) . "\n";
+	error_log('load-scripts $handle ' . $handle . ' $path ' . $path);
 }
 
 header( "Etag: $wp_version" );

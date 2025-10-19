@@ -544,13 +544,23 @@ class My_Design_Endpoint {
         $created_date   = new DateTime();
         $user_id        = wp_get_current_user()->ID;
         $table_name     =  $wpdb->prefix . 'nbdesigner_mydesigns';
-        $wpdb->insert($table_name, array(
+        
+        error_log('[nbdesigner_insert_table_my_design] 插入设计记录 - product_id: ' . $product_id . ', variation_id: ' . $variation_id . ', folder: ' . $folder . ', user_id: ' . $user_id);
+        
+        $result = $wpdb->insert($table_name, array(
             'product_id'    => $product_id,
             'variation_id'  => $variation_id,
             'folder'        => $folder,
             'user_id'       => $user_id,
             'created_date'  => $created_date->format('Y-m-d H:i:s')
         ));
+        
+        if($result === false){
+            error_log('[nbdesigner_insert_table_my_design] 插入失败: ' . $wpdb->last_error);
+            return false;
+        }
+        
+        error_log('[nbdesigner_insert_table_my_design] 插入成功，插入ID: ' . $wpdb->insert_id);
         return true;
     }
     /**
